@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+
+namespace tripTicket.Services.Database;
+
+public partial class Transaction
+{
+    public string Id { get; set; } = null!;
+
+    public string PurchaseId { get; set; } = null!;
+
+    public decimal Amount { get; set; }
+
+    public string Status { get; set; } = null!;
+
+    public string PaymentMethod { get; set; } = null!;
+
+    public DateTime TransactionDate { get; set; }
+
+    public string StripeTransactionId { get; set; } = null!;
+
+    public virtual Purchase Purchase { get; set; } = null!;
+}

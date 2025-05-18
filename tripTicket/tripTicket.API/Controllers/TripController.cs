@@ -1,22 +1,26 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using tripTicket.Model;
-using tripTicket.Services;
+using tripTicket.Model.Models;
+using tripTicket.Model.Requests;
+using tripTicket.Model.SearchObjects;
+using tripTicket.Services.Interfaces;
 
 namespace tripTicket.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TripController : Controller
+    public class TripController : BaseCRUDController<Trip, TripSearchObject, TripInsertRequest, TripUpdateRequest>
     {
-        protected ITripService _tripService;
-        public TripController(ITripService service)
+        protected new ITripService _service;
+        public TripController(ITripService service) : base(service)
         {
-            _tripService = service;
+            _service = service;
         }
-        [HttpGet]
-        public List<Trip> GetList()
+
+        [HttpPut("{id}/cancel")]
+        public IActionResult Cancel(int id)
         {
-            return _tripService.GetList();
+            _service.Cancel(id);
+            return Ok();
         }
     }
 }
