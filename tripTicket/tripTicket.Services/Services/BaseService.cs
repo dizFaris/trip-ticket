@@ -58,7 +58,7 @@ namespace tripTicket.Services.Services
 
             if (entity == null)
             {
-                throw new Exception("Invalid id.");
+                return null;
             }
 
             return Mapper.Map<TModel>(entity);

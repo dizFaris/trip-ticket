@@ -29,7 +29,7 @@ namespace tripTicket.Services.Services
 
                 if (entity == null)
                 {
-                    throw new Exception("Invalid id.");
+                    return null;
                 }
 
                 return Mapper.Map<Model.Models.Trip>(entity);
@@ -88,11 +88,25 @@ namespace tripTicket.Services.Services
                 Context.SaveChanges();
             }
 
-            public void Cancel(int id)
+            public (bool Success, string Message) Cancel(int id)
             {
                 var entity = GetById(id);
-                var state = BaseTripState.CreateState(entity.TripStatus);
-                state.Cancel(id);
+
+                if (entity == null)
+                {
+                    return (false, "Trip not found.");
+                }
+
+                try
+                {
+                    var state = BaseTripState.CreateState(entity.TripStatus);
+                    state.Cancel(id);
+                    return (true, "Trip canceled successfully.");
+                }
+                catch (UserException ex)
+                {
+                    return (false, ex.Message);
+                }
             }
     }
 }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using tripTicket.Model.Requests;
 using tripTicket.Services.Database;
 using Microsoft.Extensions.DependencyInjection;
+using tripTicket.Model;
 
 namespace tripTicket.Services.TripStateMachine
 {
@@ -23,22 +24,22 @@ namespace tripTicket.Services.TripStateMachine
         }
         public virtual Model.Models.Trip Insert(TripInsertRequest request)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual void Cancel(int id)
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual void LockTrips()
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public virtual void CompleteTrips()
         {
-            throw new Exception("Method not allowed");
+            throw new UserException("Method not allowed");
         }
 
         public BaseTripState CreateState(string stateName)
@@ -52,9 +53,11 @@ namespace tripTicket.Services.TripStateMachine
                 case "locked":
                     return ServiceProvider.GetService<LockedTripState>();
                 case "canceled":
-                    throw new Exception("Cannot change canceled trip state");
+                    throw new UserException("Cannot change canceled trip state");
+                case "complete":
+                    throw new UserException("Cannot cancel a completed trip");
                 default:
-                    throw new Exception("State not recognized");
+                    throw new UserException("State not recognized");
             }
         }
     }

@@ -3,6 +3,7 @@ using tripTicket.Model.Models;
 using tripTicket.Model.Requests;
 using tripTicket.Model.SearchObjects;
 using tripTicket.Services.Interfaces;
+using tripTicket.Services.Services;
 
 namespace tripTicket.API.Controllers
 {
@@ -19,8 +20,16 @@ namespace tripTicket.API.Controllers
         [HttpPut("{id}/cancel")]
         public IActionResult Cancel(int id)
         {
-            _service.Cancel(id);
-            return Ok();
+            var (success, message) = _service.Cancel(id);
+            if (!success)
+            {
+                if (message == "Trip not found.")
+                    return NotFound(new { message });
+
+                return BadRequest(new { message });
+            }
+
+            return Ok(new { message });
         }
     }
 }

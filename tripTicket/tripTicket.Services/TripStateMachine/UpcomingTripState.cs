@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tripTicket.Model;
 using tripTicket.Services.Database;
 
 namespace tripTicket.Services.TripStateMachine

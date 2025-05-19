@@ -1,6 +1,7 @@
 using Hangfire;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using tripTicket.API.Filters;
 using tripTicket.Model.Requests;
 using tripTicket.Services.BackgroundServices;
 using tripTicket.Services.Database;
@@ -19,7 +20,10 @@ builder.Services.AddTransient<InitialTripState>();
 builder.Services.AddTransient<UpcomingTripState>();
 builder.Services.AddTransient<LockedTripState>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(x =>
+{
+    x.Filters.Add<ExceptionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
