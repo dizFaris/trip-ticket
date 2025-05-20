@@ -8,11 +8,16 @@ using tripTicket.Services.Database;
 using tripTicket.Services.Interfaces;
 using tripTicket.Services.Services;
 using tripTicket.Services.TripStateMachine;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddTransient<ITripService, TripService>();
+builder.Services.AddTransient<IUserService, UserService>();
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();
