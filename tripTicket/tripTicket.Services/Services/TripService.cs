@@ -29,7 +29,7 @@ namespace tripTicket.Services.Services
 
                 if (entity == null)
                 {
-                    return null;
+                    throw new UserException("Trip not found");
                 }
 
                 return Mapper.Map<Model.Models.Trip>(entity);
@@ -88,25 +88,17 @@ namespace tripTicket.Services.Services
                 Context.SaveChanges();
             }
 
-            public (bool Success, string Message) Cancel(int id)
+            public Model.Models.Trip Cancel(int id)
             {
                 var entity = GetById(id);
 
                 if (entity == null)
                 {
-                    return (false, "Trip not found.");
+                   throw new UserException("Trip not found.");
                 }
 
-                try
-                {
-                    var state = BaseTripState.CreateState(entity.TripStatus);
-                    state.Cancel(id);
-                    return (true, "Trip canceled successfully.");
-                }
-                catch (UserException ex)
-                {
-                    return (false, ex.Message);
-                }
+                var state = BaseTripState.CreateState(entity.TripStatus);
+                return state.Cancel(id);
             }
     }
 }

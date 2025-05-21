@@ -27,7 +27,7 @@ namespace tripTicket.Services.TripStateMachine
             throw new UserException("Method not allowed");
         }
 
-        public virtual void Cancel(int id)
+        public virtual Model.Models.Trip Cancel(int id)
         {
             throw new UserException("Method not allowed");
         }

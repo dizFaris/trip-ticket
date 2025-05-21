@@ -15,19 +15,21 @@ namespace tripTicket.Services.TripStateMachine
         {
         }
 
-        public override void Cancel(int id)
+        public override Model.Models.Trip Cancel(int id)
         {
             var set = Context.Set<Trip>();
             var entity = set.Find(id);
 
             if (entity == null)
             {
-                throw new Exception($"Trip with ID {id} not found.");
+                throw new UserException($"Trip with ID {id} not found.");
             }
 
             entity.TripStatus = "canceled";
             entity.IsCanceled = true;
             Context.SaveChanges();
+
+            return Mapper.Map<Model.Models.Trip>(entity);
         }
 
         public override void LockTrips()

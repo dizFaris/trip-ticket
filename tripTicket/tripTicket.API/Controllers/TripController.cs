@@ -18,18 +18,9 @@ namespace tripTicket.API.Controllers
         }
 
         [HttpPut("{id}/cancel")]
-        public IActionResult Cancel(int id)
+        public Trip Cancel(int id)
         {
-            var (success, message) = _service.Cancel(id);
-            if (!success)
-            {
-                if (message == "Trip not found.")
-                    return NotFound(new { message });
-
-                return BadRequest(new { message });
-            }
-
-            return Ok(new { message });
+             return _service.Cancel(id);
         }
     }
 }

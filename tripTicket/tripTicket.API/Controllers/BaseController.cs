@@ -22,13 +22,9 @@ namespace tripTicket.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<TModel> GetById(int id)
+        public TModel GetById(int id)
         {
-            var entity = _service.GetById(id);
-            if (entity == null)
-                return NotFound(new { message = "Requested entity not found." });
-
-            return Ok(entity);
+            return _service.GetById(id);
         }
     }
 }

@@ -58,7 +58,7 @@ namespace tripTicket.Services.Services
 
             if (entity == null)
             {
-                return null;
+                throw new UserException("Entity not found");
             }
 
             return Mapper.Map<TModel>(entity);

@@ -45,7 +45,7 @@ namespace tripTicket.Services.Services
             var pwValidationResult = ValidationHelpers.CheckPasswordStrength(request.Password);
             if (!string.IsNullOrEmpty(pwValidationResult))
             {
-                throw new Exception("Invalid password");
+                throw new UserException("Invalid password");
             }
 
             if (!string.IsNullOrEmpty(request.Phone))
@@ -53,19 +53,17 @@ namespace tripTicket.Services.Services
                 var phoneValidationResult = ValidationHelpers.CheckPhoneNumber(request.Phone);
                 if (!string.IsNullOrEmpty(phoneValidationResult))
                 {
-                    throw new Exception("Invalid phone number");
+                    throw new UserException("Invalid phone number");
                 }
             }
 
             if (request.Password != request.PasswordConfirm)
             {
-                throw new Exception("Password and confirm password are not matching");
+                throw new UserException("Password and confirm password are not matching");
             }
 
             entity.PasswordSalt = HashGenerator.GenerateSalt();
             entity.PasswordHash = HashGenerator.GenerateHash(entity.PasswordSalt, request.Password);
-
-            base.BeforeInsert(request, entity);
         }
 
         public override void BeforeUpdate(UserUpdateRequest request, Database.User entity)
@@ -76,7 +74,7 @@ namespace tripTicket.Services.Services
                 var pw = ValidationHelpers.CheckPasswordStrength(request.Password);
                 if (!string.IsNullOrEmpty(pw))
                 {
-                    throw new Exception("Invalid password");
+                    throw new UserException("Invalid password");
                 }
             }
             if (!string.IsNullOrEmpty(request.Phone))
@@ -84,14 +82,14 @@ namespace tripTicket.Services.Services
                 var phoneNumber = ValidationHelpers.CheckPhoneNumber(request.Phone);
                 if (!string.IsNullOrEmpty(phoneNumber))
                 {
-                    throw new Exception("Invalid phone number");
+                    throw new UserException("Invalid phone number");
                 }
             }
             if (request.Password != null)
             {
                 if (request.Password != request.PasswordConfirm)
                 {
-                    throw new Exception("Password and confirm password are not matching");
+                    throw new UserException("Password and confirm password are not matching");
                 }
                 entity!.PasswordSalt = HashGenerator.GenerateSalt();
                 entity.PasswordHash = HashGenerator.GenerateHash(entity.PasswordSalt, request.Password);
