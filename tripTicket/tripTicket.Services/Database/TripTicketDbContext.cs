@@ -43,7 +43,7 @@ public partial class TripTicketDbContext : DbContext
     {
         modelBuilder.Entity<Bookmark>(entity =>
         {
-            entity.HasKey(e => e.BookmarkId).HasName("PK__Bookmark__541A3B713D54E270");
+            entity.HasKey(e => e.Id).HasName("PK__Bookmark__541A3B713D54E270");
 
             entity.HasIndex(e => new { e.UserId, e.TripId }, "UQ_Bookmarks_User_Trip").IsUnique();
 

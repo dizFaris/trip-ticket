@@ -5,7 +5,7 @@ namespace tripTicket.Services.Database;
 
 public partial class Bookmark
 {
-    public int BookmarkId { get; set; }
+    public int Id { get; set; }
 
     public int UserId { get; set; }
 

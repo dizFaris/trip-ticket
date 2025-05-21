@@ -18,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddTransient<ITripService, TripService>();
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IBookmarkService, BookmarkService>();
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();
