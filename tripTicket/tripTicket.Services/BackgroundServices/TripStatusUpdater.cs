@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tripTicket.Services.PurchaseStateMachine;
 using tripTicket.Services.TripStateMachine;
 
 namespace tripTicket.Services.BackgroundServices
@@ -17,13 +18,15 @@ namespace tripTicket.Services.BackgroundServices
             _serviceProvider = serviceProvider;
         }
 
-        public void UpdateTripStatuses()
+        public void UpdateTripsAndPurchases()
         {
-            var upcomingState = _serviceProvider.GetRequiredService<UpcomingTripState>();
-            var lockedState = _serviceProvider.GetRequiredService<LockedTripState>();
+            var upcomingTripState = _serviceProvider.GetRequiredService<UpcomingTripState>();
+            var lockedTripState = _serviceProvider.GetRequiredService<LockedTripState>();
+            var acceptedPurchaseState = _serviceProvider.GetRequiredService<AcceptedPurchaseState>();
 
-            upcomingState.LockTrips();
-            lockedState.CompleteTrips();
+            upcomingTripState.LockTrips();
+            lockedTripState.CompleteTrips();
+            acceptedPurchaseState.ExpirePurchases();
         }
     }
 }

@@ -7,7 +7,7 @@ public partial class Transaction
 {
     public string Id { get; set; } = null!;
 
-    public string PurchaseId { get; set; } = null!;
+    public int PurchaseId { get; set; }
 
     public decimal Amount { get; set; }
 

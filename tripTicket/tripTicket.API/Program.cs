@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Text.Json.Serialization;
+using tripTicket.Services.PurchaseStateMachine;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,12 +20,19 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddTransient<ITripService, TripService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBookmarkService, BookmarkService>();
+builder.Services.AddTransient<IPurchaseService, PurchaseService>();
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();
 builder.Services.AddTransient<InitialTripState>();
 builder.Services.AddTransient<UpcomingTripState>();
 builder.Services.AddTransient<LockedTripState>();
+
+// Purchase state machine
+// Trip state machine
+builder.Services.AddTransient<BasePurchaseState>();
+builder.Services.AddTransient<InitialPurchaseState>();
+builder.Services.AddTransient<AcceptedPurchaseState>();
 
 builder.Services.AddControllers(x =>
 {
@@ -51,7 +59,7 @@ app.UseHangfireDashboard();
 
 RecurringJob.AddOrUpdate<TripStatusUpdater>(
     "UpdateTripStatuses",                   
-    updater => updater.UpdateTripStatuses(),
+    updater => updater.UpdateTripsAndPurchases(),
     Cron.Minutely);
 
 // Configure the HTTP request pipeline.

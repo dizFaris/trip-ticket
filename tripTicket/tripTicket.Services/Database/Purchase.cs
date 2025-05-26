@@ -5,7 +5,7 @@ namespace tripTicket.Services.Database;
 
 public partial class Purchase
 {
-    public string Id { get; set; } = null!;
+    public int Id { get; set; }
 
     public int TripId { get; set; }
 
@@ -22,6 +22,7 @@ public partial class Purchase
     public string Status { get; set; } = null!;
 
     public string PaymentMethod { get; set; } = null!;
+    public virtual Trip Trip { get; set; } = null!;
 
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

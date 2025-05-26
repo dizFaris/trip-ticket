@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tripTicket.Services.Database;
 
@@ -11,9 +12,11 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    partial class TripTicketDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250525194240_UpdatePurchaseId")]
+    partial class UpdatePurchaseId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -88,14 +91,11 @@ namespace tripTicket.Services.Migrations
 
             modelBuilder.Entity("tripTicket.Services.Database.Purchase", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
                         .HasMaxLength(8)
                         .IsUnicode(false)
-                        .HasColumnType("int")
+                        .HasColumnType("char(8)")
                         .IsFixedLength();
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime");
@@ -150,10 +150,11 @@ namespace tripTicket.Services.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<int>("PurchaseId")
+                    b.Property<string>("PurchaseId")
+                        .IsRequired()
                         .HasMaxLength(8)
                         .IsUnicode(false)
-                        .HasColumnType("int")
+                        .HasColumnType("char(8)")
                         .IsFixedLength();
 
                     b.Property<string>("Status")
