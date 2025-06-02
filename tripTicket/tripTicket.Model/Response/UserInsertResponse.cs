@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tripTicket.Model.Models;
 
-namespace tripTicket.Model.Models
+namespace tripTicket.Model.Response
 {
-    public class User
+    public class UserInsertResponse
     {
         public int Id { get; set; }
 

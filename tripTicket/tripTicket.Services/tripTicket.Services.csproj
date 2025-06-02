@@ -21,4 +21,8 @@
     <ProjectReference Include="..\tripTicket.Model\tripTicket.Model.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

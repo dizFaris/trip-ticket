@@ -10,6 +10,7 @@ public partial class User
     public string FirstName { get; set; } = null!;
 
     public string LastName { get; set; } = null!;
+    public string Username { get; set; } = null!;
 
     public string Email { get; set; } = null!;
 
@@ -28,4 +29,5 @@ public partial class User
     public virtual ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
 
     public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    public virtual ICollection<UserRole> UserRoles { get; set; }
 }

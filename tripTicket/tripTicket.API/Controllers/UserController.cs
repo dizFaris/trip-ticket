@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using tripTicket.Model;
 using tripTicket.Model.Models;
 using tripTicket.Model.Requests;
@@ -11,10 +12,21 @@ namespace tripTicket.API.Controllers
     [Route("[controller]")]
     public class UserController : BaseCRUDController<User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
-        protected new IUserService _service;
         public UserController(IUserService service) : base(service)
         {
-            _service = service;
+        }
+
+        [AllowAnonymous]
+        public override User Insert(UserInsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public Model.Models.User Login(LoginRequest request)
+        {
+            return (_service as IUserService).Login(request.username, request.password);
         }
     }
 }

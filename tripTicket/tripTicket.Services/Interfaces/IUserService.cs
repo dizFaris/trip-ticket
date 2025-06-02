@@ -11,5 +11,7 @@ namespace tripTicket.Services.Interfaces
 {
     public interface IUserService : ICRUDService<User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
+        Task<List<Role>> GetUserRolesAsync(int id);
+        User Login(string username, string password);
     }
 }

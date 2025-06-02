@@ -6,28 +6,22 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tripTicket.Services.Migrations
 {
     /// <inheritdoc />
-    public partial class RenameProperty : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Purchases",
+                name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "char(8)", unicode: false, fixedLength: true, maxLength: 8, nullable: false),
-                    TripId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    NumberOfTickets = table.Column<int>(type: "int", nullable: false),
-                    TotalPayment = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    Discount = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
-                    Status = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    PaymentMethod = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Purchase__3214EC07591365F4", x => x.Id);
+                    table.PrimaryKey("PK_Roles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -54,7 +48,7 @@ namespace tripTicket.Services.Migrations
                     DiscountPercentage = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
                     Photo = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     TripStatus = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false, defaultValue: "Upcoming"),
-                    isCanceled = table.Column<bool>(type: "bit", nullable: false),
+                    IsCanceled = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
                 },
                 constraints: table =>
@@ -88,10 +82,11 @@ namespace tripTicket.Services.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
-                    PasswordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    PasswordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordSalt = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BirthDate = table.Column<DateOnly>(type: "date", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "(getdate())")
@@ -102,25 +97,29 @@ namespace tripTicket.Services.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transactions",
+                name: "Purchases",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "char(8)", unicode: false, fixedLength: true, maxLength: 8, nullable: false),
-                    PurchaseId = table.Column<string>(type: "char(8)", unicode: false, fixedLength: true, maxLength: 8, nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Id = table.Column<int>(type: "int", unicode: false, fixedLength: true, maxLength: 8, nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TripId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    NumberOfTickets = table.Column<int>(type: "int", nullable: false),
+                    TotalPayment = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Discount = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     Status = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
-                    PaymentMethod = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
-                    TransactionDate = table.Column<DateTime>(type: "datetime", nullable: false),
-                    StripeTransactionId = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false)
+                    PaymentMethod = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Transact__3214EC07E2C01878", x => x.Id);
+                    table.PrimaryKey("PK__Purchase__3214EC07591365F4", x => x.Id);
                     table.ForeignKey(
-                        name: "FK__Transacti__Purch__49C3F6B7",
-                        column: x => x.PurchaseId,
-                        principalTable: "Purchases",
-                        principalColumn: "Id");
+                        name: "FK_Purchases_Trips_TripId",
+                        column: x => x.TripId,
+                        principalTable: "Trips",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -170,7 +169,7 @@ namespace tripTicket.Services.Migrations
                 name: "Bookmarks",
                 columns: table => new
                 {
-                    BookmarkId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     TripId = table.Column<int>(type: "int", nullable: false),
@@ -178,7 +177,7 @@ namespace tripTicket.Services.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__Bookmark__541A3B713D54E270", x => x.BookmarkId);
+                    table.PrimaryKey("PK__Bookmark__541A3B713D54E270", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Bookmarks_Trip",
                         column: x => x.TripId,
@@ -209,6 +208,54 @@ namespace tripTicket.Services.Migrations
                         name: "FK__Notificat__UserI__4CA06362",
                         column: x => x.UserId,
                         principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRoles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRoles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Roles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRoles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Transactions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "char(8)", unicode: false, fixedLength: true, maxLength: 8, nullable: false),
+                    PurchaseId = table.Column<int>(type: "int", unicode: false, fixedLength: true, maxLength: 8, nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
+                    Status = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
+                    PaymentMethod = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
+                    TransactionDate = table.Column<DateTime>(type: "datetime", nullable: false),
+                    StripeTransactionId = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK__Transact__3214EC07E2C01878", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK__Transacti__Purch__49C3F6B7",
+                        column: x => x.PurchaseId,
+                        principalTable: "Purchases",
                         principalColumn: "Id");
                 });
 
@@ -250,6 +297,11 @@ namespace tripTicket.Services.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Purchases_TripId",
+                table: "Purchases",
+                column: "TripId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_PurchaseId",
                 table: "Transactions",
                 column: "PurchaseId");
@@ -268,6 +320,16 @@ namespace tripTicket.Services.Migrations
                 name: "IX_TripStatistics_TripId",
                 table: "TripStatistics",
                 column: "TripId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_RoleId",
+                table: "UserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRoles_UserId",
+                table: "UserRoles",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "UQ__Users__A9D105340E77BC21",
@@ -298,13 +360,19 @@ namespace tripTicket.Services.Migrations
                 name: "UserActivity");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "UserRoles");
 
             migrationBuilder.DropTable(
                 name: "Purchases");
 
             migrationBuilder.DropTable(
                 name: "TripDays");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Trips");
