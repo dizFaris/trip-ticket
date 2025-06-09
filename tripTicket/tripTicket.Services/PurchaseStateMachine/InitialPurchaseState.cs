@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using EasyNetQ;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using tripTicket.Model;
 using tripTicket.Model.Requests;
 using tripTicket.Services.Database;
+using tripTicket.Services.Messages;
 
 namespace tripTicket.Services.PurchaseStateMachine
 {
@@ -60,7 +62,24 @@ namespace tripTicket.Services.PurchaseStateMachine
             set.Add(entity);
             Context.SaveChanges();
 
-            return Mapper.Map<Model.Models.Purchase>(entity);
+            var bus = RabbitHutch.CreateBus("host=localhost");
+            var purchase = Mapper.Map<Model.Models.Purchase>(entity);
+
+            PurchaseSuccessful message = new PurchaseSuccessful 
+            {
+                PurchaseId = entity.Id,
+                Email = user.Email,
+                Name = user.FirstName,
+                DepartureDate = trip.DepartureDate,
+                NumberOfTickets = entity.NumberOfTickets,
+                TotalPayment = entity.TotalPayment,
+                TripCity = trip.City,
+                TripCountry = trip.Country 
+            };
+
+            bus.PubSub.Publish(message);
+
+            return purchase;
         }
     }
 }

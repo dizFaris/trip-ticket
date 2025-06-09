@@ -12,5 +12,6 @@ namespace tripTicket.Services.Interfaces
 {
     public interface IPurchaseService : ICRUDService<Purchase, PurchaseSearchObject, PurchaseInsertRequest, PurchaseUpdateRequest>
     {
+        public Purchase Cancel(int id);
     }
 }
