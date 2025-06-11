@@ -93,10 +93,24 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors(
+    options => options
+        .SetIsOriginAllowed(x => _ = true)
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+        .AllowCredentials()
+);
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dataContext = scope.ServiceProvider.GetRequiredService<TripTicketDbContext>();
+    dataContext.Database.Migrate();
+}
 
 app.Run();

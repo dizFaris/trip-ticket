@@ -8,7 +8,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Templates\PurchaseExpired.html" />
+    <None Remove="Templates\PurchaseCanceled.html" />
+    <None Remove="Templates\PurchaseComplete.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\PurchaseExpired.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Templates\PurchaseCanceled.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\PurchaseComplete.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -17,13 +33,16 @@
 	  <PackageReference Include="MailKit" Version="4.11.0" />
 	  <PackageReference Include="MimeKit" Version="4.11.0" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <ProjectReference Include="..\tripTicket.Model\tripTicket.Model.csproj" />
 	  <None Update="Templates\**\*.*">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\tripTicket.Services\tripTicket.Services.csproj" />
+    <None Update="Templates\PurchaseSuccessful.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

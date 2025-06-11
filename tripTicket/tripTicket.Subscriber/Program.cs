@@ -110,5 +110,4 @@ await bus.PubSub.SubscribeAsync<PurchaseCompleted>("trip_service_complete", asyn
     await mailSender.SendEmail(email);
 });
 
-Console.WriteLine("Listening for messages... Press <return> to exit.");
 Console.ReadLine();
