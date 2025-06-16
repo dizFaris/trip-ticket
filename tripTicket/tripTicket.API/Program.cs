@@ -82,7 +82,6 @@ builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
-app.UseHangfireDashboard();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -110,6 +109,8 @@ using (var scope = app.Services.CreateScope())
     var dataContext = scope.ServiceProvider.GetRequiredService<TripTicketDbContext>();
     dataContext.Database.Migrate();
 }
+
+app.UseHangfireDashboard();
 
 RecurringJob.AddOrUpdate<TripStatusUpdater>(
     "UpdateTripStatuses",
