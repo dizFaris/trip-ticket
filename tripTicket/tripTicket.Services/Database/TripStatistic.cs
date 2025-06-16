@@ -5,7 +5,7 @@ namespace tripTicket.Services.Database;
 
 public partial class TripStatistic
 {
-    public int TripStatisticsId { get; set; }
+    public int Id { get; set; }
 
     public int TripId { get; set; }
 

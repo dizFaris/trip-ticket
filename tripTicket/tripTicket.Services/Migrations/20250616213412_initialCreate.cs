@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tripTicket.Services.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -146,7 +146,7 @@ namespace tripTicket.Services.Migrations
                 name: "TripStatistics",
                 columns: table => new
                 {
-                    TripStatisticsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TripId = table.Column<int>(type: "int", nullable: false),
                     TotalViews = table.Column<int>(type: "int", nullable: true, defaultValue: 0),
@@ -157,7 +157,7 @@ namespace tripTicket.Services.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__TripStat__9B3192CC57176F94", x => x.TripStatisticsId);
+                    table.PrimaryKey("PK__TripStat__9B3192CC57176F94", x => x.Id);
                     table.ForeignKey(
                         name: "FK_TripStatistics_Trip",
                         column: x => x.TripId,

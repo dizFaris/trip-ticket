@@ -25,6 +25,9 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBookmarkService, BookmarkService>();
 builder.Services.AddTransient<IPurchaseService, PurchaseService>();
 builder.Services.AddTransient<IUserActivityService, UserActivityService>();
+builder.Services.AddTransient<INotificationService, NotificationService>();
+builder.Services.AddTransient<ITransactionService, TransactionService>();
+builder.Services.AddTransient<ITripStatisticService, TripStatisticService>();
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();

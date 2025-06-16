@@ -37,9 +37,9 @@ public partial class TripTicketDbContext : DbContext
     public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<UserRole> UserRoles { get; set; }
 
-//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-//        => optionsBuilder.UseSqlServer("Data Source=localhost, 1433;Initial Catalog=TripTicketDB; user=sa; Password=QWEasd123!; TrustServerCertificate=True");
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Data Source=localhost, 1433;Initial Catalog=TripTicketDB; user=sa; Password=QWEasd123!; TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -177,7 +177,7 @@ public partial class TripTicketDbContext : DbContext
 
         modelBuilder.Entity<TripStatistic>(entity =>
         {
-            entity.HasKey(e => e.TripStatisticsId).HasName("PK__TripStat__9B3192CC57176F94");
+            entity.HasKey(e => e.Id).HasName("PK__TripStat__9B3192CC57176F94");
 
             entity.Property(e => e.LastUpdated)
                 .HasDefaultValueSql("(getdate())")

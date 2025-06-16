@@ -346,11 +346,11 @@ namespace tripTicket.Services.Migrations
 
             modelBuilder.Entity("tripTicket.Services.Database.TripStatistic", b =>
                 {
-                    b.Property<int>("TripStatisticsId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TripStatisticsId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("LastUpdated")
                         .ValueGeneratedOnAdd()
@@ -380,7 +380,7 @@ namespace tripTicket.Services.Migrations
                     b.Property<int>("TripId")
                         .HasColumnType("int");
 
-                    b.HasKey("TripStatisticsId")
+                    b.HasKey("Id")
                         .HasName("PK__TripStat__9B3192CC57176F94");
 
                     b.HasIndex("TripId");
