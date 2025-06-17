@@ -24,9 +24,29 @@ namespace tripTicket.API.Controllers
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public Model.Models.User Login(LoginRequest request)
+        public IActionResult Login([FromBody] LoginRequest request)
         {
-            return (_service as IUserService).Login(request.username, request.password);
+            var user = (_service as IUserService).Login(request.username, request.password);
+
+            var clientTypeRaw = Request.Headers["X-Client-Type"].ToString();
+            var clientType = clientTypeRaw?.Trim().ToLower();
+
+            if (string.IsNullOrEmpty(clientType) || (clientType != "desktop" && clientType != "mobile"))
+            {
+                return BadRequest(new { error = "Invalid or missing 'X-Client-Type' header. Must be 'desktop' or 'mobile'." });
+            }
+
+            if (clientType == "desktop" && !user.Roles.Contains("Admin"))
+            {
+                return Unauthorized(new { error = "Only admins can log in from the desktop app." });
+            }
+
+            if (clientType == "mobile" && user.Roles.Contains("Admin"))
+            {
+                return Unauthorized(new { error = "Admins cannot log in from the mobile app." });
+            }
+
+            return Ok(user);
         }
     }
 }

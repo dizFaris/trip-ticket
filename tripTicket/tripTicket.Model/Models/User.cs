@@ -24,5 +24,7 @@ namespace tripTicket.Model.Models
         public bool IsDeleted { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public List<string> Roles { get; set; } = new();
     }
 }

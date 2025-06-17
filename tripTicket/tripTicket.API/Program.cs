@@ -65,6 +65,7 @@ builder.Services.AddSwaggerGen(c =>
             new string[]{}
     } });
 
+    c.OperationFilter<ClientTypeHeaderOperationFilter>();
 });
 
 var connectionString = builder.Configuration.GetConnectionString("TripTicketDB");
@@ -72,6 +73,9 @@ builder.Services.AddDbContext<TripTicketDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddMapster();
+
+TypeAdapterConfig<tripTicket.Services.Database.User, tripTicket.Model.Models.User>.NewConfig()
+    .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => ur.Role.Name).ToList());
 
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 
