@@ -33,17 +33,17 @@ namespace tripTicket.API.Controllers
 
             if (string.IsNullOrEmpty(clientType) || (clientType != "desktop" && clientType != "mobile"))
             {
-                return BadRequest(new { error = "Invalid or missing 'X-Client-Type' header. Must be 'desktop' or 'mobile'." });
+                return BadRequest(new { message = "Invalid or missing 'X-Client-Type' header. Must be 'desktop' or 'mobile'." });
             }
 
             if (clientType == "desktop" && !user.Roles.Contains("Admin"))
             {
-                return Unauthorized(new { error = "Only admins can log in from the desktop app." });
+                return Unauthorized(new { message = "Only admins can log in from the desktop app." });
             }
 
             if (clientType == "mobile" && user.Roles.Contains("Admin"))
             {
-                return Unauthorized(new { error = "Admins cannot log in from the mobile app." });
+                return Unauthorized(new { message = "Admins cannot log in from the mobile app." });
             }
 
             return Ok(user);

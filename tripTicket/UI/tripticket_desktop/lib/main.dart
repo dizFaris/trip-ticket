@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tripticket_desktop/screens/master_screen.dart';
-import 'package:tripticket_desktop/screens/trips_screen.dart';
 import 'package:tripticket_desktop/utils/utils.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/providers/user_provider.dart';
@@ -185,12 +184,12 @@ class _LoginScreenState extends State<LoginScreen> {
     AuthProvider.username = _usernameController.text;
     AuthProvider.password = _passwordController.text;
     try {
-      var data = await userProvider.login(
+      await userProvider.login(
         _usernameController.text,
         _passwordController.text,
       );
 
-      print(data);
+      if (!mounted) return;
 
       _usernameController.clear();
       _passwordController.clear();

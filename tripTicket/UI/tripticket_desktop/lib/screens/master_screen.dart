@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:tripticket_desktop/app_colors.dart';
 import 'package:tripticket_desktop/models/menu_model.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/screens/purchases_screen.dart';
 import 'package:tripticket_desktop/screens/trips_screen.dart';
 
 class MasterScreen extends StatefulWidget {
-  MasterScreen({super.key});
+  const MasterScreen({super.key});
 
   @override
   State<MasterScreen> createState() => _MasterScreenState();
@@ -76,7 +75,7 @@ class _MasterScreenState extends State<MasterScreen> {
                 selected: _selectedIndex == index,
                 onTap: () => _changeScreen(index),
               );
-            }).toList(),
+            }),
             Divider(),
             ListTile(
               leading: Icon(Icons.logout),
