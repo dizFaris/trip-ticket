@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tripticket_desktop/screens/master_screen.dart';
+import 'package:tripticket_desktop/screens/trips_screen.dart';
 import 'package:tripticket_desktop/utils/utils.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/providers/user_provider.dart';
@@ -14,7 +15,26 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'TripTicket', home: const LoginScreen());
+    return MaterialApp(
+      title: 'TripTicket',
+      theme: ThemeData(
+        primaryColor: Colors.green,
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColors.primaryGreen,
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        drawerTheme: DrawerThemeData(backgroundColor: AppColors.primaryGreen),
+        listTileTheme: ListTileThemeData(
+          textColor: Colors.white,
+          selectedColor: AppColors.primaryYellow,
+          selectedTileColor: AppColors.primaryGreen,
+          iconColor: Colors.white,
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      home: const LoginScreen(),
+    );
   }
 }
 
@@ -169,6 +189,8 @@ class _LoginScreenState extends State<LoginScreen> {
         _usernameController.text,
         _passwordController.text,
       );
+
+      print(data);
 
       _usernameController.clear();
       _passwordController.clear();
