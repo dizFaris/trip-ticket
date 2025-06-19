@@ -59,7 +59,12 @@ namespace tripTicket.Services.Services
                     filteredQuery = filteredQuery.Where(x => x.DepartureDate.Day == search.Day.Value);
                 }
 
-                return filteredQuery;
+                if (!string.IsNullOrWhiteSpace(search.Status))
+                {
+                    filteredQuery = filteredQuery.Where(x => x.TripStatus == search.Status);
+                }
+
+            return filteredQuery;
             }
 
             public override Model.Models.Trip Insert(TripInsertRequest request)

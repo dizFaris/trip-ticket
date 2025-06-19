@@ -30,6 +30,11 @@ class MyApp extends StatelessWidget {
           selectedTileColor: AppColors.primaryGreen,
           iconColor: Colors.white,
         ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            textStyle: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
         iconTheme: IconThemeData(color: Colors.white),
       ),
       home: const LoginScreen(),

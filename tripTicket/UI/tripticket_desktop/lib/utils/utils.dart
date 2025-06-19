@@ -1,3 +1,8 @@
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+import 'package:tripticket_desktop/app_colors.dart';
+
 typedef Validator = String? Function(String? value);
 
 String? inputRequired(
@@ -43,4 +48,24 @@ String? password(String? value, [String? message]) {
       ? null
       : (message ??
             'Password must be at least 8 characters long, contain one uppercase letter, one number, and one symbol.');
+}
+
+String capitalize(String input) {
+  if (input.isEmpty) return input;
+  return input[0].toUpperCase() + input.substring(1).toLowerCase();
+}
+
+Color getStatusColor(String status) {
+  switch (status.toLowerCase()) {
+    case 'upcoming':
+      return AppColors.statusUpcoming;
+    case 'locked':
+      return AppColors.statusLocked;
+    case 'canceled':
+      return AppColors.statusCanceled;
+    case 'complete':
+      return AppColors.statusComplete;
+    default:
+      return AppColors.statusLocked;
+  }
 }
