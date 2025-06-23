@@ -10,6 +10,7 @@ public partial class Trip
     public string City { get; set; } = null!;
 
     public string Country { get; set; } = null!;
+    public string CountryCode {  get; set; } = null!;
 
     public string DepartureCity { get; set; } = null!;
 

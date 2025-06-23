@@ -11,13 +11,13 @@ namespace tripTicket.Services.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
-                table: "Roles",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
+    table: "Roles",
+    columns: new[] { "Id", "Name" },
+    values: new object[,]
+    {
                     { 1, "Admin" },
                     { 2, "User" }
-                });
+    });
 
             migrationBuilder.InsertData(
                 table: "Users",
@@ -55,22 +55,22 @@ namespace tripTicket.Services.Migrations
             migrationBuilder.InsertData(
                 table: "Trips",
                 columns: new[] {
-                    "Id", "City", "Country", "DepartureCity", "DepartureDate", "ReturnDate", "TicketSaleEnd",
+                    "Id", "City", "Country", "CountryCode", "DepartureCity", "DepartureDate", "ReturnDate", "TicketSaleEnd",
                     "TripType", "TransportType", "TicketPrice", "AvailableTickets", "PurchasedTickets", "Description",
                     "FreeCancellationUntil", "CancellationFee", "MinTicketsForDiscount", "DiscountPercentage", "Photo",
                     "TripStatus", "IsCanceled", "CreatedAt"
                 },
                 values: new object[,] {
-                    { 1, "Paris", "France", "Berlin", new DateOnly(2025, 7, 1), new DateOnly(2025, 7, 10), DateTime.UtcNow.AddDays(20), "Vacation", "Flight", 1200.50m, 100, 25, "A relaxing 10-day trip to Paris.", new DateOnly(2025, 6, 20), 50m, 5, 10m, null, "upcoming", false, DateTime.UtcNow },
-                    { 2, "Rome", "Italy", "Munich", new DateOnly(2025, 8, 15), new DateOnly(2025, 8, 25), DateTime.UtcNow.AddDays(30), "Historical", "Train", 800.00m, 50, 10, "Explore the ancient ruins and culture of Rome.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow },
-                    { 3, "New York", "USA", "London", new DateOnly(2025, 9, 5), new DateOnly(2025, 9, 15), DateTime.UtcNow.AddDays(40), "City Tour", "Flight", 1500.75m, 80, 40, "Experience the Big Apple and its vibrant life.", new DateOnly(2025, 8, 25), 75m, 3, 15m, null, "upcoming", false, DateTime.UtcNow },
-                    { 4, "Tokyo", "Japan", "Seoul", new DateOnly(2025, 10, 10), new DateOnly(2025, 10, 20), DateTime.UtcNow.AddDays(50), "Cultural", "Flight", 1800.00m, 60, 12, "Discover the rich culture and tech in Tokyo.", new DateOnly(2025, 9, 30), 100m, 4, 12m, null, "upcoming", false, DateTime.UtcNow },
-                    { 5, "Sydney", "Australia", "Auckland", new DateOnly(2025, 11, 1), new DateOnly(2025, 11, 10), DateTime.UtcNow.AddDays(55), "Adventure", "Flight", 2200.00m, 40, 5, "Explore Sydney's beautiful harbor and beaches.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow },
-                    { 6, "Barcelona", "Spain", "Paris", new DateOnly(2025, 7, 15), new DateOnly(2025, 7, 22), DateTime.UtcNow.AddDays(25), "City Tour", "Bus", 700.00m, 120, 60, "Visit Barcelona's architecture and beaches.", new DateOnly(2025, 7, 5), 30m, 6, 8m, null, "upcoming", false, DateTime.UtcNow },
-                    { 7, "Cape Town", "South Africa", "Johannesburg", new DateOnly(2025, 8, 5), new DateOnly(2025, 8, 15), DateTime.UtcNow.AddDays(35), "Safari", "Flight", 1400.00m, 30, 8, "Enjoy wildlife and stunning landscapes.", new DateOnly(2025, 7, 28), 60m, 2, 10m, null, "upcoming", false, DateTime.UtcNow },
-                    { 8, "Vancouver", "Canada", "Seattle", new DateOnly(2025, 9, 20), new DateOnly(2025, 9, 28), DateTime.UtcNow.AddDays(45), "Nature", "Car", 900.00m, 70, 20, "Explore the mountains and coastlines of Vancouver.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow },
-                    { 9, "Amsterdam", "Netherlands", "Brussels", new DateOnly(2025, 10, 25), new DateOnly(2025, 11, 2), DateTime.UtcNow.AddDays(60), "City Tour", "Train", 1100.00m, 90, 35, "Cycle through historic canals and museums.", new DateOnly(2025, 10, 15), 40m, 7, 9m, null, "upcoming", false, DateTime.UtcNow },
-                    { 10, "Rio de Janeiro", "Brazil", "Buenos Aires", new DateOnly(2025, 12, 5), new DateOnly(2025, 12, 15), DateTime.UtcNow.AddDays(70), "Beach", "Flight", 1300.00m, 55, 15, "Sunbathe on Copacabana and experience carnival vibes.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow }
+                    { 1, "Paris", "France", "FR", "Berlin", new DateOnly(2025, 7, 1), new DateOnly(2025, 7, 10), DateTime.UtcNow.AddDays(20), "Vacation", "Bus", 1200.50m, 100, 25, "A relaxing 10-day trip to Paris.", new DateOnly(2025, 6, 20), 50m, 5, 10m, null, "upcoming", false, DateTime.UtcNow },
+                    { 2, "Rome", "Italy", "IT", "Munich", new DateOnly(2025, 8, 15), new DateOnly(2025, 8, 25), DateTime.UtcNow.AddDays(30), "Historical", "Train", 800.00m, 50, 10, "Explore the ancient ruins and culture of Rome.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow },
+                    { 3, "New York", "USA", "US", "London", new DateOnly(2025, 9, 5), new DateOnly(2025, 9, 15), DateTime.UtcNow.AddDays(40), "City Tour", "Plane", 1500.75m, 80, 40, "Experience the Big Apple and its vibrant life.", new DateOnly(2025, 8, 25), 75m, 3, 15m, null, "upcoming", false, DateTime.UtcNow },
+                    { 4, "Tokyo", "Japan", "JP", "Seoul", new DateOnly(2025, 10, 10), new DateOnly(2025, 10, 20), DateTime.UtcNow.AddDays(50), "Cultural", "Bus", 1800.00m, 60, 12, "Discover the rich culture and tech in Tokyo.", new DateOnly(2025, 9, 30), 100m, 4, 12m, null, "upcoming", false, DateTime.UtcNow },
+                    { 5, "Sydney", "Australia", "AU", "Auckland", new DateOnly(2025, 11, 1), new DateOnly(2025, 11, 10), DateTime.UtcNow.AddDays(55), "Adventure", "Plane", 2200.00m, 40, 5, "Explore Sydney's beautiful harbor and beaches.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow },
+                    { 6, "Barcelona", "Spain", "ES", "Paris", new DateOnly(2025, 7, 15), new DateOnly(2025, 7, 22), DateTime.UtcNow.AddDays(25), "City Tour", "Bus", 700.00m, 120, 60, "Visit Barcelona's architecture and beaches.", new DateOnly(2025, 7, 5), 30m, 6, 8m, null, "upcoming", false, DateTime.UtcNow },
+                    { 7, "Cape Town", "South Africa", "ZA", "Johannesburg", new DateOnly(2025, 8, 5), new DateOnly(2025, 8, 15), DateTime.UtcNow.AddDays(35), "Safari", "Bike", 1400.00m, 30, 8, "Enjoy wildlife and stunning landscapes.", new DateOnly(2025, 7, 28), 60m, 2, 10m, null, "upcoming", false, DateTime.UtcNow },
+                    { 8, "Vancouver", "Canada", "CA", "Seattle", new DateOnly(2025, 9, 20), new DateOnly(2025, 9, 28), DateTime.UtcNow.AddDays(45), "Nature", "Car", 900.00m, 70, 20, "Explore the mountains and coastlines of Vancouver.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow },
+                    { 9, "Amsterdam", "Netherlands", "NL", "Brussels", new DateOnly(2025, 10, 25), new DateOnly(2025, 11, 2), DateTime.UtcNow.AddDays(60), "City Tour", "Train", 1100.00m, 90, 35, "Cycle through historic canals and museums.", new DateOnly(2025, 10, 15), 40m, 7, 9m, null, "upcoming", false, DateTime.UtcNow },
+                    { 10, "Rio de Janeiro", "Brazil", "BR", "Buenos Aires", new DateOnly(2025, 12, 5), new DateOnly(2025, 12, 15), DateTime.UtcNow.AddDays(70), "Beach", "Bus", 1300.00m, 55, 15, "Sunbathe on Copacabana and experience carnival vibes.", null, null, null, null, null, "upcoming", false, DateTime.UtcNow }
                 });
 
             migrationBuilder.InsertData(

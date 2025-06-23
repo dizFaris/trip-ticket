@@ -4,11 +4,14 @@ import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/screens/purchases_screen.dart';
 import 'package:tripticket_desktop/screens/trips_screen.dart';
 
+final GlobalKey<MasterScreenState> masterScreenKey =
+    GlobalKey<MasterScreenState>();
+
 class MasterScreen extends StatefulWidget {
   const MasterScreen({super.key});
 
   @override
-  State<MasterScreen> createState() => _MasterScreenState();
+  State<MasterScreen> createState() => MasterScreenState();
 }
 
 final List<DrawerItem> drawerItems = [
@@ -16,7 +19,7 @@ final List<DrawerItem> drawerItems = [
   DrawerItem(title: 'Purchases overview', screen: PurchasesScreen()),
 ];
 
-class _MasterScreenState extends State<MasterScreen> {
+class MasterScreenState extends State<MasterScreen> {
   Widget _selectedScreen = TripsScreen();
   int _selectedIndex = 0;
 
@@ -26,6 +29,13 @@ class _MasterScreenState extends State<MasterScreen> {
       _selectedScreen = drawerItems[index].screen;
     });
     Navigator.pop(context);
+  }
+
+  void navigateTo(Widget screen) {
+    setState(() {
+      _selectedIndex = -1;
+      _selectedScreen = screen;
+    });
   }
 
   @override

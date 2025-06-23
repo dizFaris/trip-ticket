@@ -1,8 +1,11 @@
+import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tripticket_desktop/app_colors.dart';
 import 'package:tripticket_desktop/models/trip_model.dart';
 import 'package:tripticket_desktop/providers/trip_provider.dart';
+import 'package:tripticket_desktop/screens/master_screen.dart';
+import 'package:tripticket_desktop/screens/trip_screen.dart';
 import 'dart:async';
 
 import 'package:tripticket_desktop/utils/utils.dart';
@@ -188,8 +191,6 @@ class _TripsScreenState extends State<TripsScreen> {
     );
   }
 
-  _openTripDetails(int id) {}
-
   Widget _tripWidget(Trip trip) {
     return Stack(
       children: [
@@ -272,10 +273,22 @@ class _TripsScreenState extends State<TripsScreen> {
                           fontWeight: FontWeight.w400,
                         ),
                       ),
-                      Text(
-                        trip.country,
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      Row(
+                        children: [
+                          CountryFlag.fromCountryCode(
+                            trip.countryCode,
+                            height: 15,
+                            width: 20,
+                            shape: const Circle(),
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            trip.country,
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
                       ),
+
                       Text.rich(
                         TextSpan(
                           children: [
@@ -288,10 +301,10 @@ class _TripsScreenState extends State<TripsScreen> {
                             ),
                             TextSpan(
                               text:
-                                  "${trip.ticketPrice.toStringAsFixed(2)} BAM",
+                                  "${trip.ticketPrice.toStringAsFixed(2)} EUR",
                               style: TextStyle(
                                 color: Colors.yellow,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w500,
                                 fontSize: 16,
                               ),
                             ),
@@ -326,7 +339,11 @@ class _TripsScreenState extends State<TripsScreen> {
                       SizedBox(
                         width: 110,
                         child: ElevatedButton(
-                          onPressed: () => _openTripDetails(trip.id),
+                          onPressed: () => {
+                            masterScreenKey.currentState?.navigateTo(
+                              TripScreen(tripId: trip.id),
+                            ),
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primaryYellow,
                             shape: RoundedRectangleBorder(
@@ -338,7 +355,7 @@ class _TripsScreenState extends State<TripsScreen> {
                             ),
                           ),
                           child: Text(
-                            "View details",
+                            "Edit trip",
                             style: TextStyle(color: Colors.black),
                           ),
                         ),
@@ -496,7 +513,7 @@ class _TripsScreenState extends State<TripsScreen> {
                   width: 120,
                   child: ElevatedButton(
                     onPressed: () {
-                      print("ADD NEW TRIP");
+                      masterScreenKey.currentState?.navigateTo(TripScreen());
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryYellow,
@@ -531,20 +548,31 @@ class _TripsScreenState extends State<TripsScreen> {
                     ),
                   )
                 : Expanded(
-                    child: GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 4,
-                            mainAxisSpacing: 8,
-                            crossAxisSpacing: 8,
-                            childAspectRatio: 1.2,
+                    child: _trips.isEmpty
+                        ? const Center(
+                            child: Text(
+                              'No results found',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          )
+                        : GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4,
+                                  mainAxisSpacing: 20,
+                                  crossAxisSpacing: 20,
+                                  childAspectRatio: 1.2,
+                                ),
+                            itemCount: _trips.length,
+                            itemBuilder: (context, index) {
+                              final trip = _trips[index];
+                              return _tripWidget(trip);
+                            },
                           ),
-                      itemCount: _trips.length,
-                      itemBuilder: (context, index) {
-                        final trip = _trips[index];
-                        return _tripWidget(trip);
-                      },
-                    ),
                   ),
 
             SizedBox(height: 8),

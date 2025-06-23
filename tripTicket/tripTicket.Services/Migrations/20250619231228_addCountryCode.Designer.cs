@@ -12,8 +12,8 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    [Migration("20250616213727_seedData")]
-    partial class seedData
+    [Migration("20250619231228_addCountryCode")]
+    partial class addCountryCode
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -224,6 +224,10 @@ namespace tripTicket.Services.Migrations
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()

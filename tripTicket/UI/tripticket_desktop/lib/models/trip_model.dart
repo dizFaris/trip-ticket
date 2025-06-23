@@ -7,6 +7,7 @@ class Trip {
   final int id;
   final String city;
   final String country;
+  final String countryCode;
   final String departureCity;
   final DateTime departureDate;
   final DateTime returnDate;
@@ -31,6 +32,7 @@ class Trip {
     required this.id,
     required this.city,
     required this.country,
+    required this.countryCode,
     required this.departureCity,
     required this.departureDate,
     required this.returnDate,

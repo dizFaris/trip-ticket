@@ -11,6 +11,8 @@ namespace tripTicket.Model.Models
 
         public string Country { get; set; }
 
+        public string CountryCode { get; set; }
+
         public string DepartureCity { get; set; }
 
         public DateOnly DepartureDate { get; set; }

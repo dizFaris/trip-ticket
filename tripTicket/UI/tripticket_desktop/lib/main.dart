@@ -199,9 +199,11 @@ class _LoginScreenState extends State<LoginScreen> {
       _usernameController.clear();
       _passwordController.clear();
 
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => MasterScreen()));
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => MasterScreen(key: masterScreenKey),
+        ),
+      );
     } on Exception catch (e) {
       showDialog(
         context: context,
