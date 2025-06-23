@@ -772,7 +772,6 @@ class _TripScreenState extends State<TripScreen> {
                                   initialDays: tripDays,
                                   onChanged: (updatedTripDays) {
                                     tripDays = updatedTripDays;
-                                    print(tripDays);
                                   },
                                 ),
                               ],
@@ -1013,15 +1012,5 @@ class _TripScreenState extends State<TripScreen> {
               ),
             ),
     );
-  }
-
-  void _saveTrip() {
-    if (_isEditing) {
-      print("Updating trip ${widget.tripId}");
-    } else {
-      print("Creating new trip");
-    }
-
-    Navigator.pop(context);
   }
 }
