@@ -1,6 +1,7 @@
+import 'dart:convert';
+
 import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:tripticket_desktop/app_colors.dart';
 import 'package:tripticket_desktop/models/trip_model.dart';
 import 'package:tripticket_desktop/providers/trip_provider.dart';
@@ -93,6 +94,7 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   void _goToPreviousPage() {
+    if (_isLoading) return;
     setState(() {
       _currentPage--;
       _getTrips();
@@ -100,6 +102,7 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   void _goToNextPage() {
+    if (_isLoading) return;
     setState(() {
       _currentPage++;
       _getTrips();
@@ -107,35 +110,39 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   Future<void> _getTrips() async {
-    setState(() {
-      _isLoading = true;
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 400), () async {
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        var filter = {
+          if (selectedStatus != null) 'status': selectedStatus,
+          if (selectedYear != null) 'year': selectedYear.toString(),
+          if (selectedMonth != null) 'month': selectedMonth.toString(),
+          if (selectedDay != null) 'day': selectedDay.toString(),
+          if (_ftsController.text.isNotEmpty) 'FTS': _ftsController.text,
+        };
+
+        var searchResult = await _tripProvider.get(
+          filter: filter,
+          page: _currentPage,
+          pageSize: 8,
+        );
+
+        setState(() {
+          _trips = searchResult.result;
+          _isLoading = false;
+          _totalPages = (searchResult.count / 8).ceil();
+        });
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     });
-
-    try {
-      var filter = {
-        if (selectedStatus != null) 'status': selectedStatus,
-        if (selectedYear != null) 'year': selectedYear.toString(),
-        if (selectedMonth != null) 'month': selectedMonth.toString(),
-        if (selectedDay != null) 'day': selectedDay.toString(),
-        if (_ftsController.text.isNotEmpty) 'FTS': _ftsController.text,
-      };
-
-      var searchResult = await _tripProvider.get(
-        filter: filter,
-        page: _currentPage,
-        pageSize: 8,
-      );
-
-      setState(() {
-        _trips = searchResult.result;
-        _isLoading = false;
-        _totalPages = (searchResult.count / 8).ceil();
-      });
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
   }
 
   Widget _dropdown<T>({
@@ -199,7 +206,7 @@ class _TripsScreenState extends State<TripsScreen> {
             borderRadius: BorderRadius.circular(8),
             image: trip.photo != null
                 ? DecorationImage(
-                    image: MemoryImage(Uint8List.fromList(trip.photo!)),
+                    image: MemoryImage(base64Decode(trip.photo!)),
                     fit: BoxFit.cover,
                   )
                 : const DecorationImage(
@@ -266,7 +273,7 @@ class _TripsScreenState extends State<TripsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        trip.city,
+                        trip.city.name,
                         style: TextStyle(
                           fontSize: 22,
                           color: Colors.white,
@@ -276,14 +283,14 @@ class _TripsScreenState extends State<TripsScreen> {
                       Row(
                         children: [
                           CountryFlag.fromCountryCode(
-                            trip.countryCode,
+                            trip.city.country!.countryCode,
                             height: 15,
                             width: 20,
                             shape: const Circle(),
                           ),
                           SizedBox(width: 8),
                           Text(
-                            trip.country,
+                            trip.city.country!.name,
                             style: TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ],
@@ -463,10 +470,7 @@ class _TripsScreenState extends State<TripsScreen> {
                       ),
                     ),
                     onChanged: (value) {
-                      _debounce?.cancel();
-                      _debounce = Timer(Duration(milliseconds: 300), () {
-                        _getTrips();
-                      });
+                      _getTrips();
                     },
                   ),
                 ),

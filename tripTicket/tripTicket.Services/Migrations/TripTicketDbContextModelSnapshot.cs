@@ -52,7 +52,7 @@ namespace tripTicket.Services.Migrations
                     b.ToTable("Bookmarks");
                 });
 
-            modelBuilder.Entity("tripTicket.Services.Database.Notification", b =>
+            modelBuilder.Entity("tripTicket.Services.Database.City", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -60,30 +60,48 @@ namespace tripTicket.Services.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTime>("SentAt")
-                        .HasColumnType("datetime");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(20)");
-
-                    b.Property<int>("UserId")
+                    b.Property<int>("CountryId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id")
-                        .HasName("PK__Notifica__3214EC071273BD68");
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
-                    b.HasIndex("UserId");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.ToTable("Notifications");
+                    b.HasKey("Id");
+
+                    b.HasIndex("CountryId");
+
+                    b.ToTable("Cities");
+                });
+
+            modelBuilder.Entity("tripTicket.Services.Database.Country", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CountryCode")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Countries");
                 });
 
             modelBuilder.Entity("tripTicket.Services.Database.Purchase", b =>
@@ -212,29 +230,16 @@ namespace tripTicket.Services.Migrations
                     b.Property<decimal?>("CancellationFee")
                         .HasColumnType("decimal(10, 2)");
 
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("CountryCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("CityId")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime")
                         .HasDefaultValueSql("(getdate())");
 
-                    b.Property<string>("DepartureCity")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                    b.Property<int>("DepartureCityId")
+                        .HasColumnType("int");
 
                     b.Property<DateOnly>("DepartureDate")
                         .HasColumnType("date");
@@ -287,6 +292,10 @@ namespace tripTicket.Services.Migrations
 
                     b.HasKey("Id")
                         .HasName("PK__Trips__3214EC070626FA74");
+
+                    b.HasIndex("CityId");
+
+                    b.HasIndex("DepartureCityId");
 
                     b.ToTable("Trips");
                 });
@@ -534,15 +543,15 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("tripTicket.Services.Database.Notification", b =>
+            modelBuilder.Entity("tripTicket.Services.Database.City", b =>
                 {
-                    b.HasOne("tripTicket.Services.Database.User", "User")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .IsRequired()
-                        .HasConstraintName("FK__Notificat__UserI__4CA06362");
+                    b.HasOne("tripTicket.Services.Database.Country", "Country")
+                        .WithMany("Cities")
+                        .HasForeignKey("CountryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Country");
                 });
 
             modelBuilder.Entity("tripTicket.Services.Database.Purchase", b =>
@@ -565,6 +574,25 @@ namespace tripTicket.Services.Migrations
                         .HasConstraintName("FK__Transacti__Purch__49C3F6B7");
 
                     b.Navigation("Purchase");
+                });
+
+            modelBuilder.Entity("tripTicket.Services.Database.Trip", b =>
+                {
+                    b.HasOne("tripTicket.Services.Database.City", "City")
+                        .WithMany("Trips")
+                        .HasForeignKey("CityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("tripTicket.Services.Database.City", "DepartureCity")
+                        .WithMany()
+                        .HasForeignKey("DepartureCityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("City");
+
+                    b.Navigation("DepartureCity");
                 });
 
             modelBuilder.Entity("tripTicket.Services.Database.TripDay", b =>
@@ -617,6 +645,16 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("tripTicket.Services.Database.City", b =>
+                {
+                    b.Navigation("Trips");
+                });
+
+            modelBuilder.Entity("tripTicket.Services.Database.Country", b =>
+                {
+                    b.Navigation("Cities");
+                });
+
             modelBuilder.Entity("tripTicket.Services.Database.Purchase", b =>
                 {
                     b.Navigation("Transactions");
@@ -646,8 +684,6 @@ namespace tripTicket.Services.Migrations
             modelBuilder.Entity("tripTicket.Services.Database.User", b =>
                 {
                     b.Navigation("Bookmarks");
-
-                    b.Navigation("Notifications");
 
                     b.Navigation("UserRoles");
                 });

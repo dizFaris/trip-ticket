@@ -25,9 +25,10 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBookmarkService, BookmarkService>();
 builder.Services.AddTransient<IPurchaseService, PurchaseService>();
 builder.Services.AddTransient<IUserActivityService, UserActivityService>();
-builder.Services.AddTransient<INotificationService, NotificationService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<ITripStatisticService, TripStatisticService>();
+builder.Services.AddTransient<ICountryService, CountryService>();
+builder.Services.AddTransient<ICityService, CityService>();
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();
@@ -76,6 +77,18 @@ builder.Services.AddMapster();
 
 TypeAdapterConfig<tripTicket.Services.Database.User, tripTicket.Model.Models.User>.NewConfig()
     .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => ur.Role.Name).ToList());
+
+TypeAdapterConfig<CityUpdateRequest, tripTicket.Services.Database.City>
+    .NewConfig()
+    .IgnoreIf((src, dest) => src.Name == null, dest => dest.Name)
+    .IgnoreIf((src, dest) => src.IsActive == null, dest => dest.IsActive);
+
+
+TypeAdapterConfig<CountryUpdateRequest, tripTicket.Services.Database.Country>
+    .NewConfig()
+    .IgnoreIf((src, dest) => src.Name == null, dest => dest.Name)
+    .IgnoreIf((src, dest) => src.CountryCode == null, dest => dest.CountryCode)
+    .IgnoreIf((src, dest) => src.IsActive == null, dest => dest.IsActive);
 
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 

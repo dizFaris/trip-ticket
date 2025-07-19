@@ -7,12 +7,9 @@ public partial class Trip
 {
     public int Id { get; set; }
 
-    public string City { get; set; } = null!;
+    public int CityId { get; set; }
 
-    public string Country { get; set; } = null!;
-    public string CountryCode {  get; set; } = null!;
-
-    public string DepartureCity { get; set; } = null!;
+    public int DepartureCityId { get; set; }
 
     public DateOnly DepartureDate { get; set; }
 
@@ -47,6 +44,9 @@ public partial class Trip
     public bool IsCanceled { get; set; }
 
     public DateTime CreatedAt { get; set; }
+
+    public virtual City City { get; set; } = null!;
+    public virtual City DepartureCity { get; set; } = null!;
 
     public virtual ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
 

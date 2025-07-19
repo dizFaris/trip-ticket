@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using EasyNetQ.Internals;
 using Microsoft.EntityFrameworkCore;
 
 namespace tripTicket.Services.Database;
@@ -17,11 +18,13 @@ public partial class TripTicketDbContext : DbContext
 
     public virtual DbSet<Bookmark> Bookmarks { get; set; }
 
-    public virtual DbSet<Notification> Notifications { get; set; }
-
     public virtual DbSet<Purchase> Purchases { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
+
+    public virtual DbSet<Country> Countries { get; set; }
+
+    public virtual DbSet<City> Cities { get; set; }
 
     public virtual DbSet<Trip> Trips { get; set; }
 
@@ -62,24 +65,6 @@ public partial class TripTicketDbContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Bookmarks_User");
-        });
-
-        modelBuilder.Entity<Notification>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Notifica__3214EC071273BD68");
-
-            entity.Property(e => e.Message)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-            entity.Property(e => e.SentAt).HasColumnType("datetime");
-            entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.User).WithMany(p => p.Notifications)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Notificat__UserI__4CA06362");
         });
 
         modelBuilder.Entity<Purchase>(entity =>
@@ -131,26 +116,57 @@ public partial class TripTicketDbContext : DbContext
                 .HasConstraintName("FK__Transacti__Purch__49C3F6B7");
         });
 
+        modelBuilder.Entity<Country>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.CountryCode).HasMaxLength(10).IsRequired();
+        });
+
+        modelBuilder.Entity<City>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
+
+            entity.HasOne(e => e.Country)
+                .WithMany(c => c.Cities)
+                .HasForeignKey(e => e.CountryId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<Trip>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Trips__3214EC070626FA74");
 
             entity.Property(e => e.CancellationFee).HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.City).HasMaxLength(100);
-            entity.Property(e => e.Country).HasMaxLength(100);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.DepartureCity).HasMaxLength(100);
+
             entity.Property(e => e.Description).HasMaxLength(300);
             entity.Property(e => e.DiscountPercentage).HasColumnType("decimal(5, 2)");
             entity.Property(e => e.TicketPrice).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.TicketSaleEnd).HasColumnType("datetime");
             entity.Property(e => e.TransportType).HasMaxLength(50);
+
             entity.Property(e => e.TripStatus)
                 .HasMaxLength(20)
                 .HasDefaultValue("Upcoming");
+
             entity.Property(e => e.TripType).HasMaxLength(50);
+
+            entity.HasOne(e => e.City)
+                .WithMany(c => c.Trips)
+                .HasForeignKey(e => e.CityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.DepartureCity)
+                .WithMany()
+                .HasForeignKey(e => e.DepartureCityId)
+                .OnDelete(DeleteBehavior.Restrict);
+
         });
 
         modelBuilder.Entity<TripDay>(entity =>

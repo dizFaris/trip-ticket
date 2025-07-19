@@ -3,10 +3,17 @@ import 'package:country_flags/country_flags.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:tripticket_desktop/app_colors.dart';
+import 'package:tripticket_desktop/models/city_model.dart';
+import 'package:tripticket_desktop/models/country_model.dart';
 import 'package:tripticket_desktop/models/trip_model.dart';
+import 'package:tripticket_desktop/providers/city_provider.dart';
+import 'package:tripticket_desktop/providers/country_provider.dart';
 import 'package:tripticket_desktop/providers/trip_provider.dart';
+import 'package:tripticket_desktop/screens/master_screen.dart';
+import 'package:tripticket_desktop/screens/trips_screen.dart';
 import 'package:tripticket_desktop/widgets/date_picker.dart';
 import 'package:tripticket_desktop/utils/utils.dart';
+import 'package:tripticket_desktop/widgets/photo_picker.dart';
 import 'package:tripticket_desktop/widgets/trip_day_editor.dart';
 
 class TripScreen extends StatefulWidget {
@@ -20,10 +27,49 @@ class TripScreen extends StatefulWidget {
 
 class _TripScreenState extends State<TripScreen> {
   final TripProvider _tripProvider = TripProvider();
+  final CountryProvider _countryProvider = CountryProvider();
+  final CityProvider _cityProvider = CityProvider();
+
   bool get _isEditing => widget.tripId != null;
   bool _isLoading = true;
-  Map<String, String> countries = {};
-  List<String> cities = [];
+  List<Country> countries = [];
+  List<City> cities = [];
+  List<City> departureCities = [];
+
+  int? selectedCityId;
+  int? departureCityId;
+  int? selectedCountryId;
+  int? departureCountryId;
+  DateTime? departureDate;
+  DateTime? returnDate;
+  String? tripType;
+  double? ticketPrice;
+  int? availableTickets = 0;
+  int? purchasedTickets = 0;
+  String? transportType;
+  List<Map<String, Object>>? tripDays = [];
+  String? description;
+  DateTime? freeCancellationUntil;
+  double? cancellationFee = 0;
+  double? discountPercentage;
+  int? minTicketsForDiscount;
+  List<int>? selectedPhoto;
+  String? tripStatus;
+
+  bool get inputEnabled =>
+      !_isEditing || (_isEditing && tripStatus == 'upcoming');
+
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _availableTicketsController =
+      TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _cancellationFeeController =
+      TextEditingController();
+  final TextEditingController _discountPercentageController =
+      TextEditingController();
+  final TextEditingController _minTicketsForDiscountController =
+      TextEditingController();
+
   final List<String> tripTypes = [
     "Romantic",
     "Adventure",
@@ -51,38 +97,6 @@ class _TripScreenState extends State<TripScreen> {
     'Bike': Icons.directions_bike,
   };
 
-  String? selectedCountry;
-  String? selectedState;
-  String? selectedCity;
-  String? selectedCountryCode;
-  DateTime? departureDate;
-  DateTime? returnDate;
-  String? tripType;
-  double? ticketPrice;
-  int? availableTickets = 0;
-  int? purchasedTickets = 0;
-  String? transportType;
-  String? departureCity;
-  List<Map<String, Object>>? tripDays;
-  String? description;
-  DateTime? freeCancellationUntil;
-  double? cancellationFee = 0;
-  double? discountPercentage;
-  int? minTicketsForDiscount;
-
-  final TextEditingController _priceController = TextEditingController();
-  final TextEditingController _availableTicketsController =
-      TextEditingController();
-  final TextEditingController _departureCityController =
-      TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _cancellationFeeController =
-      TextEditingController();
-  final TextEditingController _discountPercentageController =
-      TextEditingController();
-  final TextEditingController _minTicketsForDiscountController =
-      TextEditingController();
-
   @override
   void initState() {
     super.initState();
@@ -108,7 +122,7 @@ class _TripScreenState extends State<TripScreen> {
         return {
           'dayNumber': day.dayNumber,
           'title': day.title,
-          'items': day.tripDayItems.map((item) {
+          'tripDayItems': day.tripDayItems.map((item) {
             return {
               'time': item.time,
               'action': item.action,
@@ -119,9 +133,21 @@ class _TripScreenState extends State<TripScreen> {
       }).toList();
     }
 
+    var tripCountryCities = await _getCountryCities(trip.city.country!.id);
+    var departureCountryCities = await _getCountryCities(
+      trip.departureCity.country!.id,
+    );
+
     setState(() {
-      selectedCountryCode = trip.countryCode;
-      selectedCountry = trip.country;
+      selectedCityId = trip.city.id;
+      cities = tripCountryCities;
+
+      departureCityId = trip.departureCity.id;
+      departureCities = departureCountryCities;
+
+      selectedCountryId = trip.city.country!.id;
+      departureCountryId = trip.departureCity.country!.id;
+
       departureDate = trip.departureDate;
       returnDate = trip.returnDate;
       tripType = trip.tripType;
@@ -134,9 +160,6 @@ class _TripScreenState extends State<TripScreen> {
 
       purchasedTickets = trip.purchasedTickets;
       transportType = trip.transportType;
-
-      departureCity = trip.departureCity;
-      _departureCityController.text = trip.departureCity;
 
       tripDays = convertModelTripDaysToState(trip.tripDays);
 
@@ -157,8 +180,11 @@ class _TripScreenState extends State<TripScreen> {
           ? trip.minTicketsForDiscount!.toInt().toString()
           : '';
 
-      _getCountryCities();
-      selectedCity = trip.city;
+      selectedPhoto = (trip.photo != null && trip.photo!.isNotEmpty)
+          ? base64Decode(trip.photo!)
+          : null;
+      tripStatus = trip.tripStatus;
+
       _isLoading = false;
     });
   }
@@ -171,19 +197,10 @@ class _TripScreenState extends State<TripScreen> {
     }
 
     try {
-      final String jsonString = await rootBundle.loadString(
-        'assets/countries.json',
-      );
-      final Map<String, dynamic> json = jsonDecode(jsonString);
-      final List<dynamic> data = json['data'];
-
-      final Map<String, String> countryMap = {
-        for (var item in data)
-          item['iso2'] as String: item['country'] as String,
-      };
+      var searchResult = await _countryProvider.get();
 
       setState(() {
-        countries = countryMap;
+        countries = searchResult.result;
         if (!_isEditing) {
           setState(() {
             _isLoading = false;
@@ -197,31 +214,24 @@ class _TripScreenState extends State<TripScreen> {
     }
   }
 
-  Future<void> _getCountryCities() async {
-    setState(() {
-      cities = [];
-    });
-    final String jsonString = await rootBundle.loadString(
-      'assets/countries.json',
-    );
-    final Map<String, dynamic> json = jsonDecode(jsonString);
-    final List<dynamic> data = json['data'];
+  Future<List<City>> _getCountryCities(int countryId) async {
+    try {
+      var searchResult = await _cityProvider.getCitiesByCountryId(countryId);
 
-    final country = data.firstWhere(
-      (item) => item['iso2'] == selectedCountryCode,
-      orElse: () => null,
-    );
+      if (!_isEditing) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
 
-    if (country != null && country['cities'] is List) {
+      return searchResult.result;
+    } catch (e) {
       setState(() {
-        cities = List<String>.from(country['cities']);
+        _isLoading = false;
       });
-      return;
-    }
 
-    setState(() {
-      cities = [];
-    });
+      return [];
+    }
   }
 
   @override
@@ -229,15 +239,15 @@ class _TripScreenState extends State<TripScreen> {
     super.dispose();
     _priceController.dispose();
     _availableTicketsController.dispose();
-    _departureCityController.dispose();
     _descriptionController.dispose();
     _cancellationFeeController.dispose();
   }
 
   Widget countryDropdown({
-    required Map<String, String> countries,
-    required String? selectedCountryCode,
-    required void Function(String?) onChanged,
+    required List<Country> countries,
+    required void Function(int?) onChanged,
+    required int? value,
+    bool? enabled,
   }) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -246,7 +256,7 @@ class _TripScreenState extends State<TripScreen> {
 
     return SizedBox(
       width: 256,
-      child: DropdownButtonFormField<String>(
+      child: DropdownButtonFormField<int>(
         decoration: InputDecoration(
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(
@@ -254,33 +264,32 @@ class _TripScreenState extends State<TripScreen> {
             vertical: 8,
           ),
           filled: true,
-          fillColor: AppColors.primaryGray,
+          fillColor: (enabled ?? true)
+              ? AppColors.primaryGray
+              : Colors.blueGrey[300],
           border: border,
           enabledBorder: border,
           focusedBorder: border,
           hintText: 'Select a country',
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
         ),
-        value: selectedCountryCode,
-        items: countries.entries.map((entry) {
-          final code = entry.key;
-          final name = entry.value;
-          return DropdownMenuItem<String>(
-            value: code,
+        value: value,
+        items: countries.map((country) {
+          return DropdownMenuItem<int>(
+            value: country.id,
             child: Row(
               children: [
                 CountryFlag.fromCountryCode(
-                  code,
+                  country.countryCode,
                   height: 15,
                   width: 20,
                   shape: const Circle(),
                 ),
-
                 const SizedBox(width: 8),
                 SizedBox(
                   width: 180,
                   child: Text(
-                    name,
+                    country.name,
                     style: const TextStyle(fontSize: 16, color: Colors.black),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -290,7 +299,64 @@ class _TripScreenState extends State<TripScreen> {
             ),
           );
         }).toList(),
-        onChanged: onChanged,
+        onChanged: (enabled ?? true) ? onChanged : null,
+        style: const TextStyle(fontSize: 16, color: Colors.black),
+        dropdownColor: Colors.white,
+        icon: const Icon(
+          Icons.keyboard_arrow_down,
+          size: 24,
+          color: Colors.black,
+        ),
+        iconSize: 24,
+      ),
+    );
+  }
+
+  Widget cityDropdown({
+    required List<City> cities,
+    required void Function(int?) onChanged,
+    required int? value,
+    bool? enabled,
+  }) {
+    final border = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(8),
+      borderSide: BorderSide.none,
+    );
+    return SizedBox(
+      width: 256,
+      child: DropdownButtonFormField<int>(
+        decoration: InputDecoration(
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
+          filled: true,
+          fillColor: (enabled ?? true)
+              ? AppColors.primaryGray
+              : Colors.blueGrey[300],
+          border: border,
+          enabledBorder: border,
+          focusedBorder: border,
+          hintText: 'Select a city',
+          hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
+        ),
+        value: value,
+        items: cities.map((city) {
+          return DropdownMenuItem<int>(
+            value: city.id,
+            child: SizedBox(
+              width: 180,
+              child: Text(
+                city.name,
+                style: const TextStyle(fontSize: 16, color: Colors.black),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+            ),
+          );
+        }).toList(),
+        onChanged: (enabled ?? true) ? onChanged : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
         dropdownColor: Colors.white,
         icon: const Icon(
@@ -368,6 +434,7 @@ class _TripScreenState extends State<TripScreen> {
     required String? value,
     required Map<String, IconData> items,
     required ValueChanged<String?> onChanged,
+    bool? enabled,
   }) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -384,7 +451,9 @@ class _TripScreenState extends State<TripScreen> {
             vertical: 8,
           ),
           filled: true,
-          fillColor: AppColors.primaryGray,
+          fillColor: (enabled ?? true)
+              ? AppColors.primaryGray
+              : Colors.blueGrey[300],
           border: border,
           enabledBorder: border,
           focusedBorder: border,
@@ -407,7 +476,7 @@ class _TripScreenState extends State<TripScreen> {
             ),
           );
         }).toList(),
-        onChanged: onChanged,
+        onChanged: (enabled ?? true) ? onChanged : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
         dropdownColor: Colors.white,
         icon: const Icon(
@@ -423,6 +492,36 @@ class _TripScreenState extends State<TripScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        title: Row(
+          children: [
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primaryGreen,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () =>
+                    masterScreenKey.currentState?.navigateTo(TripsScreen()),
+              ),
+            ),
+            SizedBox(width: 12),
+            Text(
+              _isEditing ? "Edit trip" : "Add new trip",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ],
+        ),
+      ),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator(
@@ -438,14 +537,6 @@ class _TripScreenState extends State<TripScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      _isEditing ? "Edit trip" : "Add new trip",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 8),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -455,7 +546,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Country",
                                     style: TextStyle(
@@ -467,13 +558,16 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(width: 8),
                                 countryDropdown(
                                   countries: countries,
-                                  selectedCountryCode: selectedCountryCode,
-                                  onChanged: (value) {
+                                  enabled: inputEnabled,
+                                  value: selectedCountryId,
+                                  onChanged: (value) async {
+                                    var countryCities = await _getCountryCities(
+                                      value!,
+                                    );
                                     setState(() {
-                                      selectedCity = null;
-                                      selectedCountry = value;
-                                      selectedCountryCode = value;
-                                      _getCountryCities();
+                                      selectedCityId = null;
+                                      selectedCountryId = value;
+                                      cities = countryCities;
                                     });
                                   },
                                 ),
@@ -483,7 +577,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "City",
                                     style: TextStyle(
@@ -493,14 +587,13 @@ class _TripScreenState extends State<TripScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                _dropdown<String>(
-                                  label: 'Select a city',
-                                  value: selectedCity,
-                                  items: cities,
-                                  enabled: selectedCountryCode != null,
-                                  onChanged: (val) {
+                                cityDropdown(
+                                  cities: cities,
+                                  enabled: inputEnabled,
+                                  value: selectedCityId,
+                                  onChanged: (value) {
                                     setState(() {
-                                      selectedCity = val;
+                                      selectedCityId = value;
                                     });
                                   },
                                 ),
@@ -510,7 +603,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Departure date",
                                     style: TextStyle(
@@ -522,6 +615,7 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(width: 8),
                                 DatePickerButton(
                                   initialDate: departureDate,
+                                  enabled: inputEnabled,
                                   onDateSelected: (date) {
                                     setState(() {
                                       departureDate = date;
@@ -534,7 +628,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Return date",
                                     style: TextStyle(
@@ -546,6 +640,7 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(width: 8),
                                 DatePickerButton(
                                   initialDate: returnDate,
+                                  enabled: inputEnabled,
                                   onDateSelected: (date) {
                                     setState(() {
                                       returnDate = date;
@@ -558,7 +653,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Trip type",
                                     style: TextStyle(
@@ -570,6 +665,7 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(width: 8),
                                 _dropdown<String>(
                                   label: 'Select type',
+                                  enabled: inputEnabled,
                                   value: tripType,
                                   items: tripTypes,
                                   onChanged: (val) {
@@ -584,7 +680,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Ticket price",
                                     style: TextStyle(
@@ -595,10 +691,11 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   height: 32,
                                   child: TextField(
                                     controller: _priceController,
+                                    enabled: inputEnabled,
                                     inputFormatters: <TextInputFormatter>[
                                       FilteringTextInputFormatter.digitsOnly,
                                       LengthLimitingTextInputFormatter(8),
@@ -617,7 +714,9 @@ class _TripScreenState extends State<TripScreen> {
                                         vertical: 6,
                                       ),
                                       filled: true,
-                                      fillColor: AppColors.primaryGray,
+                                      fillColor: inputEnabled
+                                          ? AppColors.primaryGray
+                                          : Colors.blueGrey[300],
                                       border: OutlineInputBorder(
                                         borderSide: BorderSide.none,
                                         borderRadius: BorderRadius.circular(8),
@@ -631,7 +730,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Available tickets",
                                     style: TextStyle(
@@ -650,6 +749,7 @@ class _TripScreenState extends State<TripScreen> {
                                         child: TextField(
                                           controller:
                                               _availableTicketsController,
+                                          enabled: inputEnabled,
                                           keyboardType: TextInputType.number,
                                           textAlign: TextAlign.center,
                                           inputFormatters: <TextInputFormatter>[
@@ -667,7 +767,9 @@ class _TripScreenState extends State<TripScreen> {
                                                   vertical: 6,
                                                 ),
                                             filled: true,
-                                            fillColor: AppColors.primaryGray,
+                                            fillColor: inputEnabled
+                                                ? AppColors.primaryGray
+                                                : Colors.blueGrey[300],
                                             border: OutlineInputBorder(
                                               borderSide: BorderSide.none,
                                               borderRadius:
@@ -690,9 +792,9 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
-                                    "Departure city",
+                                    "Departure Country",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -700,30 +802,19 @@ class _TripScreenState extends State<TripScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                SizedBox(
-                                  width: 256,
-                                  child: TextField(
-                                    controller: _departureCityController,
-                                    keyboardType: TextInputType.text,
-                                    inputFormatters: <TextInputFormatter>[
-                                      LengthLimitingTextInputFormatter(25),
-                                    ],
-                                    decoration: InputDecoration(
-                                      labelText: null,
-                                      hintText: 'Enter text',
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 6,
-                                      ),
-                                      filled: true,
-                                      fillColor: AppColors.primaryGray,
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                    ),
-                                  ),
+                                countryDropdown(
+                                  countries: countries,
+                                  enabled: inputEnabled,
+                                  value: departureCountryId,
+                                  onChanged: (value) async {
+                                    var departureCountryCities =
+                                        await _getCountryCities(value!);
+                                    setState(() {
+                                      departureCityId = null;
+                                      departureCountryId = value;
+                                      departureCities = departureCountryCities;
+                                    });
+                                  },
                                 ),
                               ],
                             ),
@@ -731,9 +822,9 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
-                                    "Transport type",
+                                    "Departure City",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -741,13 +832,13 @@ class _TripScreenState extends State<TripScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                _transportTypeDropdown(
-                                  label: 'Select Transport',
-                                  value: transportType,
-                                  items: transportTypes,
-                                  onChanged: (val) {
+                                cityDropdown(
+                                  cities: departureCities,
+                                  enabled: inputEnabled,
+                                  value: departureCityId,
+                                  onChanged: (value) {
                                     setState(() {
-                                      transportType = val;
+                                      departureCityId = value;
                                     });
                                   },
                                 ),
@@ -758,7 +849,7 @@ class _TripScreenState extends State<TripScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Schedule",
                                     style: TextStyle(
@@ -770,6 +861,7 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(width: 8),
                                 TripDayEditor(
                                   initialDays: tripDays,
+                                  enabled: inputEnabled,
                                   onChanged: (updatedTripDays) {
                                     tripDays = updatedTripDays;
                                   },
@@ -785,7 +877,7 @@ class _TripScreenState extends State<TripScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Short description",
                                     style: TextStyle(
@@ -800,6 +892,7 @@ class _TripScreenState extends State<TripScreen> {
                                   height: 150,
                                   child: TextField(
                                     controller: _descriptionController,
+                                    enabled: inputEnabled,
                                     maxLines: null,
                                     expands: true,
                                     textAlignVertical: TextAlignVertical.top,
@@ -809,7 +902,9 @@ class _TripScreenState extends State<TripScreen> {
                                     decoration: InputDecoration(
                                       hintText: 'Describe your trip...',
                                       filled: true,
-                                      fillColor: AppColors.primaryGray,
+                                      fillColor: inputEnabled
+                                          ? AppColors.primaryGray
+                                          : Colors.blueGrey[300],
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(8),
                                         borderSide: BorderSide.none,
@@ -824,7 +919,34 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
+                                  child: Text(
+                                    "Transport type",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                _transportTypeDropdown(
+                                  label: 'Select Transport',
+                                  value: transportType,
+                                  enabled: inputEnabled,
+                                  items: transportTypes,
+                                  onChanged: (val) {
+                                    setState(() {
+                                      transportType = val;
+                                    });
+                                  },
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 170,
                                   child: Text(
                                     "Cancellation",
                                     style: TextStyle(
@@ -846,6 +968,7 @@ class _TripScreenState extends State<TripScreen> {
                                     SizedBox(width: 8),
                                     DatePickerButton(
                                       initialDate: freeCancellationUntil,
+                                      enabled: inputEnabled,
                                       onDateSelected: (date) {
                                         setState(() {
                                           freeCancellationUntil = date;
@@ -861,7 +984,7 @@ class _TripScreenState extends State<TripScreen> {
                             Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SizedBox(width: 140, child: Text("")),
+                                SizedBox(width: 170, child: Text("")),
                                 SizedBox(width: 8),
                                 Row(
                                   children: [
@@ -874,10 +997,11 @@ class _TripScreenState extends State<TripScreen> {
                                     ),
                                     SizedBox(width: 8),
                                     SizedBox(
-                                      width: 80,
+                                      width: 100,
                                       height: 32,
                                       child: TextField(
                                         controller: _cancellationFeeController,
+                                        enabled: inputEnabled,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
                                               .digitsOnly,
@@ -893,7 +1017,9 @@ class _TripScreenState extends State<TripScreen> {
                                             vertical: 6,
                                           ),
                                           filled: true,
-                                          fillColor: AppColors.primaryGray,
+                                          fillColor: inputEnabled
+                                              ? AppColors.primaryGray
+                                              : Colors.blueGrey[300],
                                           border: OutlineInputBorder(
                                             borderSide: BorderSide.none,
                                             borderRadius: BorderRadius.circular(
@@ -912,7 +1038,7 @@ class _TripScreenState extends State<TripScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 SizedBox(
-                                  width: 140,
+                                  width: 170,
                                   child: Text(
                                     "Discount",
                                     style: TextStyle(
@@ -930,6 +1056,7 @@ class _TripScreenState extends State<TripScreen> {
                                       child: TextField(
                                         controller:
                                             _discountPercentageController,
+                                        enabled: inputEnabled,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
                                               .digitsOnly,
@@ -945,7 +1072,9 @@ class _TripScreenState extends State<TripScreen> {
                                             vertical: 6,
                                           ),
                                           filled: true,
-                                          fillColor: AppColors.primaryGray,
+                                          fillColor: inputEnabled
+                                              ? AppColors.primaryGray
+                                              : Colors.blueGrey[300],
                                           border: OutlineInputBorder(
                                             borderSide: BorderSide.none,
                                             borderRadius: BorderRadius.circular(
@@ -970,6 +1099,7 @@ class _TripScreenState extends State<TripScreen> {
                                       child: TextField(
                                         controller:
                                             _minTicketsForDiscountController,
+                                        enabled: inputEnabled,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
                                               .digitsOnly,
@@ -989,7 +1119,9 @@ class _TripScreenState extends State<TripScreen> {
                                             vertical: 6,
                                           ),
                                           filled: true,
-                                          fillColor: AppColors.primaryGray,
+                                          fillColor: inputEnabled
+                                              ? AppColors.primaryGray
+                                              : Colors.blueGrey[300],
                                           border: OutlineInputBorder(
                                             borderSide: BorderSide.none,
                                             borderRadius: BorderRadius.circular(
@@ -1003,8 +1135,132 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                               ],
                             ),
+                            SizedBox(height: 8),
+                            SizedBox(height: 8),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(
+                                  width: 170,
+                                  child: Text(
+                                    "Photo",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                TripPhotoPicker(
+                                  initialPhoto: selectedPhoto,
+                                  enabled: inputEnabled,
+                                  onPhotoSelected: (bytes) {
+                                    selectedPhoto = bytes;
+                                  },
+                                ),
+                              ],
+                            ),
                           ],
                         ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        tripStatus == "upcoming"
+                            ? SizedBox(
+                                height: 32,
+                                width: 120,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _cancelTrip();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryRed,
+                                    padding: EdgeInsets.zero,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    "CANCEL TRIP",
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+
+                        SizedBox(width: 8),
+                        SizedBox(
+                          height: 32,
+                          width: 120,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              masterScreenKey.currentState?.navigateTo(
+                                TripsScreen(),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryYellow,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                            child: Text(
+                              "RETURN",
+                              style: TextStyle(color: AppColors.primaryBlack),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8),
+                        _isEditing
+                            ? tripStatus == "upcoming"
+                                  ? SizedBox(
+                                      height: 32,
+                                      width: 120,
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          _saveTrip();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              AppColors.primaryGreen,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              4,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          "SAVE",
+                                          style: TextStyle(
+                                            color: AppColors.primaryYellow,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox.shrink()
+                            : SizedBox(
+                                height: 32,
+                                width: 120,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _addNewTrip();
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primaryGreen,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                  ),
+                                  child: Text(
+                                    "ADD",
+                                    style: TextStyle(
+                                      color: AppColors.primaryYellow,
+                                    ),
+                                  ),
+                                ),
+                              ),
                       ],
                     ),
                   ],
@@ -1012,5 +1268,319 @@ class _TripScreenState extends State<TripScreen> {
               ),
             ),
     );
+  }
+
+  Future<void> _addNewTrip() async {
+    final tripData = {
+      "CityId": selectedCityId,
+      "DepartureCityId": departureCityId,
+      "DepartureDate": departureDate?.toIso8601String().substring(0, 10),
+      "ReturnDate": returnDate?.toIso8601String().substring(0, 10),
+      "TripType": tripType,
+      "TransportType": transportType,
+      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
+      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
+      "Description": _descriptionController.text,
+      "FreeCancellationUntil": freeCancellationUntil
+          ?.toIso8601String()
+          .substring(0, 10),
+      "CancellationFee":
+          double.tryParse(_cancellationFeeController.text) ?? 0.0,
+      "MinTicketsForDiscount":
+          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
+      "DiscountPercentage":
+          double.tryParse(_discountPercentageController.text) ?? 0.0,
+      "Photo": selectedPhoto != null ? base64Encode(selectedPhoto!) : null,
+      "TripDays": tripDays,
+    };
+
+    final validationError = _validateTripData(tripData);
+    if (validationError != null) {
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Validation Error"),
+          content: Text(validationError),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _tripProvider.insert(tripData);
+      if (!mounted) return;
+
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text("Success"),
+          content: Text("Trip successfully added"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+
+      if (result == true || result == null) {
+        masterScreenKey.currentState?.navigateTo(TripsScreen());
+      }
+    } on Exception catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveTrip() async {
+    final tripData = {
+      "CityId": selectedCityId,
+      "DepartureCityId": departureCityId,
+      "DepartureDate": departureDate?.toIso8601String().substring(0, 10),
+      "ReturnDate": returnDate?.toIso8601String().substring(0, 10),
+      "TripType": tripType,
+      "TransportType": transportType,
+      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
+      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
+      "Description": _descriptionController.text,
+      "FreeCancellationUntil": freeCancellationUntil
+          ?.toIso8601String()
+          .substring(0, 10),
+      "CancellationFee":
+          double.tryParse(_cancellationFeeController.text) ?? 0.0,
+      "MinTicketsForDiscount":
+          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
+      "DiscountPercentage":
+          double.tryParse(_discountPercentageController.text) ?? 0.0,
+      "Photo": selectedPhoto != null ? base64Encode(selectedPhoto!) : null,
+      "TripDays": tripDays,
+    };
+
+    final validationError = _validateTripData(tripData);
+    if (validationError != null) {
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Validation Error"),
+          content: Text(validationError),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _tripProvider.update(widget.tripId!, tripData);
+      if (!mounted) return;
+
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text("Success"),
+          content: Text("Trip successfully updated"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+
+      if (result == true || result == null) {
+        masterScreenKey.currentState?.navigateTo(TripsScreen());
+      }
+    } on Exception catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  String? _validateTripData(Map<String, dynamic> tripData) {
+    final errors = <String>[];
+
+    if (tripData["CityId"] == null) {
+      errors.add("City must be selected.");
+    }
+    if (tripData["DepartureCityId"] == null) {
+      errors.add("Departure city must be selected.");
+    }
+    if (tripData["DepartureDate"] == null ||
+        tripData["DepartureDate"].isEmpty) {
+      errors.add("Departure date is required.");
+    }
+    if (tripData["ReturnDate"] == null || tripData["ReturnDate"].isEmpty) {
+      errors.add("Return date is required.");
+    }
+    if (tripData["TripType"] == null || tripData["TripType"].isEmpty) {
+      errors.add("Trip type is required.");
+    }
+    if (tripData["TransportType"] == null ||
+        tripData["TransportType"].isEmpty) {
+      errors.add("Transport type is required.");
+    }
+    if (tripData["TicketPrice"] == null || tripData["TicketPrice"] <= 0) {
+      errors.add("Ticket price must be greater than zero.");
+    }
+    if (tripData["AvailableTickets"] == null ||
+        tripData["AvailableTickets"] < 0) {
+      errors.add("Available tickets must be zero or more.");
+    }
+
+    DateTime? departureDate;
+    DateTime? returnDate;
+    DateTime? freeCancellationUntil;
+
+    try {
+      if (tripData["DepartureDate"] != null &&
+          tripData["DepartureDate"].isNotEmpty) {
+        departureDate = DateTime.parse(tripData["DepartureDate"]);
+      }
+    } catch (_) {
+      errors.add("Departure date format is invalid.");
+    }
+    try {
+      if (tripData["ReturnDate"] != null && tripData["ReturnDate"].isNotEmpty) {
+        returnDate = DateTime.parse(tripData["ReturnDate"]);
+      }
+    } catch (_) {
+      errors.add("Return date format is invalid.");
+    }
+    try {
+      if (tripData["FreeCancellationUntil"] != null &&
+          tripData["FreeCancellationUntil"].isNotEmpty) {
+        freeCancellationUntil = DateTime.parse(
+          tripData["FreeCancellationUntil"],
+        );
+      }
+    } catch (_) {
+      errors.add("Free cancellation date format is invalid.");
+    }
+
+    if (departureDate != null && returnDate != null) {
+      if (departureDate.isAfter(returnDate)) {
+        errors.add("Departure date must be before return date.");
+      }
+    }
+
+    if (departureDate != null && freeCancellationUntil != null) {
+      final diff = departureDate.difference(freeCancellationUntil).inDays;
+      if (diff < 3) {
+        errors.add(
+          "Free cancellation must end at least 3 days before departure.",
+        );
+      }
+    }
+
+    final discount = tripData["DiscountPercentage"] ?? 0.0;
+    if (discount < 0 || discount > 100) {
+      errors.add("Discount percentage must be between 0 and 100.");
+    }
+
+    final cancellationFee = tripData["CancellationFee"] ?? 0.0;
+    if (cancellationFee < 0) {
+      errors.add("Cancellation fee cannot be negative.");
+    }
+
+    final minTickets = tripData["MinTicketsForDiscount"] ?? 0;
+    if (minTickets < 0) {
+      errors.add("Minimum tickets for discount cannot be negative.");
+    }
+
+    if (errors.isEmpty) {
+      return null;
+    } else {
+      return errors.join('\n');
+    }
+  }
+
+  _cancelTrip() async {
+    try {
+      await _tripProvider.cancelTrip(widget.tripId!);
+
+      if (!mounted) return;
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text("Success"),
+          content: Text("Trip successfully updated"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+
+      if (result == true || result == null) {
+        masterScreenKey.currentState?.navigateTo(TripsScreen());
+      }
+    } on Exception catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

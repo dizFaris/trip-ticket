@@ -80,8 +80,8 @@ namespace tripTicket.Services.PurchaseStateMachine
                 DepartureDate = trip.DepartureDate,
                 NumberOfTickets = entity.NumberOfTickets,
                 TotalPayment = entity.TotalPayment,
-                TripCity = trip.City,
-                TripCountry = trip.Country
+                TripCity = trip.City.Name,
+                TripCountry = trip.City.Country.Name
             };
 
             bus.PubSub.Publish(message);

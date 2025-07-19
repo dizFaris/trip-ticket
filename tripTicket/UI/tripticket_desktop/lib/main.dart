@@ -190,8 +190,8 @@ class _LoginScreenState extends State<LoginScreen> {
     AuthProvider.password = _passwordController.text;
     try {
       await userProvider.login(
-        _usernameController.text,
-        _passwordController.text,
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
       );
 
       if (!mounted) return;

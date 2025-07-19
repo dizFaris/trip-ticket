@@ -23,9 +23,47 @@ namespace tripTicket.Services.Services
                 BaseTripState = baseTripState;
             }
 
-            public virtual Model.Models.Trip GetById(int id)
+            public override PagedResult<Model.Models.Trip> GetPaged(TripSearchObject search)
             {
-                var entity = Context.Set<Database.Trip>().Include(t => t.TripDays).ThenInclude(td => td.TripDayItems).FirstOrDefault(t => t.Id == id);
+                List<Model.Models.Trip> result = new List<Model.Models.Trip>();
+
+                var query = Context.Set<Database.Trip>()
+                    .Include(t => t.City)
+                        .ThenInclude(td => td.Country)
+                    .Include(t => t.DepartureCity)
+                        .ThenInclude(td => td.Country)
+                    .AsQueryable();
+
+                query = AddFilter(search, query);
+
+                int count = query.Count();
+
+                int page = (search?.Page.HasValue == true && search.Page.Value >= 0) ? search.Page.Value : 0;
+                int pageSize = (search?.PageSize.HasValue == true && search.PageSize.Value > 0) ? search.PageSize.Value : 10;
+
+                query = query.Skip(page * pageSize).Take(pageSize);
+
+                var list = query.ToList();
+
+                result = Mapper.Map(list, result);
+
+                PagedResult<Model.Models.Trip> pagedResult = new PagedResult<Model.Models.Trip>();
+                pagedResult.ResultList = result;
+                pagedResult.Count = count;
+
+                return pagedResult;
+            }
+
+            public override Model.Models.Trip GetById(int id)
+            {
+                var entity = Context.Set<Database.Trip>()
+                    .Include(t => t.City)
+                        .ThenInclude(td => td.Country)
+                    .Include(t => t.DepartureCity)
+                        .ThenInclude(td => td.Country)
+                    .Include(t => t.TripDays)
+                        .ThenInclude(td => td.TripDayItems)
+                    .FirstOrDefault(t => t.Id == id);
 
                 if (entity == null)
                 {
@@ -41,7 +79,7 @@ namespace tripTicket.Services.Services
 
                 if (!string.IsNullOrWhiteSpace(search?.FTS))
                 {
-                    filteredQuery = filteredQuery.Where(x => x.City.Contains(search.FTS) || x.Country.Contains(search.FTS));
+                    filteredQuery = filteredQuery.Where(x => x.City.Name.Contains(search.FTS) || x.City.Country.Name.Contains(search.FTS));
                 }
 
                 if (search.Year.HasValue)
@@ -71,6 +109,33 @@ namespace tripTicket.Services.Services
             {
                 var state = BaseTripState.CreateState("initial");
                 return state.Insert(request);
+            }
+
+            public override Model.Models.Trip Update(int id, TripUpdateRequest request)
+            {
+                var set = Context.Set<Database.Trip>();
+
+                var entity = set.SingleOrDefault(t => t.Id == id);
+
+                if (entity == null)
+                {
+                    throw new Exception($"Trip with id {id} not found.");
+                }
+
+                Mapper.Map(request, entity);
+
+                BeforeUpdate(request, entity);
+
+                Context.SaveChanges();
+
+                entity = set
+                    .Include(t => t.City)
+                        .ThenInclude(c => c.Country)
+                    .Include(t => t.DepartureCity)
+                        .ThenInclude(dc => dc.Country)
+                    .SingleOrDefault(t => t.Id == id);
+
+                return Mapper.Map<Model.Models.Trip>(entity);
             }
 
             public override void BeforeUpdate(TripUpdateRequest request, Database.Trip entity)

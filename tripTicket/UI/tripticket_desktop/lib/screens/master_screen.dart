@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tripticket_desktop/models/menu_model.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
+import 'package:tripticket_desktop/screens/countries_screen.dart';
 import 'package:tripticket_desktop/screens/purchases_screen.dart';
 import 'package:tripticket_desktop/screens/trips_screen.dart';
 
@@ -15,8 +16,9 @@ class MasterScreen extends StatefulWidget {
 }
 
 final List<DrawerItem> drawerItems = [
-  DrawerItem(title: 'Trips', screen: TripsScreen()),
+  DrawerItem(title: 'Trips Overview', screen: TripsScreen()),
   DrawerItem(title: 'Purchases overview', screen: PurchasesScreen()),
+  DrawerItem(title: 'Edit Countries and Cities', screen: CountriesScreen()),
 ];
 
 class MasterScreenState extends State<MasterScreen> {

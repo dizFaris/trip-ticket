@@ -7,13 +7,10 @@ namespace tripTicket.Model.Models
     {
         public int Id { get; set; }
 
-        public string City { get; set; }
-
-        public string Country { get; set; }
-
-        public string CountryCode { get; set; }
-
-        public string DepartureCity { get; set; }
+        public int CityId { get; set; }
+        public int DepartureCityId { get; set; }
+        public virtual City City { get; set; } = null!;
+        public virtual City DepartureCity { get; set; } = null!;
 
         public DateOnly DepartureDate { get; set; }
 

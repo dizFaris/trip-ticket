@@ -27,7 +27,5 @@ public partial class User
     public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
-
-    public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
-    public virtual ICollection<UserRole> UserRoles { get; set; }
+    public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 }

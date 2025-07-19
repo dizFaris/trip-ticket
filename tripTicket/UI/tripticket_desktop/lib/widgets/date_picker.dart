@@ -5,11 +5,13 @@ import 'package:tripticket_desktop/app_colors.dart';
 class DatePickerButton extends StatefulWidget {
   final void Function(DateTime) onDateSelected;
   final DateTime? initialDate;
+  final bool enabled;
 
   const DatePickerButton({
     super.key,
     required this.onDateSelected,
     this.initialDate,
+    this.enabled = true,
   });
 
   @override
@@ -32,31 +34,36 @@ class DatePickerButtonState extends State<DatePickerButton> {
       width: 140,
       child: TextButton(
         style: TextButton.styleFrom(
-          backgroundColor: AppColors.primaryGray,
+          backgroundColor: widget.enabled
+              ? AppColors.primaryGray
+              : Colors.blueGrey[300],
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
-        onPressed: () async {
-          final DateTime now = DateTime.now();
-          final DateTime minDate = now.add(const Duration(days: 3));
+        onPressed: widget.enabled
+            ? () async {
+                final DateTime now = DateTime.now();
+                final DateTime minDate = now.add(const Duration(days: 5));
 
-          final DateTime initialPickerDate =
-              (selectedDate != null && selectedDate!.isAfter(minDate))
-              ? selectedDate!
-              : minDate;
+                final DateTime initialPickerDate =
+                    (selectedDate != null && selectedDate!.isAfter(minDate))
+                    ? selectedDate!
+                    : minDate;
 
-          final DateTime? picked = await showDatePicker(
-            context: context,
-            initialDate: initialPickerDate,
-            firstDate: minDate,
-            lastDate: DateTime(2100),
-          );
-          if (picked != null && picked != selectedDate) {
-            setState(() {
-              selectedDate = picked;
-            });
-            widget.onDateSelected(picked);
-          }
-        },
+                final DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: initialPickerDate,
+                  firstDate: minDate,
+                  lastDate: DateTime(2100),
+                );
+                if (picked != null && picked != selectedDate) {
+                  setState(() {
+                    selectedDate = picked;
+                  });
+                  widget.onDateSelected(picked);
+                }
+              }
+            : null,
+
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [

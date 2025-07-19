@@ -8,11 +8,8 @@ namespace tripTicket.Model.Requests
 {
     public class TripInsertRequest
     {
-        public string City { get; set; }
-
-        public string Country { get; set; }
-
-        public string DepartureCity { get; set; }
+        public int CityId { get; set; }
+        public int DepartureCityId { get; set; }
 
         public DateOnly DepartureDate { get; set; }
 

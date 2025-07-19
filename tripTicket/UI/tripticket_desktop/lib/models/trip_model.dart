@@ -1,14 +1,12 @@
 import 'package:json_annotation/json_annotation.dart';
-
+import 'package:tripticket_desktop/models/city_model.dart';
 part 'trip_model.g.dart';
 
 @JsonSerializable()
 class Trip {
   final int id;
-  final String city;
-  final String country;
-  final String countryCode;
-  final String departureCity;
+  final City city;
+  final City departureCity;
   final DateTime departureDate;
   final DateTime returnDate;
   final DateTime ticketSaleEnd;
@@ -22,7 +20,7 @@ class Trip {
   final double? cancellationFee;
   final int? minTicketsForDiscount;
   final double? discountPercentage;
-  final List<int>? photo;
+  final String? photo;
   final String tripStatus;
   final bool isCanceled;
   final DateTime createdAt;
@@ -31,8 +29,6 @@ class Trip {
   Trip({
     required this.id,
     required this.city,
-    required this.country,
-    required this.countryCode,
     required this.departureCity,
     required this.departureDate,
     required this.returnDate,

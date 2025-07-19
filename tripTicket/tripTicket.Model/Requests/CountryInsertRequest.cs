@@ -7,9 +7,9 @@ using tripTicket.Model.Models;
 
 namespace tripTicket.Model.Requests
 {
-    public class NotificationUpdateRequest
+    public class CountryInsertRequest
     {
-        public int Id { get; set; }
-        public string Message { get; set; } = null!;
+        public string Name { get; set; } = null!;
+        public string CountryCode { get; set; } = null!;
     }
 }

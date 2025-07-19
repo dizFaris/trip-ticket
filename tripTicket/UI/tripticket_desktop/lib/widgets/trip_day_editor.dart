@@ -5,8 +5,14 @@ import 'package:tripticket_desktop/widgets/time_picker.dart';
 class TripDayEditor extends StatefulWidget {
   final List<Map<String, Object>>? initialDays;
   final void Function(List<Map<String, Object>> tripDays)? onChanged;
+  final bool enabled;
 
-  const TripDayEditor({super.key, this.initialDays, this.onChanged});
+  const TripDayEditor({
+    super.key,
+    this.initialDays,
+    this.onChanged,
+    this.enabled = true,
+  });
 
   @override
   State<TripDayEditor> createState() => _TripDayEditorState();
@@ -28,7 +34,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
   }
 
   Widget dayItemsSection(int dayIndex) {
-    final items = tripDays[dayIndex]['items'] as List;
+    final items = tripDays[dayIndex]['tripDayItems'] as List;
 
     return Column(
       children: [
@@ -47,22 +53,28 @@ class _TripDayEditorState extends State<TripDayEditor> {
               onTap: () {
                 setState(() {
                   items.add({
-                    'time': '',
+                    'time': '00:00',
                     'action': '',
                     'orderNumber': items.length,
                   });
                   _notifyChange();
                 });
               },
-              child: Container(
-                height: 30,
-                width: 30,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryYellow,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.add, color: Colors.black, size: 20),
-              ),
+              child: widget.enabled
+                  ? Container(
+                      height: 30,
+                      width: 30,
+                      decoration: BoxDecoration(
+                        color: AppColors.primaryYellow,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(
+                        Icons.add,
+                        color: Colors.black,
+                        size: 20,
+                      ),
+                    )
+                  : SizedBox.shrink(),
             ),
           ),
         ),
@@ -109,6 +121,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
                 Expanded(
                   child: TextField(
                     controller: dayController,
+                    enabled: widget.enabled,
                     onChanged: (value) {
                       setState(() {
                         tripDays[dayIndex]['title'] = value;
@@ -132,7 +145,9 @@ class _TripDayEditorState extends State<TripDayEditor> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                buildDayActionButton(false, dayIndex),
+                widget.enabled
+                    ? buildDayActionButton(false, dayIndex)
+                    : SizedBox.shrink(),
               ],
             ),
           ),
@@ -164,8 +179,8 @@ class _TripDayEditorState extends State<TripDayEditor> {
               if ((tripDays[dayIndex]['title'] as String).trim().isNotEmpty) {
                 tripDays.add({
                   'title': '',
-                  'items': [
-                    {'time': '', 'action': '', 'orderNumber': 0},
+                  'tripDayItems': [
+                    {'time': '00:00', 'action': '', 'orderNumber': 0},
                   ],
                 });
               }
@@ -181,7 +196,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
   }
 
   Widget buildItemRow(int dayIndex, int itemIndex, {Key? key}) {
-    final items = tripDays[dayIndex]['items'] as List;
+    final items = tripDays[dayIndex]['tripDayItems'] as List;
     final item = items[itemIndex];
 
     TextEditingController textController = TextEditingController(
@@ -202,6 +217,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
           children: [
             SimpleTimePicker(
               key: ValueKey('timepicker_${dayIndex}_${item['orderNumber']}'),
+              enabled: widget.enabled,
               initialValue: item['time'],
               onChanged: (val) {
                 setState(() {
@@ -214,6 +230,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
             Expanded(
               child: TextField(
                 controller: textController,
+                enabled: widget.enabled,
                 onChanged: (value) {
                   setState(() {
                     item['action'] = value;
@@ -237,27 +254,34 @@ class _TripDayEditorState extends State<TripDayEditor> {
               ),
             ),
             const SizedBox(width: 8),
-            Container(
-              height: 30,
-              width: 30,
-              decoration: BoxDecoration(
-                color: AppColors.primaryYellow,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(8),
-                onTap: () {
-                  setState(() {
-                    final items = tripDays[dayIndex]['items'] as List;
-                    items.removeAt(itemIndex);
-                    _notifyChange();
-                  });
-                },
-                child: Center(
-                  child: Icon(Icons.remove, color: Colors.black, size: 20),
-                ),
-              ),
-            ),
+            widget.enabled
+                ? Container(
+                    height: 30,
+                    width: 30,
+                    decoration: BoxDecoration(
+                      color: AppColors.primaryYellow,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(8),
+                      onTap: () {
+                        setState(() {
+                          final items =
+                              tripDays[dayIndex]['tripDayItems'] as List;
+                          items.removeAt(itemIndex);
+                          _notifyChange();
+                        });
+                      },
+                      child: Center(
+                        child: Icon(
+                          Icons.remove,
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                      ),
+                    ),
+                  )
+                : SizedBox.shrink(),
           ],
         ),
       ),
@@ -288,34 +312,42 @@ class _TripDayEditorState extends State<TripDayEditor> {
                         tripDays.length,
                         (index) => dayRowInput(index),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryYellow,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            minimumSize: const Size(100, 36),
-                          ),
-                          icon: const Icon(Icons.add, size: 20),
-                          label: const Text(
-                            'Add new day',
-                            style: TextStyle(fontWeight: FontWeight.w600),
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              tripDays.add({
-                                'dayNumber': tripDays.length,
-                                'title': '',
-                                'items': [],
-                              });
-                              _notifyChange();
-                            });
-                          },
-                        ),
-                      ),
+                      widget.enabled
+                          ? Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryYellow,
+                                  foregroundColor: Colors.black,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  minimumSize: const Size(100, 36),
+                                ),
+                                icon: const Icon(Icons.add, size: 20),
+                                label: const Text(
+                                  'Add new day',
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    tripDays.add({
+                                      'dayNumber': tripDays.length,
+                                      'title': '',
+                                      'tripDayItems': [
+                                        {
+                                          'time': '00:00',
+                                          'action': '',
+                                          'orderNumber': 0,
+                                        },
+                                      ],
+                                    });
+                                    _notifyChange();
+                                  });
+                                },
+                              ),
+                            )
+                          : SizedBox.shrink(),
                     ],
                   ),
                 ),

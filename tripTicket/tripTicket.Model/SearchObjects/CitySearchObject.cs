@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace tripTicket.Model.SearchObjects
 {
-    public class NotificationSearchObject : BaseSearchObject
+    public class CitySearchObject : BaseSearchObject
     {
+        public string? FTS { get; set; }
     }
 }

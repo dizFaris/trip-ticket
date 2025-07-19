@@ -9,11 +9,8 @@ namespace tripTicket.Model.Requests
 {
     public class TripUpdateRequest
     {
-        public string City { get; set; }
-
-        public string Country { get; set; }
-
-        public string DepartureCity { get; set; }
+        public int CityId { get; set; }
+        public int DepartureCityId { get; set; }
 
         public DateOnly DepartureDate { get; set; }
 
@@ -27,7 +24,7 @@ namespace tripTicket.Model.Requests
 
         public DateOnly FreeCancellationUntil { get; set; }
 
-        public byte[] Photo { get; set; }
+        public byte[]? Photo { get; set; }
 
         public List<TripDayUpdateRequest> TripDays { get; set; } = new();
 

@@ -4,8 +4,14 @@ import 'package:tripticket_desktop/app_colors.dart';
 class SimpleTimePicker extends StatefulWidget {
   final String? initialValue;
   final ValueChanged<String>? onChanged;
+  final bool enabled;
 
-  const SimpleTimePicker({super.key, this.initialValue, this.onChanged});
+  const SimpleTimePicker({
+    super.key,
+    this.initialValue,
+    this.onChanged,
+    this.enabled = true,
+  });
 
   @override
   State<SimpleTimePicker> createState() => _SimpleTimePickerState();
@@ -53,14 +59,16 @@ class _SimpleTimePickerState extends State<SimpleTimePicker> {
                   child: Text(hour.toString().padLeft(2, '0')),
                 );
               }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedHour = value;
-                  });
-                  _updateTime(_selectedHour, _selectedMinute);
-                }
-              },
+              onChanged: widget.enabled
+                  ? (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedHour = value;
+                        });
+                        _updateTime(_selectedHour, _selectedMinute);
+                      }
+                    }
+                  : null,
             ),
           ),
         ),
@@ -84,14 +92,16 @@ class _SimpleTimePickerState extends State<SimpleTimePicker> {
                   child: Text(minute.toString().padLeft(2, '0')),
                 );
               }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedMinute = value;
-                  });
-                  _updateTime(_selectedHour, _selectedMinute);
-                }
-              },
+              onChanged: widget.enabled
+                  ? (value) {
+                      if (value != null) {
+                        setState(() {
+                          _selectedMinute = value;
+                        });
+                        _updateTime(_selectedHour, _selectedMinute);
+                      }
+                    }
+                  : null,
             ),
           ),
         ),

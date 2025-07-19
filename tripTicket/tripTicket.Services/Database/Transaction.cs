@@ -19,5 +19,5 @@ public partial class Transaction
 
     public string StripeTransactionId { get; set; } = null!;
 
-    public virtual Purchase Purchase { get; set; } = null!;
+    public virtual Purchase Purchase { get; set; }  = null!;
 }

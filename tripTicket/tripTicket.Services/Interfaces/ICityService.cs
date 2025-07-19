@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using tripTicket.Model;
 using tripTicket.Model.Models;
 using tripTicket.Model.Requests;
+using tripTicket.Model.Response;
 using tripTicket.Model.SearchObjects;
 
 namespace tripTicket.Services.Interfaces
 {
-    public interface INotificationService : ICRUDService<Notification, NotificationSearchObject, NotificationInsertRequest, NotificationUpdateRequest>
+    public interface ICityService : ICRUDService<City, CitySearchObject, CityInsertRequest, CityUpdateRequest>
     {
+        public PagedResult<City> GetCitiesByCountryId(int id, CitySearchObject search);
     }
 }
