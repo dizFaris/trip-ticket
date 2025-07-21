@@ -58,8 +58,10 @@ String capitalize(String input) {
 Color getStatusColor(String status) {
   switch (status.toLowerCase()) {
     case 'upcoming':
+    case 'accepted':
       return AppColors.primaryBlue;
     case 'locked':
+    case 'expired':
       return AppColors.primaryBlack;
     case 'canceled':
       return AppColors.primaryRed;

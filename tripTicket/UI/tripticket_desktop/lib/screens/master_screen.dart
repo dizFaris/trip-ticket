@@ -17,8 +17,8 @@ class MasterScreen extends StatefulWidget {
 
 final List<DrawerItem> drawerItems = [
   DrawerItem(title: 'Trips Overview', screen: TripsScreen()),
-  DrawerItem(title: 'Purchases overview', screen: PurchasesScreen()),
   DrawerItem(title: 'Edit Countries and Cities', screen: CountriesScreen()),
+  DrawerItem(title: 'Purchases overview', screen: PurchasesScreen()),
 ];
 
 class MasterScreenState extends State<MasterScreen> {

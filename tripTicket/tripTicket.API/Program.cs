@@ -16,6 +16,7 @@ using tripTicket.Services.PurchaseStateMachine;
 using Microsoft.AspNetCore.Authentication;
 using tripTicket.API;
 using Microsoft.OpenApi.Models;
+using tripTicket.Model.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,6 +90,19 @@ TypeAdapterConfig<CountryUpdateRequest, tripTicket.Services.Database.Country>
     .IgnoreIf((src, dest) => src.Name == null, dest => dest.Name)
     .IgnoreIf((src, dest) => src.CountryCode == null, dest => dest.CountryCode)
     .IgnoreIf((src, dest) => src.IsActive == null, dest => dest.IsActive);
+
+TypeAdapterConfig<tripTicket.Services.Database.Purchase, tripTicket.Model.Models.Purchase>.NewConfig()
+    .Map(dest => dest.Trip, src => src.Trip.Adapt<TripShort>())
+    .Map(dest => dest.User, src => src.User.Adapt<UserShort>());
+
+TypeAdapterConfig<tripTicket.Services.Database.Trip, TripShort>.NewConfig()
+    .Map(dest => dest.City, src => src.City.Name)
+    .Map(dest => dest.Country, src => src.City.Country.Name)
+    .Map(dest => dest.Photo, src => src.Photo)
+    .Map(dest => dest.ExpirationDate, src => src.DepartureDate)
+    .Map(dest => dest.CountryCode, src => src.City.Country.CountryCode);
+
+TypeAdapterConfig<tripTicket.Services.Database.User, UserShort>.NewConfig();
 
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
 

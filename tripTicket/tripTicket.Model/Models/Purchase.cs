@@ -11,19 +11,30 @@ namespace tripTicket.Model.Models
     {
         public int Id { get; set; }
         public int TripId { get; set; }
-
+        public TripShort Trip { get; set; } = null!;
         public int UserId { get; set; }
-
+        public UserShort User { get; set; } = null!;
         public int NumberOfTickets { get; set; }
-
         public decimal TotalPayment { get; set; }
-
         public decimal? Discount { get; set; }
-
         public DateTime CreatedAt { get; set; }
-
         public string Status { get; set; } = null!;
-
         public string PaymentMethod { get; set; } = null!;
+
+    }
+    public class TripShort
+    {
+        public byte[]? Photo { get; set; }
+        public string City { get; set; } = null!;
+        public string Country { get; set; } = null!;
+        public string CountryCode {  get; set; } = null!;
+        public DateOnly ExpirationDate { get; set; }
+    }
+
+    public class UserShort
+    {
+        public string FirstName { get; set; } = null!;
+        public string LastName { get; set; } = null!;
+        public string Username { get; set; } = null!;
     }
 }

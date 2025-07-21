@@ -1550,7 +1550,7 @@ class _TripScreenState extends State<TripScreen> {
         barrierDismissible: true,
         builder: (context) => AlertDialog(
           title: Text("Success"),
-          content: Text("Trip successfully updated"),
+          content: Text("Trip successfully canceled"),
           actions: [
             TextButton(
               onPressed: () {

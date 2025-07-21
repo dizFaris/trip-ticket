@@ -8,6 +8,7 @@ import 'package:tripticket_desktop/providers/city_provider.dart';
 import 'package:country_flags/country_flags.dart';
 import 'package:tripticket_desktop/screens/countries_screen.dart';
 import 'package:tripticket_desktop/screens/master_screen.dart';
+import 'package:tripticket_desktop/widgets/pagination_controls.dart';
 
 class CitiesScreen extends StatefulWidget {
   final Country country;
@@ -499,61 +500,12 @@ class CitiesScreenState extends State<CitiesScreen> {
 
             // Pagination
             const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 38,
-                  height: 38,
-                  child: ElevatedButton(
-                    onPressed: _currentPage > 0 ? _goToPreviousPage : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryYellow,
-                      foregroundColor: Colors.black,
-                      disabledBackgroundColor: AppColors.primaryYellow,
-                      disabledForegroundColor: Colors.grey[600],
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 2,
-                      shadowColor: Colors.black26,
-                    ),
-                    child: const Icon(Icons.chevron_left),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  'Page ${_currentPage + 1} / $_totalPages',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                SizedBox(
-                  width: 38,
-                  height: 38,
-                  child: ElevatedButton(
-                    onPressed: _currentPage < _totalPages - 1
-                        ? _goToNextPage
-                        : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryYellow,
-                      foregroundColor: Colors.black,
-                      disabledBackgroundColor: AppColors.primaryYellow,
-                      disabledForegroundColor: Colors.grey[600],
-                      padding: EdgeInsets.zero,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 2,
-                      shadowColor: Colors.black26,
-                    ),
-                    child: const Icon(Icons.chevron_right),
-                  ),
-                ),
-              ],
+            PaginationControls(
+              currentPage: _currentPage,
+              totalPages: _totalPages,
+              onPrevious: _goToPreviousPage,
+              onNext: _goToNextPage,
+              backgroundColor: AppColors.primaryYellow,
             ),
           ],
         ),

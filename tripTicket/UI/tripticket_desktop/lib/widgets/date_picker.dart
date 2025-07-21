@@ -6,12 +6,16 @@ class DatePickerButton extends StatefulWidget {
   final void Function(DateTime) onDateSelected;
   final DateTime? initialDate;
   final bool enabled;
+  final bool allowPastDates;
+  final String placeHolder;
 
   const DatePickerButton({
     super.key,
     required this.onDateSelected,
     this.initialDate,
     this.enabled = true,
+    this.allowPastDates = false,
+    this.placeHolder = 'Select date',
   });
 
   @override
@@ -42,7 +46,9 @@ class DatePickerButtonState extends State<DatePickerButton> {
         onPressed: widget.enabled
             ? () async {
                 final DateTime now = DateTime.now();
-                final DateTime minDate = now.add(const Duration(days: 5));
+                final DateTime minDate = widget.allowPastDates
+                    ? DateTime(2000) // or DateTime(1900), as far back as needed
+                    : now.add(const Duration(days: 5));
 
                 final DateTime initialPickerDate =
                     (selectedDate != null && selectedDate!.isAfter(minDate))
@@ -72,7 +78,7 @@ class DatePickerButtonState extends State<DatePickerButton> {
             Text(
               selectedDate != null
                   ? DateFormat('yyyy-MM-dd').format(selectedDate!)
-                  : 'Select date',
+                  : widget.placeHolder,
               style: const TextStyle(fontSize: 16, color: Colors.black),
             ),
           ],
