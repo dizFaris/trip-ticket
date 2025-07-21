@@ -141,7 +141,23 @@ class _TripsScreenState extends State<TripsScreen> {
       } catch (e) {
         setState(() {
           _isLoading = false;
+          _trips = [];
         });
+
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Error"),
+            content: Text(e.toString()),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text("Ok"),
+              ),
+            ],
+          ),
+        );
       }
     });
   }
