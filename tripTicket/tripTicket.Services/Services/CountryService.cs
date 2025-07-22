@@ -65,13 +65,28 @@ namespace tripTicket.Services.Services
         {
             base.BeforeUpdate(request, entity);
 
-            if (request.IsActive.HasValue)
+            if (request.IsActive.HasValue && request.IsActive == false)
             {
-                var cities = Context.Cities.Where(c => c.CountryId == entity.Id).ToList();
+                var cityIds = Context.Cities
+                    .Where(c => c.CountryId == entity.Id)
+                    .Select(c => c.Id)
+                    .ToList();
+
+                bool isCountryInUse = Context.Trips
+                    .Any(t => cityIds.Contains(t.CityId) || cityIds.Contains(t.DepartureCityId));
+
+                if (isCountryInUse)
+                {
+                    throw new UserException("Cannot deactivate country because it is used in one or more trips.");
+                }
+
+                var cities = Context.Cities
+                    .Where(c => c.CountryId == entity.Id)
+                    .ToList();
 
                 foreach (var city in cities)
                 {
-                    city.IsActive = request.IsActive.Value;
+                    city.IsActive = false;
                 }
 
                 Context.SaveChanges();

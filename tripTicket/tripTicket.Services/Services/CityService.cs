@@ -76,6 +76,21 @@ namespace tripTicket.Services.Services
             return filteredQuery;
         }
 
+        public override void BeforeUpdate(CityUpdateRequest request, City entity)
+        {
+            base.BeforeUpdate(request, entity);
+
+            if (entity.IsActive && request.IsActive == false)
+            {
+                bool isCityInUse = Context.Trips.Any(t => t.CityId == entity.Id || t.DepartureCityId == entity.Id);
+
+                if (isCityInUse)
+                {
+                    throw new UserException("Cannot deactivate city because it is used in one or more trips.");
+                }
+            }
+        }
+
         public PagedResult<Model.Models.City> GetCitiesByCountryId(int id, CitySearchObject search)
         {
             var query = Context.Set<City>().AsQueryable();

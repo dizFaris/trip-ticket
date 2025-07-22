@@ -126,7 +126,7 @@ class CitiesScreenState extends State<CitiesScreen> {
         barrierDismissible: true,
         builder: (context) => AlertDialog(
           title: Text("Success"),
-          content: Text("Country successfully removed"),
+          content: Text("City successfully removed"),
           actions: [
             TextButton(
               onPressed: () {
