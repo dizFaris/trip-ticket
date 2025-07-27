@@ -35,13 +35,28 @@ namespace tripTicket.Services.Services
                     x.Email.Contains(search.FTS));
             }
 
-            if (search.BirthDate != null)
+            filteredQuery = filteredQuery.Where(x =>
+                !x.UserRoles.Any(ur => ur.Role.Name == "Admin")
+            );
+
+            if (search.FromDate.HasValue)
             {
-                filteredQuery = filteredQuery.Where(x => x.BirthDate == search.BirthDate);
+                filteredQuery = filteredQuery.Where(x => x.BirthDate >= search.FromDate.Value);
+            }
+
+            if (search.ToDate.HasValue)
+            {
+                filteredQuery = filteredQuery.Where(x => x.BirthDate <= search.ToDate.Value);
+            }
+
+            if (search.IsActive.HasValue)
+            {
+                filteredQuery = filteredQuery.Where(x => x.IsActive == search.IsActive.Value);
             }
 
             return filteredQuery;
         }
+
 
         public override void BeforeInsert(UserInsertRequest request, Database.User entity)
         {
@@ -77,6 +92,7 @@ namespace tripTicket.Services.Services
 
             entity.PasswordSalt = HashGenerator.GenerateSalt();
             entity.PasswordHash = HashGenerator.GenerateHash(entity.PasswordSalt, request.Password);
+            entity.IsActive = true;
 
             var defaultRole = Context.Roles.FirstOrDefault(r => r.Name == "User");
             if (defaultRole == null)
@@ -96,6 +112,13 @@ namespace tripTicket.Services.Services
         public override void BeforeUpdate(UserUpdateRequest request, Database.User entity)
         {
             base.BeforeUpdate(request, entity);
+
+            if (entity == null)
+                throw new UserException("User entity not found.");
+
+            if (!entity.IsActive)
+                throw new UserException("Cannot update data of an inactive user.");
+
             if (!string.IsNullOrEmpty(request.Password))
             {
                 var pw = ValidationHelpers.CheckPasswordStrength(request.Password);
@@ -118,7 +141,7 @@ namespace tripTicket.Services.Services
                 {
                     throw new UserException("Password and confirm password are not matching");
                 }
-                entity!.PasswordSalt = HashGenerator.GenerateSalt();
+                entity.PasswordSalt = HashGenerator.GenerateSalt();
                 entity.PasswordHash = HashGenerator.GenerateHash(entity.PasswordSalt, request.Password);
             }
         }
@@ -150,6 +173,11 @@ namespace tripTicket.Services.Services
                 throw new UserException("User not found");
             }
 
+            if (!entity.IsActive)
+            {
+                throw new UserException("Your account has been deactivated. Please contact the administrator for help.");
+            }
+
             var hash = HashGenerator.GenerateHash(entity.PasswordSalt, password);
 
             if (hash != entity.PasswordHash)
@@ -158,6 +186,28 @@ namespace tripTicket.Services.Services
             }
 
             return Mapper.Map<Model.Models.User>(entity);
+        }
+
+
+        public Model.Models.User ToggleActiveStatus(int userId, UserToggleActiveRequest request)
+        {
+            var user = Context.Users
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                .FirstOrDefault(u => u.Id == userId);
+
+            if (user == null)
+                throw new UserException("User not found.");
+
+            bool isAdmin = user.UserRoles.Any(ur => ur.Role.Name == "Admin");
+
+            if (!request.IsActive && isAdmin)
+                throw new UserException("Cannot deactivate a user with the Admin role.");
+
+            user.IsActive = request.IsActive;
+            Context.SaveChanges();
+
+            return Mapper.Map<Model.Models.User>(user);
         }
     }
 }

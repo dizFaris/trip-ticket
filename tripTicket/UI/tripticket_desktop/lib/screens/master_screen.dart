@@ -4,6 +4,7 @@ import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/screens/countries_screen.dart';
 import 'package:tripticket_desktop/screens/purchases_screen.dart';
 import 'package:tripticket_desktop/screens/trips_screen.dart';
+import 'package:tripticket_desktop/screens/users_screen.dart';
 
 final GlobalKey<MasterScreenState> masterScreenKey =
     GlobalKey<MasterScreenState>();
@@ -18,7 +19,8 @@ class MasterScreen extends StatefulWidget {
 final List<DrawerItem> drawerItems = [
   DrawerItem(title: 'Trips Overview', screen: TripsScreen()),
   DrawerItem(title: 'Edit Countries and Cities', screen: CountriesScreen()),
-  DrawerItem(title: 'Purchases overview', screen: PurchasesScreen()),
+  DrawerItem(title: 'Purchases', screen: PurchasesScreen()),
+  DrawerItem(title: 'Users', screen: UsersScreen()),
 ];
 
 class MasterScreenState extends State<MasterScreen> {

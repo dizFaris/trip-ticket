@@ -14,7 +14,7 @@ User _$UserFromJson(Map<String, dynamic> json) => User(
   email: json['email'] as String,
   phone: json['phone'] as String?,
   birthDate: DateTime.parse(json['birthDate'] as String),
-  isDeleted: json['isDeleted'] as bool,
+  isActive: json['isActive'] as bool,
   createdAt: DateTime.parse(json['createdAt'] as String),
   roles: (json['roles'] as List<dynamic>).map((e) => e as String).toList(),
 );
@@ -27,7 +27,7 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
   'email': instance.email,
   'phone': instance.phone,
   'birthDate': instance.birthDate.toIso8601String(),
-  'isDeleted': instance.isDeleted,
+  'isActive': instance.isActive,
   'createdAt': instance.createdAt.toIso8601String(),
   'roles': instance.roles,
 };

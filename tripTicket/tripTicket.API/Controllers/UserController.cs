@@ -5,6 +5,7 @@ using tripTicket.Model.Models;
 using tripTicket.Model.Requests;
 using tripTicket.Model.SearchObjects;
 using tripTicket.Services.Interfaces;
+using tripTicket.Services.Services;
 
 namespace tripTicket.API.Controllers
 {
@@ -12,8 +13,10 @@ namespace tripTicket.API.Controllers
     [Route("[controller]")]
     public class UserController : BaseCRUDController<User, UserSearchObject, UserInsertRequest, UserUpdateRequest>
     {
+        protected new IUserService _service;
         public UserController(IUserService service) : base(service)
         {
+            _service = service;
         }
 
         [AllowAnonymous]
@@ -26,7 +29,7 @@ namespace tripTicket.API.Controllers
         [AllowAnonymous]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var user = (_service as IUserService).Login(request.username, request.password);
+            var user = _service.Login(request.username, request.password);
 
             var clientTypeRaw = Request.Headers["X-Client-Type"].ToString();
             var clientType = clientTypeRaw?.Trim().ToLower();
@@ -46,6 +49,13 @@ namespace tripTicket.API.Controllers
                 return Unauthorized(new { message = "Admins cannot log in from the mobile app." });
             }
 
+            return Ok(user);
+        }
+
+        [HttpPatch("{id}/status")]
+        public IActionResult ToggleUserStatus(int id, [FromBody] UserToggleActiveRequest request)
+        {
+            var user = _service.ToggleActiveStatus(id, request);
             return Ok(user);
         }
     }

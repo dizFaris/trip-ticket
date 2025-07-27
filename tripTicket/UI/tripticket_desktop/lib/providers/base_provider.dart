@@ -128,6 +128,26 @@ abstract class BaseProvider<T> with ChangeNotifier {
     }
   }
 
+  Future<T> patch(int id, dynamic request, {String? customPath}) async {
+    var url = "$_baseUrl$_endpoint/$id";
+    if (customPath != null) {
+      url = "$_baseUrl$_endpoint/$id/$customPath";
+    }
+
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+    var jsonRequest = jsonEncode(request);
+
+    var response = await http.patch(uri, headers: headers, body: jsonRequest);
+
+    if (isValidResponse(response)) {
+      var data = jsonDecode(response.body);
+      return fromJson(data);
+    } else {
+      throw Exception("Unknown error");
+    }
+  }
+
   T fromJson(data) {
     throw Exception("Method not implemented");
   }

@@ -290,7 +290,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             Row(
               children: [
                 DatePickerButton(
-                  initialDate: null,
+                  initialDate: fromDate,
                   allowPastDates: true,
                   placeHolder: 'Date from',
                   onDateSelected: (date) {
@@ -302,7 +302,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                 ),
                 SizedBox(width: 8),
                 DatePickerButton(
-                  initialDate: null,
+                  initialDate: toDate,
                   allowPastDates: true,
                   placeHolder: 'Date to',
                   onDateSelected: (date) {

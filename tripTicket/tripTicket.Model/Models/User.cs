@@ -21,7 +21,7 @@ namespace tripTicket.Model.Models
 
         public DateOnly BirthDate { get; set; }
 
-        public bool IsDeleted { get; set; }
+        public bool IsActive { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

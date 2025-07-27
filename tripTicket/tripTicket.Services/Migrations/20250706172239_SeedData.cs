@@ -21,18 +21,18 @@ namespace tripTicket.Services.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "FirstName", "LastName", "Username", "Email", "Phone", "PasswordHash", "PasswordSalt", "BirthDate", "IsDeleted", "CreatedAt" },
+                columns: new[] { "Id", "FirstName", "LastName", "Username", "Email", "Phone", "PasswordHash", "PasswordSalt", "BirthDate", "IsActive", "CreatedAt" },
                 values: new object[,] {
-         { 1, "Admin", "Admin", "admin", "admin@example.com", "1234567890", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), false, DateTime.UtcNow },
-         { 2, "Test", "User", "testuser", "test@example.com", "1234567890", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), false, DateTime.UtcNow },
-         { 3, "Faris", "Dizdarevic", "faris", "faris.diz789@gmail.com", "0603360416", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), false, DateTime.UtcNow },
-         { 4, "Emily", "Johnson", "emilyj", "emily.johnson@example.com", "3456789012", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1988, 11, 12), false, DateTime.UtcNow },
-         { 5, "Michael", "Brown", "michaelb", "michael.brown@example.com", "4567890123", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1992, 3, 3), false, DateTime.UtcNow },
-         { 6, "Jessica", "Davis", "jessicad", "jessica.davis@example.com", "5678901234", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1990, 7, 15), false, DateTime.UtcNow },
-         { 7, "David", "Miller", "davidm", "david.miller@example.com", "6789012345", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1985, 12, 1), false, DateTime.UtcNow },
-         { 8, "Sarah", "Wilson", "sarahw", "sarah.wilson@example.com", "7890123456", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1998, 9, 9), false, DateTime.UtcNow },
-         { 9, "Daniel", "Moore", "danielmoore", "daniel.moore@example.com", "8901234567", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1993, 4, 22), false, DateTime.UtcNow },
-         { 10, "Laura", "Taylor", "laurat", "laura.taylor@example.com", "9012345678", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1997, 8, 30), false, DateTime.UtcNow }
+         { 1, "Admin", "Admin", "admin", "admin@example.com", "1234567890", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), true, DateTime.UtcNow },
+         { 2, "Test", "User", "testuser", "test@example.com", "1234567890", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), true, DateTime.UtcNow },
+         { 3, "Faris", "Dizdarevic", "faris", "faris.diz789@gmail.com", "0603360416", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), true, DateTime.UtcNow },
+         { 4, "Emily", "Johnson", "emilyj", "emily.johnson@example.com", "3456789012", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1988, 11, 12), true, DateTime.UtcNow },
+         { 5, "Michael", "Brown", "michaelb", "michael.brown@example.com", "4567890123", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1992, 3, 3), true, DateTime.UtcNow },
+         { 6, "Jessica", "Davis", "jessicad", "jessica.davis@example.com", "5678901234", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1990, 7, 15), true, DateTime.UtcNow },
+         { 7, "David", "Miller", "davidm", "david.miller@example.com", "6789012345", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1985, 12, 1), true, DateTime.UtcNow },
+         { 8, "Sarah", "Wilson", "sarahw", "sarah.wilson@example.com", "7890123456", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1998, 9, 9), true, DateTime.UtcNow },
+         { 9, "Daniel", "Moore", "danielmoore", "daniel.moore@example.com", "8901234567", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1993, 4, 22), true, DateTime.UtcNow },
+         { 10, "Laura", "Taylor", "laurat", "laura.taylor@example.com", "9012345678", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1997, 8, 30), true, DateTime.UtcNow }
                 });
 
             migrationBuilder.InsertData(

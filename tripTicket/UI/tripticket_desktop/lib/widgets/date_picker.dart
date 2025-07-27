@@ -32,6 +32,16 @@ class DatePickerButtonState extends State<DatePickerButton> {
   }
 
   @override
+  void didUpdateWidget(covariant DatePickerButton oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialDate != oldWidget.initialDate) {
+      setState(() {
+        selectedDate = widget.initialDate;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 32,
@@ -47,7 +57,7 @@ class DatePickerButtonState extends State<DatePickerButton> {
             ? () async {
                 final DateTime now = DateTime.now();
                 final DateTime minDate = widget.allowPastDates
-                    ? DateTime(2000) // or DateTime(1900), as far back as needed
+                    ? DateTime(1950)
                     : now.add(const Duration(days: 5));
 
                 final DateTime initialPickerDate =

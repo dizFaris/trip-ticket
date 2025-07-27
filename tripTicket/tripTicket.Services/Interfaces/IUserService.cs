@@ -13,5 +13,6 @@ namespace tripTicket.Services.Interfaces
     {
         Task<List<Role>> GetUserRolesAsync(int id);
         User Login(string username, string password);
+        User ToggleActiveStatus(int userId, UserToggleActiveRequest request);
     }
 }

@@ -11,7 +11,7 @@ class User {
   final String email;
   final String? phone;
   final DateTime birthDate;
-  final bool isDeleted;
+  final bool isActive;
   final DateTime createdAt;
   final List<String> roles;
 
@@ -23,7 +23,7 @@ class User {
     required this.email,
     this.phone,
     required this.birthDate,
-    required this.isDeleted,
+    required this.isActive,
     required this.createdAt,
     required this.roles,
   });
