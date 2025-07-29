@@ -514,7 +514,6 @@ class CitiesScreenState extends State<CitiesScreen> {
                           ),
                   ),
 
-            // Pagination
             const SizedBox(height: 12),
             PaginationControls(
               currentPage: _currentPage,

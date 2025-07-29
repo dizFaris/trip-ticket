@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication;
 using tripTicket.API;
 using Microsoft.OpenApi.Models;
 using tripTicket.Model.Models;
+using QuestPDF.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +31,7 @@ builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<ITripStatisticService, TripStatisticService>();
 builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICityService, CityService>();
+builder.Services.AddTransient<IStatisticsService, StatisticsService>();
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();
@@ -110,6 +112,8 @@ builder.Services.AddHangfire(configuration => configuration
     .UseSqlServerStorage(connectionString));
 
 builder.Services.AddHangfireServer();
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 var app = builder.Build();
 

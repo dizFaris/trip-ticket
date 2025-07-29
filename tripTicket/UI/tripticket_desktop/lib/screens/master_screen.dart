@@ -3,6 +3,7 @@ import 'package:tripticket_desktop/models/menu_model.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/screens/countries_screen.dart';
 import 'package:tripticket_desktop/screens/purchases_screen.dart';
+import 'package:tripticket_desktop/screens/statistics_screen.dart';
 import 'package:tripticket_desktop/screens/trips_screen.dart';
 import 'package:tripticket_desktop/screens/users_screen.dart';
 
@@ -21,6 +22,7 @@ final List<DrawerItem> drawerItems = [
   DrawerItem(title: 'Edit Countries and Cities', screen: CountriesScreen()),
   DrawerItem(title: 'Purchases', screen: PurchasesScreen()),
   DrawerItem(title: 'Users', screen: UsersScreen()),
+  DrawerItem(title: 'Reports', screen: StatisticsScreen()),
 ];
 
 class MasterScreenState extends State<MasterScreen> {

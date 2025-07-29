@@ -528,7 +528,6 @@ class CountriesScreenState extends State<CountriesScreen> {
                           ),
                   ),
 
-            // Pagination
             const SizedBox(height: 12),
             PaginationControls(
               currentPage: _currentPage,
