@@ -54,13 +54,78 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   String? usernameError;
   String? passwordError;
-  bool isLoading = false;
-  late UserProvider userProvider;
+  bool _isLoading = false;
+  final UserProvider _userProvider = UserProvider();
 
   @override
   void initState() {
     super.initState();
-    userProvider = UserProvider();
+  }
+
+  void _login() async {
+    if (!_validateInputs()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    AuthProvider.username = _usernameController.text;
+    AuthProvider.password = _passwordController.text;
+    try {
+      await _userProvider.login(
+        _usernameController.text.trim(),
+        _passwordController.text.trim(),
+      );
+
+      if (!mounted) return;
+
+      _usernameController.clear();
+      _passwordController.clear();
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => MasterScreen(key: masterScreenKey),
+        ),
+      );
+    } on Exception catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+          content: Text(e.toString()),
+        ),
+      );
+    }
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  bool _validateInputs() {
+    final usernameVal = _usernameController.text;
+    final passwordVal = _passwordController.text;
+
+    final usernameValidation =
+        inputRequired(usernameVal) ??
+        noSpecialCharacters(usernameVal) ??
+        minLength(usernameVal, 3) ??
+        maxLength(usernameVal, 20);
+
+    final passwordValidation =
+        inputRequired(passwordVal) ?? password(passwordVal);
+
+    setState(() {
+      usernameError = usernameValidation;
+      passwordError = passwordValidation;
+    });
+
+    return usernameError == null && passwordError == null;
   }
 
   @override
@@ -147,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: isLoading ? null : _login,
+                        onPressed: _isLoading ? null : _login,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           backgroundColor: AppColors.primaryGreen,
@@ -155,7 +220,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: isLoading
+                        child: _isLoading
                             ? const CircularProgressIndicator(
                                 color: Colors.white,
                               )
@@ -177,71 +242,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
-  }
-
-  void _login() async {
-    if (!validateInputs()) return;
-
-    setState(() {
-      isLoading = true;
-    });
-
-    AuthProvider.username = _usernameController.text;
-    AuthProvider.password = _passwordController.text;
-    try {
-      await userProvider.login(
-        _usernameController.text.trim(),
-        _passwordController.text.trim(),
-      );
-
-      if (!mounted) return;
-
-      _usernameController.clear();
-      _passwordController.clear();
-
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => MasterScreen(key: masterScreenKey),
-        ),
-      );
-    } on Exception catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Error"),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-          content: Text(e.toString()),
-        ),
-      );
-    }
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  bool validateInputs() {
-    final usernameVal = _usernameController.text;
-    final passwordVal = _passwordController.text;
-
-    final usernameValidation =
-        inputRequired(usernameVal) ??
-        noSpecialCharacters(usernameVal) ??
-        minLength(usernameVal, 3) ??
-        maxLength(usernameVal, 20);
-
-    final passwordValidation =
-        inputRequired(passwordVal) ?? password(passwordVal);
-
-    setState(() {
-      usernameError = usernameValidation;
-      passwordError = passwordValidation;
-    });
-
-    return usernameError == null && passwordError == null;
   }
 }
