@@ -32,32 +32,28 @@ class _TripScreenState extends State<TripScreen> {
 
   bool get _isEditing => widget.tripId != null;
   bool _isLoading = true;
-  List<Country> countries = [];
-  List<City> cities = [];
-  List<City> departureCities = [];
+  List<Country> _countries = [];
+  List<City> _cities = [];
+  List<City> _departureCities = [];
 
-  int? selectedCityId;
-  int? departureCityId;
-  int? selectedCountryId;
-  int? departureCountryId;
-  DateTime? departureDate;
-  DateTime? returnDate;
-  String? tripType;
-  double? ticketPrice;
-  int? availableTickets = 0;
-  int? purchasedTickets = 0;
-  String? transportType;
-  List<Map<String, Object>>? tripDays = [];
-  String? description;
-  DateTime? freeCancellationUntil;
-  double? cancellationFee = 0;
-  double? discountPercentage;
-  int? minTicketsForDiscount;
-  List<int>? selectedPhoto;
-  String? tripStatus;
+  int? _selectedCityId;
+  int? _departureCityId;
+  int? _selectedCountryId;
+  int? _departureCountryId;
+  DateTime? _departureDate;
+  DateTime? _returnDate;
+  String? _tripType;
+  double? _ticketPrice;
+  int? _availableTickets = 0;
+  int? _purchasedTickets = 0;
+  String? _transportType;
+  List<Map<String, Object>>? _tripDays = [];
+  DateTime? _freeCancellationUntil;
+  List<int>? _selectedPhoto;
+  String? _tripStatus;
 
-  bool get inputEnabled =>
-      !_isEditing || (_isEditing && tripStatus == 'upcoming');
+  bool get _inputEnabled =>
+      !_isEditing || (_isEditing && _tripStatus == 'upcoming');
 
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _availableTicketsController =
@@ -70,7 +66,7 @@ class _TripScreenState extends State<TripScreen> {
   final TextEditingController _minTicketsForDiscountController =
       TextEditingController();
 
-  final List<String> tripTypes = [
+  final List<String> _tripTypes = [
     "Romantic",
     "Adventure",
     "Cultural",
@@ -88,7 +84,7 @@ class _TripScreenState extends State<TripScreen> {
     "Vacation",
   ];
 
-  final Map<String, IconData> transportTypes = {
+  final Map<String, IconData> _transportTypes = {
     'Bus': Icons.directions_bus,
     'Plane': Icons.flight,
     'Car': Icons.directions_car,
@@ -102,13 +98,13 @@ class _TripScreenState extends State<TripScreen> {
     super.initState();
     _getCountries();
     if (_isEditing) {
-      getTripData(widget.tripId!);
+      _getTripData(widget.tripId!);
     } else {
       _isLoading = false;
     }
   }
 
-  void getTripData(int tripId) async {
+  void _getTripData(int tripId) async {
     setState(() {
       _isLoading = true;
     });
@@ -139,51 +135,48 @@ class _TripScreenState extends State<TripScreen> {
     );
 
     setState(() {
-      selectedCityId = trip.city.id;
-      cities = tripCountryCities;
+      _selectedCityId = trip.city.id;
+      _cities = tripCountryCities;
 
-      departureCityId = trip.departureCity.id;
-      departureCities = departureCountryCities;
+      _departureCityId = trip.departureCity.id;
+      _departureCities = departureCountryCities;
 
-      selectedCountryId = trip.city.country!.id;
-      departureCountryId = trip.departureCity.country!.id;
+      _selectedCountryId = trip.city.country!.id;
+      _departureCountryId = trip.departureCity.country!.id;
 
-      departureDate = trip.departureDate;
-      returnDate = trip.returnDate;
-      tripType = trip.tripType;
+      _departureDate = trip.departureDate;
+      _returnDate = trip.returnDate;
+      _tripType = trip.tripType;
 
-      ticketPrice = trip.ticketPrice;
-      _priceController.text = ticketPrice.toString();
+      _ticketPrice = trip.ticketPrice;
+      _priceController.text = _ticketPrice.toString();
 
-      availableTickets = trip.availableTickets;
-      _availableTicketsController.text = availableTickets.toString();
+      _availableTickets = trip.availableTickets;
+      _availableTicketsController.text = _availableTickets.toString();
 
-      purchasedTickets = trip.purchasedTickets;
-      transportType = trip.transportType;
+      _purchasedTickets = trip.purchasedTickets;
+      _transportType = trip.transportType;
 
-      tripDays = convertModelTripDaysToState(trip.tripDays);
+      _tripDays = convertModelTripDaysToState(trip.tripDays);
 
       _descriptionController.text = trip.description!;
 
-      cancellationFee = trip.cancellationFee;
       _cancellationFeeController.text = trip.cancellationFee.toString();
 
-      freeCancellationUntil = trip.freeCancellationUntil;
+      _freeCancellationUntil = trip.freeCancellationUntil;
 
-      discountPercentage = trip.discountPercentage;
       _discountPercentageController.text = trip.discountPercentage != null
           ? trip.discountPercentage!.toInt().toString()
           : '';
 
-      minTicketsForDiscount = trip.minTicketsForDiscount;
       _minTicketsForDiscountController.text = trip.minTicketsForDiscount != null
           ? trip.minTicketsForDiscount!.toInt().toString()
           : '';
 
-      selectedPhoto = (trip.photo != null && trip.photo!.isNotEmpty)
+      _selectedPhoto = (trip.photo != null && trip.photo!.isNotEmpty)
           ? base64Decode(trip.photo!)
           : null;
-      tripStatus = trip.tripStatus;
+      _tripStatus = trip.tripStatus;
 
       _isLoading = false;
     });
@@ -200,7 +193,7 @@ class _TripScreenState extends State<TripScreen> {
       var searchResult = await _countryProvider.get();
 
       setState(() {
-        countries = searchResult.result;
+        _countries = searchResult.result;
         if (!_isEditing) {
           setState(() {
             _isLoading = false;
@@ -210,7 +203,7 @@ class _TripScreenState extends State<TripScreen> {
     } catch (e) {
       setState(() {
         _isLoading = false;
-        countries = [];
+        _countries = [];
       });
 
       if (!mounted) return;
@@ -250,6 +243,316 @@ class _TripScreenState extends State<TripScreen> {
     }
   }
 
+  Future<void> _addNewTrip() async {
+    final tripData = {
+      "CityId": _selectedCityId,
+      "DepartureCityId": _departureCityId,
+      "DepartureDate": _departureDate?.toIso8601String().substring(0, 10),
+      "ReturnDate": _returnDate?.toIso8601String().substring(0, 10),
+      "TripType": _tripType,
+      "TransportType": _transportType,
+      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
+      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
+      "Description": _descriptionController.text,
+      "FreeCancellationUntil": _freeCancellationUntil
+          ?.toIso8601String()
+          .substring(0, 10),
+      "CancellationFee":
+          double.tryParse(_cancellationFeeController.text) ?? 0.0,
+      "MinTicketsForDiscount":
+          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
+      "DiscountPercentage":
+          double.tryParse(_discountPercentageController.text) ?? 0.0,
+      "Photo": _selectedPhoto != null ? base64Encode(_selectedPhoto!) : null,
+      "TripDays": _tripDays,
+    };
+
+    final validationError = _validateTripData(tripData);
+    if (validationError != null) {
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Validation Error"),
+          content: Text(validationError),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _tripProvider.insert(tripData);
+      if (!mounted) return;
+
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text("Success"),
+          content: Text("Trip successfully added"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+
+      if (result == true || result == null) {
+        masterScreenKey.currentState?.navigateTo(TripsScreen());
+      }
+    } on Exception catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  Future<void> _saveTrip() async {
+    final tripData = {
+      "CityId": _selectedCityId,
+      "DepartureCityId": _departureCityId,
+      "DepartureDate": _departureDate?.toIso8601String().substring(0, 10),
+      "ReturnDate": _returnDate?.toIso8601String().substring(0, 10),
+      "TripType": _tripType,
+      "TransportType": _transportType,
+      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
+      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
+      "Description": _descriptionController.text,
+      "FreeCancellationUntil": _freeCancellationUntil
+          ?.toIso8601String()
+          .substring(0, 10),
+      "CancellationFee":
+          double.tryParse(_cancellationFeeController.text) ?? 0.0,
+      "MinTicketsForDiscount":
+          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
+      "DiscountPercentage":
+          double.tryParse(_discountPercentageController.text) ?? 0.0,
+      "Photo": _selectedPhoto != null ? base64Encode(_selectedPhoto!) : null,
+      "TripDays": _tripDays,
+    };
+
+    final validationError = _validateTripData(tripData);
+    if (validationError != null) {
+      if (!mounted) return;
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Validation Error"),
+          content: Text(validationError),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    try {
+      await _tripProvider.update(widget.tripId!, tripData);
+      if (!mounted) return;
+
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text("Success"),
+          content: Text("Trip successfully updated"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+
+      if (result == true || result == null) {
+        masterScreenKey.currentState?.navigateTo(TripsScreen());
+      }
+    } on Exception catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  String? _validateTripData(Map<String, dynamic> tripData) {
+    final errors = <String>[];
+
+    if (tripData["CityId"] == null) {
+      errors.add("City must be selected.");
+    }
+    if (tripData["DepartureCityId"] == null) {
+      errors.add("Departure city must be selected.");
+    }
+    if (tripData["DepartureDate"] == null ||
+        tripData["DepartureDate"].isEmpty) {
+      errors.add("Departure date is required.");
+    }
+    if (tripData["ReturnDate"] == null || tripData["ReturnDate"].isEmpty) {
+      errors.add("Return date is required.");
+    }
+    if (tripData["TripType"] == null || tripData["TripType"].isEmpty) {
+      errors.add("Trip type is required.");
+    }
+    if (tripData["TransportType"] == null ||
+        tripData["TransportType"].isEmpty) {
+      errors.add("Transport type is required.");
+    }
+    if (tripData["TicketPrice"] == null || tripData["TicketPrice"] <= 0) {
+      errors.add("Ticket price must be greater than zero.");
+    }
+    if (tripData["AvailableTickets"] == null ||
+        tripData["AvailableTickets"] < 0) {
+      errors.add("Available tickets must be zero or more.");
+    }
+
+    try {
+      if (tripData["DepartureDate"] != null &&
+          tripData["DepartureDate"].isNotEmpty) {
+        _departureDate = DateTime.parse(tripData["DepartureDate"]);
+      }
+    } catch (_) {
+      errors.add("Departure date format is invalid.");
+    }
+    try {
+      if (tripData["ReturnDate"] != null && tripData["ReturnDate"].isNotEmpty) {
+        _returnDate = DateTime.parse(tripData["ReturnDate"]);
+      }
+    } catch (_) {
+      errors.add("Return date format is invalid.");
+    }
+    try {
+      if (tripData["FreeCancellationUntil"] != null &&
+          tripData["FreeCancellationUntil"].isNotEmpty) {
+        _freeCancellationUntil = DateTime.parse(
+          tripData["FreeCancellationUntil"],
+        );
+      }
+    } catch (_) {
+      errors.add("Free cancellation date format is invalid.");
+    }
+
+    if (_departureDate != null && _returnDate != null) {
+      if (_departureDate!.isAfter(_returnDate!)) {
+        errors.add("Departure date must be before return date.");
+      }
+    }
+
+    if (_departureDate != null && _freeCancellationUntil != null) {
+      final diff = _departureDate!.difference(_freeCancellationUntil!).inDays;
+      if (diff < 3) {
+        errors.add(
+          "Free cancellation must end at least 3 days before departure.",
+        );
+      }
+    }
+
+    final discount = tripData["DiscountPercentage"] ?? 0.0;
+    if (discount < 0 || discount > 100) {
+      errors.add("Discount percentage must be between 0 and 100.");
+    }
+
+    final cancellationFee = tripData["CancellationFee"] ?? 0.0;
+    if (cancellationFee < 0) {
+      errors.add("Cancellation fee cannot be negative.");
+    }
+
+    final minTickets = tripData["MinTicketsForDiscount"] ?? 0;
+    if (minTickets < 0) {
+      errors.add("Minimum tickets for discount cannot be negative.");
+    }
+
+    if (errors.isEmpty) {
+      return null;
+    } else {
+      return errors.join('\n');
+    }
+  }
+
+  _cancelTrip() async {
+    try {
+      await _tripProvider.cancelTrip(widget.tripId!);
+
+      if (!mounted) return;
+      final result = await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text("Success"),
+          content: Text("Trip successfully canceled"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+
+      if (result == true || result == null) {
+        masterScreenKey.currentState?.navigateTo(TripsScreen());
+      }
+    } on Exception catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -257,9 +560,11 @@ class _TripScreenState extends State<TripScreen> {
     _availableTicketsController.dispose();
     _descriptionController.dispose();
     _cancellationFeeController.dispose();
+    _discountPercentageController.dispose();
+    _minTicketsForDiscountController.dispose();
   }
 
-  Widget countryDropdown({
+  Widget _countryDropdown({
     required List<Country> countries,
     required void Function(int?) onChanged,
     required int? value,
@@ -290,7 +595,7 @@ class _TripScreenState extends State<TripScreen> {
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
         ),
         value: value,
-        items: countries.map((country) {
+        items: _countries.map((country) {
           return DropdownMenuItem<int>(
             value: country.id,
             child: Row(
@@ -328,7 +633,7 @@ class _TripScreenState extends State<TripScreen> {
     );
   }
 
-  Widget cityDropdown({
+  Widget _cityDropdown({
     required List<City> cities,
     required void Function(int?) onChanged,
     required int? value,
@@ -358,7 +663,7 @@ class _TripScreenState extends State<TripScreen> {
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
         ),
         value: value,
-        items: cities.map((city) {
+        items: _cities.map((city) {
           return DropdownMenuItem<int>(
             value: city.id,
             child: SizedBox(
@@ -572,18 +877,18 @@ class _TripScreenState extends State<TripScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                countryDropdown(
-                                  countries: countries,
-                                  enabled: inputEnabled,
-                                  value: selectedCountryId,
+                                _countryDropdown(
+                                  countries: _countries,
+                                  enabled: _inputEnabled,
+                                  value: _selectedCountryId,
                                   onChanged: (value) async {
                                     var countryCities = await _getCountryCities(
                                       value!,
                                     );
                                     setState(() {
-                                      selectedCityId = null;
-                                      selectedCountryId = value;
-                                      cities = countryCities;
+                                      _selectedCityId = null;
+                                      _selectedCountryId = value;
+                                      _cities = countryCities;
                                     });
                                   },
                                 ),
@@ -603,13 +908,13 @@ class _TripScreenState extends State<TripScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                cityDropdown(
-                                  cities: cities,
-                                  enabled: inputEnabled,
-                                  value: selectedCityId,
+                                _cityDropdown(
+                                  cities: _cities,
+                                  enabled: _inputEnabled,
+                                  value: _selectedCityId,
                                   onChanged: (value) {
                                     setState(() {
-                                      selectedCityId = value;
+                                      _selectedCityId = value;
                                     });
                                   },
                                 ),
@@ -630,11 +935,11 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 DatePickerButton(
-                                  initialDate: departureDate,
-                                  enabled: inputEnabled,
+                                  initialDate: _departureDate,
+                                  enabled: _inputEnabled,
                                   onDateSelected: (date) {
                                     setState(() {
-                                      departureDate = date;
+                                      _departureDate = date;
                                     });
                                   },
                                 ),
@@ -655,11 +960,11 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 DatePickerButton(
-                                  initialDate: returnDate,
-                                  enabled: inputEnabled,
+                                  initialDate: _returnDate,
+                                  enabled: _inputEnabled,
                                   onDateSelected: (date) {
                                     setState(() {
-                                      returnDate = date;
+                                      _returnDate = date;
                                     });
                                   },
                                 ),
@@ -681,12 +986,12 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(width: 8),
                                 _dropdown<String>(
                                   label: 'Select type',
-                                  enabled: inputEnabled,
-                                  value: tripType,
-                                  items: tripTypes,
+                                  enabled: _inputEnabled,
+                                  value: _tripType,
+                                  items: _tripTypes,
                                   onChanged: (val) {
                                     setState(() {
-                                      tripType = val;
+                                      _tripType = val;
                                     });
                                   },
                                 ),
@@ -711,7 +1016,7 @@ class _TripScreenState extends State<TripScreen> {
                                   height: 32,
                                   child: TextField(
                                     controller: _priceController,
-                                    enabled: inputEnabled,
+                                    enabled: _inputEnabled,
                                     inputFormatters: <TextInputFormatter>[
                                       FilteringTextInputFormatter.digitsOnly,
                                       LengthLimitingTextInputFormatter(8),
@@ -730,7 +1035,7 @@ class _TripScreenState extends State<TripScreen> {
                                         vertical: 6,
                                       ),
                                       filled: true,
-                                      fillColor: inputEnabled
+                                      fillColor: _inputEnabled
                                           ? AppColors.primaryGray
                                           : Colors.blueGrey[300],
                                       border: OutlineInputBorder(
@@ -765,7 +1070,7 @@ class _TripScreenState extends State<TripScreen> {
                                         child: TextField(
                                           controller:
                                               _availableTicketsController,
-                                          enabled: inputEnabled,
+                                          enabled: _inputEnabled,
                                           keyboardType: TextInputType.number,
                                           textAlign: TextAlign.center,
                                           inputFormatters: <TextInputFormatter>[
@@ -783,7 +1088,7 @@ class _TripScreenState extends State<TripScreen> {
                                                   vertical: 6,
                                                 ),
                                             filled: true,
-                                            fillColor: inputEnabled
+                                            fillColor: _inputEnabled
                                                 ? AppColors.primaryGray
                                                 : Colors.blueGrey[300],
                                             border: OutlineInputBorder(
@@ -796,7 +1101,7 @@ class _TripScreenState extends State<TripScreen> {
                                       ),
                                       SizedBox(width: 8),
                                       Text(
-                                        "$purchasedTickets already purchased",
+                                        "$_purchasedTickets already purchased",
                                         style: TextStyle(fontSize: 16),
                                       ),
                                     ],
@@ -818,17 +1123,17 @@ class _TripScreenState extends State<TripScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                countryDropdown(
-                                  countries: countries,
-                                  enabled: inputEnabled,
-                                  value: departureCountryId,
+                                _countryDropdown(
+                                  countries: _countries,
+                                  enabled: _inputEnabled,
+                                  value: _departureCountryId,
                                   onChanged: (value) async {
                                     var departureCountryCities =
                                         await _getCountryCities(value!);
                                     setState(() {
-                                      departureCityId = null;
-                                      departureCountryId = value;
-                                      departureCities = departureCountryCities;
+                                      _departureCityId = null;
+                                      _departureCountryId = value;
+                                      _departureCities = departureCountryCities;
                                     });
                                   },
                                 ),
@@ -848,13 +1153,13 @@ class _TripScreenState extends State<TripScreen> {
                                   ),
                                 ),
                                 SizedBox(width: 8),
-                                cityDropdown(
-                                  cities: departureCities,
-                                  enabled: inputEnabled,
-                                  value: departureCityId,
+                                _cityDropdown(
+                                  cities: _departureCities,
+                                  enabled: _inputEnabled,
+                                  value: _departureCityId,
                                   onChanged: (value) {
                                     setState(() {
-                                      departureCityId = value;
+                                      _departureCityId = value;
                                     });
                                   },
                                 ),
@@ -876,10 +1181,10 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 TripDayEditor(
-                                  initialDays: tripDays,
-                                  enabled: inputEnabled,
+                                  initialDays: _tripDays,
+                                  enabled: _inputEnabled,
                                   onChanged: (updatedTripDays) {
-                                    tripDays = updatedTripDays;
+                                    _tripDays = updatedTripDays;
                                   },
                                 ),
                               ],
@@ -895,7 +1200,7 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(
                                   width: 170,
                                   child: Text(
-                                    "Short description",
+                                    "Short _description",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -908,7 +1213,7 @@ class _TripScreenState extends State<TripScreen> {
                                   height: 150,
                                   child: TextField(
                                     controller: _descriptionController,
-                                    enabled: inputEnabled,
+                                    enabled: _inputEnabled,
                                     maxLines: null,
                                     expands: true,
                                     textAlignVertical: TextAlignVertical.top,
@@ -918,7 +1223,7 @@ class _TripScreenState extends State<TripScreen> {
                                     decoration: InputDecoration(
                                       hintText: 'Describe your trip...',
                                       filled: true,
-                                      fillColor: inputEnabled
+                                      fillColor: _inputEnabled
                                           ? AppColors.primaryGray
                                           : Colors.blueGrey[300],
                                       border: OutlineInputBorder(
@@ -947,12 +1252,12 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(width: 8),
                                 _transportTypeDropdown(
                                   label: 'Select Transport',
-                                  value: transportType,
-                                  enabled: inputEnabled,
-                                  items: transportTypes,
+                                  value: _transportType,
+                                  enabled: _inputEnabled,
+                                  items: _transportTypes,
                                   onChanged: (val) {
                                     setState(() {
-                                      transportType = val;
+                                      _transportType = val;
                                     });
                                   },
                                 ),
@@ -983,11 +1288,11 @@ class _TripScreenState extends State<TripScreen> {
                                     ),
                                     SizedBox(width: 8),
                                     DatePickerButton(
-                                      initialDate: freeCancellationUntil,
-                                      enabled: inputEnabled,
+                                      initialDate: _freeCancellationUntil,
+                                      enabled: _inputEnabled,
                                       onDateSelected: (date) {
                                         setState(() {
-                                          freeCancellationUntil = date;
+                                          _freeCancellationUntil = date;
                                         });
                                       },
                                     ),
@@ -1017,7 +1322,7 @@ class _TripScreenState extends State<TripScreen> {
                                       height: 32,
                                       child: TextField(
                                         controller: _cancellationFeeController,
-                                        enabled: inputEnabled,
+                                        enabled: _inputEnabled,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
                                               .digitsOnly,
@@ -1033,7 +1338,7 @@ class _TripScreenState extends State<TripScreen> {
                                             vertical: 6,
                                           ),
                                           filled: true,
-                                          fillColor: inputEnabled
+                                          fillColor: _inputEnabled
                                               ? AppColors.primaryGray
                                               : Colors.blueGrey[300],
                                           border: OutlineInputBorder(
@@ -1072,7 +1377,7 @@ class _TripScreenState extends State<TripScreen> {
                                       child: TextField(
                                         controller:
                                             _discountPercentageController,
-                                        enabled: inputEnabled,
+                                        enabled: _inputEnabled,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
                                               .digitsOnly,
@@ -1088,7 +1393,7 @@ class _TripScreenState extends State<TripScreen> {
                                             vertical: 6,
                                           ),
                                           filled: true,
-                                          fillColor: inputEnabled
+                                          fillColor: _inputEnabled
                                               ? AppColors.primaryGray
                                               : Colors.blueGrey[300],
                                           border: OutlineInputBorder(
@@ -1115,7 +1420,7 @@ class _TripScreenState extends State<TripScreen> {
                                       child: TextField(
                                         controller:
                                             _minTicketsForDiscountController,
-                                        enabled: inputEnabled,
+                                        enabled: _inputEnabled,
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter
                                               .digitsOnly,
@@ -1135,7 +1440,7 @@ class _TripScreenState extends State<TripScreen> {
                                             vertical: 6,
                                           ),
                                           filled: true,
-                                          fillColor: inputEnabled
+                                          fillColor: _inputEnabled
                                               ? AppColors.primaryGray
                                               : Colors.blueGrey[300],
                                           border: OutlineInputBorder(
@@ -1168,10 +1473,10 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 TripPhotoPicker(
-                                  initialPhoto: selectedPhoto,
-                                  enabled: inputEnabled,
+                                  initialPhoto: _selectedPhoto,
+                                  enabled: _inputEnabled,
                                   onPhotoSelected: (bytes) {
-                                    selectedPhoto = bytes;
+                                    _selectedPhoto = bytes;
                                   },
                                 ),
                               ],
@@ -1183,7 +1488,7 @@ class _TripScreenState extends State<TripScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        tripStatus == "upcoming"
+                        _tripStatus == "upcoming"
                             ? SizedBox(
                                 height: 32,
                                 width: 120,
@@ -1255,7 +1560,7 @@ class _TripScreenState extends State<TripScreen> {
                         ),
                         SizedBox(width: 8),
                         _isEditing
-                            ? tripStatus == "upcoming"
+                            ? _tripStatus == "upcoming"
                                   ? SizedBox(
                                       height: 32,
                                       width: 120,
@@ -1309,319 +1614,5 @@ class _TripScreenState extends State<TripScreen> {
               ),
             ),
     );
-  }
-
-  Future<void> _addNewTrip() async {
-    final tripData = {
-      "CityId": selectedCityId,
-      "DepartureCityId": departureCityId,
-      "DepartureDate": departureDate?.toIso8601String().substring(0, 10),
-      "ReturnDate": returnDate?.toIso8601String().substring(0, 10),
-      "TripType": tripType,
-      "TransportType": transportType,
-      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
-      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
-      "Description": _descriptionController.text,
-      "FreeCancellationUntil": freeCancellationUntil
-          ?.toIso8601String()
-          .substring(0, 10),
-      "CancellationFee":
-          double.tryParse(_cancellationFeeController.text) ?? 0.0,
-      "MinTicketsForDiscount":
-          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
-      "DiscountPercentage":
-          double.tryParse(_discountPercentageController.text) ?? 0.0,
-      "Photo": selectedPhoto != null ? base64Encode(selectedPhoto!) : null,
-      "TripDays": tripDays,
-    };
-
-    final validationError = _validateTripData(tripData);
-    if (validationError != null) {
-      if (!mounted) return;
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Validation Error"),
-          content: Text(validationError),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    try {
-      await _tripProvider.insert(tripData);
-      if (!mounted) return;
-
-      final result = await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => AlertDialog(
-          title: Text("Success"),
-          content: Text("Trip successfully added"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-
-      if (result == true || result == null) {
-        masterScreenKey.currentState?.navigateTo(TripsScreen());
-      }
-    } on Exception catch (e) {
-      if (!mounted) return;
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Error"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  Future<void> _saveTrip() async {
-    final tripData = {
-      "CityId": selectedCityId,
-      "DepartureCityId": departureCityId,
-      "DepartureDate": departureDate?.toIso8601String().substring(0, 10),
-      "ReturnDate": returnDate?.toIso8601String().substring(0, 10),
-      "TripType": tripType,
-      "TransportType": transportType,
-      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
-      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
-      "Description": _descriptionController.text,
-      "FreeCancellationUntil": freeCancellationUntil
-          ?.toIso8601String()
-          .substring(0, 10),
-      "CancellationFee":
-          double.tryParse(_cancellationFeeController.text) ?? 0.0,
-      "MinTicketsForDiscount":
-          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
-      "DiscountPercentage":
-          double.tryParse(_discountPercentageController.text) ?? 0.0,
-      "Photo": selectedPhoto != null ? base64Encode(selectedPhoto!) : null,
-      "TripDays": tripDays,
-    };
-
-    final validationError = _validateTripData(tripData);
-    if (validationError != null) {
-      if (!mounted) return;
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Validation Error"),
-          content: Text(validationError),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-      return;
-    }
-
-    try {
-      await _tripProvider.update(widget.tripId!, tripData);
-      if (!mounted) return;
-
-      final result = await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => AlertDialog(
-          title: Text("Success"),
-          content: Text("Trip successfully updated"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-
-      if (result == true || result == null) {
-        masterScreenKey.currentState?.navigateTo(TripsScreen());
-      }
-    } on Exception catch (e) {
-      if (!mounted) return;
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Error"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  String? _validateTripData(Map<String, dynamic> tripData) {
-    final errors = <String>[];
-
-    if (tripData["CityId"] == null) {
-      errors.add("City must be selected.");
-    }
-    if (tripData["DepartureCityId"] == null) {
-      errors.add("Departure city must be selected.");
-    }
-    if (tripData["DepartureDate"] == null ||
-        tripData["DepartureDate"].isEmpty) {
-      errors.add("Departure date is required.");
-    }
-    if (tripData["ReturnDate"] == null || tripData["ReturnDate"].isEmpty) {
-      errors.add("Return date is required.");
-    }
-    if (tripData["TripType"] == null || tripData["TripType"].isEmpty) {
-      errors.add("Trip type is required.");
-    }
-    if (tripData["TransportType"] == null ||
-        tripData["TransportType"].isEmpty) {
-      errors.add("Transport type is required.");
-    }
-    if (tripData["TicketPrice"] == null || tripData["TicketPrice"] <= 0) {
-      errors.add("Ticket price must be greater than zero.");
-    }
-    if (tripData["AvailableTickets"] == null ||
-        tripData["AvailableTickets"] < 0) {
-      errors.add("Available tickets must be zero or more.");
-    }
-
-    DateTime? departureDate;
-    DateTime? returnDate;
-    DateTime? freeCancellationUntil;
-
-    try {
-      if (tripData["DepartureDate"] != null &&
-          tripData["DepartureDate"].isNotEmpty) {
-        departureDate = DateTime.parse(tripData["DepartureDate"]);
-      }
-    } catch (_) {
-      errors.add("Departure date format is invalid.");
-    }
-    try {
-      if (tripData["ReturnDate"] != null && tripData["ReturnDate"].isNotEmpty) {
-        returnDate = DateTime.parse(tripData["ReturnDate"]);
-      }
-    } catch (_) {
-      errors.add("Return date format is invalid.");
-    }
-    try {
-      if (tripData["FreeCancellationUntil"] != null &&
-          tripData["FreeCancellationUntil"].isNotEmpty) {
-        freeCancellationUntil = DateTime.parse(
-          tripData["FreeCancellationUntil"],
-        );
-      }
-    } catch (_) {
-      errors.add("Free cancellation date format is invalid.");
-    }
-
-    if (departureDate != null && returnDate != null) {
-      if (departureDate.isAfter(returnDate)) {
-        errors.add("Departure date must be before return date.");
-      }
-    }
-
-    if (departureDate != null && freeCancellationUntil != null) {
-      final diff = departureDate.difference(freeCancellationUntil).inDays;
-      if (diff < 3) {
-        errors.add(
-          "Free cancellation must end at least 3 days before departure.",
-        );
-      }
-    }
-
-    final discount = tripData["DiscountPercentage"] ?? 0.0;
-    if (discount < 0 || discount > 100) {
-      errors.add("Discount percentage must be between 0 and 100.");
-    }
-
-    final cancellationFee = tripData["CancellationFee"] ?? 0.0;
-    if (cancellationFee < 0) {
-      errors.add("Cancellation fee cannot be negative.");
-    }
-
-    final minTickets = tripData["MinTicketsForDiscount"] ?? 0;
-    if (minTickets < 0) {
-      errors.add("Minimum tickets for discount cannot be negative.");
-    }
-
-    if (errors.isEmpty) {
-      return null;
-    } else {
-      return errors.join('\n');
-    }
-  }
-
-  _cancelTrip() async {
-    try {
-      await _tripProvider.cancelTrip(widget.tripId!);
-
-      if (!mounted) return;
-      final result = await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => AlertDialog(
-          title: Text("Success"),
-          content: Text("Trip successfully canceled"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-
-      if (result == true || result == null) {
-        masterScreenKey.currentState?.navigateTo(TripsScreen());
-      }
-    } on Exception catch (e) {
-      if (!mounted) return;
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Error"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-    }
   }
 }

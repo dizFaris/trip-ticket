@@ -28,30 +28,30 @@ class _TripsScreenState extends State<TripsScreen> {
   final TripProvider _tripProvider = TripProvider();
   List<Trip> _trips = [];
   bool _isLoading = true;
-  int? selectedYear;
-  int? selectedMonth;
-  int? selectedDay;
-  String? selectedStatus;
+  int? _selectedYear;
+  int? _selectedMonth;
+  int? _selectedDay;
+  String? _selectedStatus;
   final TextEditingController _ftsController = TextEditingController();
   Timer? _debounce;
   int _currentPage = 0;
   int _totalPages = 0;
 
-  final List<int> years = List.generate(30, (index) => 2000 + index);
-  final List<int> months = List.generate(12, (index) => index + 1);
-  List<int> days = [];
-  List<String> statuses = ["upcoming", "locked", "canceled", "complete"];
+  final List<int> _years = List.generate(30, (index) => 2000 + index);
+  final List<int> _months = List.generate(12, (index) => index + 1);
+  List<int> _days = [];
+  final List<String> _statuses = ["upcoming", "locked", "canceled", "complete"];
 
   @override
   void initState() {
     super.initState();
 
     _currentPage = 0;
-    selectedYear = null;
-    selectedMonth = null;
+    _selectedYear = null;
+    _selectedMonth = null;
     _updateDays();
-    selectedDay = null;
-    selectedStatus = null;
+    _selectedDay = null;
+    _selectedStatus = null;
 
     _getTrips();
   }
@@ -64,18 +64,18 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   void _updateDays() {
-    if (selectedYear != null && selectedMonth != null) {
+    if (_selectedYear != null && _selectedMonth != null) {
       final int daysInMonth = DateTime(
-        selectedYear!,
-        selectedMonth! + 1,
+        _selectedYear!,
+        _selectedMonth! + 1,
         0,
       ).day;
       setState(() {
-        days = List.generate(daysInMonth, (index) => index + 1);
+        _days = List.generate(daysInMonth, (index) => index + 1);
 
-        // Adjust days number to days in month
-        if (selectedDay != null && selectedDay! > daysInMonth) {
-          selectedDay = daysInMonth;
+        // Adjust _days number to _days in month
+        if (_selectedDay != null && _selectedDay! > daysInMonth) {
+          _selectedDay = daysInMonth;
         }
       });
     }
@@ -83,11 +83,11 @@ class _TripsScreenState extends State<TripsScreen> {
 
   _clearFilters() {
     setState(() {
-      selectedYear = null;
-      selectedMonth = null;
+      _selectedYear = null;
+      _selectedMonth = null;
       _updateDays();
-      selectedDay = null;
-      selectedStatus = null;
+      _selectedDay = null;
+      _selectedStatus = null;
       _ftsController.clear();
       _currentPage = 0;
       _getTrips();
@@ -120,10 +120,10 @@ class _TripsScreenState extends State<TripsScreen> {
 
       try {
         var filter = {
-          if (selectedStatus != null) 'status': selectedStatus,
-          if (selectedYear != null) 'year': selectedYear.toString(),
-          if (selectedMonth != null) 'month': selectedMonth.toString(),
-          if (selectedDay != null) 'day': selectedDay.toString(),
+          if (_selectedStatus != null) 'status': _selectedStatus,
+          if (_selectedYear != null) 'year': _selectedYear.toString(),
+          if (_selectedMonth != null) 'month': _selectedMonth.toString(),
+          if (_selectedDay != null) 'day': _selectedDay.toString(),
           if (_ftsController.text.isNotEmpty) 'FTS': _ftsController.text,
         };
 
@@ -413,11 +413,11 @@ class _TripsScreenState extends State<TripsScreen> {
               children: [
                 _dropdown<int>(
                   label: 'Year',
-                  value: selectedYear,
-                  items: years,
+                  value: _selectedYear,
+                  items: _years,
                   onChanged: (val) {
                     setState(() {
-                      selectedYear = val;
+                      _selectedYear = val;
                       _updateDays();
                     });
                     _getTrips();
@@ -426,11 +426,11 @@ class _TripsScreenState extends State<TripsScreen> {
                 SizedBox(width: 8),
                 _dropdown<int>(
                   label: 'Month',
-                  value: selectedMonth,
-                  items: months,
+                  value: _selectedMonth,
+                  items: _months,
                   onChanged: (val) {
                     setState(() {
-                      selectedMonth = val;
+                      _selectedMonth = val;
                       _updateDays();
                     });
                     _getTrips();
@@ -439,11 +439,11 @@ class _TripsScreenState extends State<TripsScreen> {
                 SizedBox(width: 8),
                 _dropdown<int>(
                   label: 'Day',
-                  value: selectedDay,
-                  items: days,
+                  value: _selectedDay,
+                  items: _days,
                   onChanged: (val) {
                     setState(() {
-                      selectedDay = val;
+                      _selectedDay = val;
                     });
                     _getTrips();
                   },
@@ -452,11 +452,11 @@ class _TripsScreenState extends State<TripsScreen> {
 
                 _dropdown<String>(
                   label: 'Status',
-                  value: selectedStatus,
-                  items: statuses,
+                  value: _selectedStatus,
+                  items: _statuses,
                   onChanged: (val) {
                     setState(() {
-                      selectedStatus = val;
+                      _selectedStatus = val;
                     });
                     _getTrips();
                   },

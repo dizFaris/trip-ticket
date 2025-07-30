@@ -17,9 +17,9 @@ class UsersScreen extends StatefulWidget {
 }
 
 class _UsersScreenState extends State<UsersScreen> {
-  DateTime? fromDate;
-  DateTime? toDate;
-  bool? isActive;
+  DateTime? _fromDate;
+  DateTime? _toDate;
+  bool? _isActive;
   final TextEditingController _userId = TextEditingController();
   final UserProvider _userProvider = UserProvider();
   Timer? _debounce;
@@ -27,7 +27,7 @@ class _UsersScreenState extends State<UsersScreen> {
   int _currentPage = 0;
   int _totalPages = 0;
   List<User> _users = [];
-  final headers = [
+  final _headers = [
     {'label': 'ID', 'flex': 1},
     {'label': 'Username', 'flex': 1},
     {'label': 'First name', 'flex': 1},
@@ -44,9 +44,9 @@ class _UsersScreenState extends State<UsersScreen> {
     super.initState();
 
     _currentPage = 0;
-    fromDate = null;
-    toDate = null;
-    isActive = null;
+    _fromDate = null;
+    _toDate = null;
+    _isActive = null;
 
     _getUsers();
   }
@@ -55,9 +55,9 @@ class _UsersScreenState extends State<UsersScreen> {
     setState(() {
       _userId.text = '';
       _currentPage = 0;
-      fromDate = null;
-      toDate = null;
-      isActive = null;
+      _fromDate = null;
+      _toDate = null;
+      _isActive = null;
     });
     _getUsers();
   }
@@ -73,11 +73,11 @@ class _UsersScreenState extends State<UsersScreen> {
       try {
         var filter = {
           if (_userId.text.isNotEmpty) 'FTS': _userId.text,
-          if (isActive != null) 'IsActive': isActive,
-          if (fromDate != null)
-            'FromDate': fromDate!.toIso8601String().substring(0, 10),
-          if (toDate != null)
-            'ToDate': toDate!.toIso8601String().substring(0, 10),
+          if (_isActive != null) '_isActive': _isActive,
+          if (_fromDate != null)
+            '_fromDate': _fromDate!.toIso8601String().substring(0, 10),
+          if (_toDate != null)
+            '_toDate': _toDate!.toIso8601String().substring(0, 10),
         };
 
         var searchResult = await _userProvider.get(
@@ -113,6 +113,61 @@ class _UsersScreenState extends State<UsersScreen> {
         );
       }
     });
+  }
+
+  Future<void> _toggleUserActiveStatus(int userId, bool isActive) async {
+    try {
+      await _userProvider.patch(userId, {
+        "_isActive": isActive,
+      }, customPath: "status");
+
+      setState(() {
+        _isLoading = true;
+      });
+
+      await _getUsers();
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      if (!mounted) return;
+
+      await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+          title: Text("Success"),
+          content: Text(
+            "User successfully ${isActive ? "activated" : "deactivated"}.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    } on Exception catch (e) {
+      if (!mounted) return;
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("Error"),
+          content: Text(e.toString()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Ok"),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   void _goToPreviousPage() {
@@ -172,24 +227,24 @@ class _UsersScreenState extends State<UsersScreen> {
             Row(
               children: [
                 DatePickerButton(
-                  initialDate: fromDate,
+                  initialDate: _fromDate,
                   allowPastDates: true,
                   placeHolder: 'Birth from',
                   onDateSelected: (date) {
                     setState(() {
-                      fromDate = date;
+                      _fromDate = date;
                     });
                     _getUsers();
                   },
                 ),
                 SizedBox(width: 8),
                 DatePickerButton(
-                  initialDate: toDate,
+                  initialDate: _toDate,
                   allowPastDates: true,
                   placeHolder: 'Birth to',
                   onDateSelected: (date) {
                     setState(() {
-                      toDate = date;
+                      _toDate = date;
                     });
                     _getUsers();
                   },
@@ -224,7 +279,7 @@ class _UsersScreenState extends State<UsersScreen> {
                         color: Colors.black,
                       ),
                     ),
-                    value: isActive,
+                    value: _isActive,
                     items: const [
                       DropdownMenuItem(
                         value: true,
@@ -243,7 +298,7 @@ class _UsersScreenState extends State<UsersScreen> {
                     ],
                     onChanged: (val) {
                       setState(() {
-                        isActive = val!;
+                        _isActive = val!;
                       });
                       _getUsers();
                     },
@@ -328,7 +383,7 @@ class _UsersScreenState extends State<UsersScreen> {
               padding: EdgeInsets.all(8),
               color: AppColors.primaryGreen,
               child: Row(
-                children: headers.map((header) {
+                children: _headers.map((header) {
                   return Expanded(
                     flex: header['flex'] as int,
                     child: Text(
@@ -544,60 +599,5 @@ class _UsersScreenState extends State<UsersScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> _toggleUserActiveStatus(int userId, bool isActive) async {
-    try {
-      await _userProvider.patch(userId, {
-        "isActive": isActive,
-      }, customPath: "status");
-
-      setState(() {
-        _isLoading = true;
-      });
-
-      await _getUsers();
-
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (!mounted) return;
-
-      await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => AlertDialog(
-          title: Text("Success"),
-          content: Text(
-            "User successfully ${isActive ? "activated" : "deactivated"}.",
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context, true);
-              },
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-    } on Exception catch (e) {
-      if (!mounted) return;
-
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Error"),
-          content: Text(e.toString()),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-    }
   }
 }

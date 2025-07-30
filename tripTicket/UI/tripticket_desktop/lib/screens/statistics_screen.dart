@@ -18,18 +18,18 @@ class StatisticsScreen extends StatefulWidget {
 
 class _StatisticsScreenState extends State<StatisticsScreen> {
   final StatisticsProvider _statisticsProvider = StatisticsProvider();
-  int selectedIndex = 0;
-  DateTime? dailyStatisticDate;
-  double? total;
-  bool isLoading = false;
-  int? selectedYear;
-  int? selectedMonth;
-  EarningsReport? earningsReport;
+  int _selectedIndex = 0;
+  DateTime? _dailyStatisticDate;
+  double? _total;
+  bool _isLoading = false;
+  int? _selectedYear;
+  int? _selectedMonth;
+  EarningsReport? _earningsReport;
 
-  final List<int> years = List.generate(50, (index) => 1980 + index);
-  final List<int> months = List.generate(12, (index) => index + 1);
+  final List<int> _years = List.generate(50, (index) => 1980 + index);
+  final List<int> _months = List.generate(12, (index) => index + 1);
 
-  final List<DropdownMenuItem<int>> statisticOptions = const [
+  final List<DropdownMenuItem<int>> _statisticOptions = const [
     DropdownMenuItem(
       value: 0,
       child: Text('Daily Statistic', style: TextStyle(fontSize: 16)),
@@ -48,90 +48,92 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   void initState() {
     super.initState();
 
-    selectedYear = null;
-    selectedMonth = null;
+    _selectedYear = null;
+    _selectedMonth = null;
   }
 
   Future<void> _getDailyStatistic(DateTime date) async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
       final dailyTotal = await _statisticsProvider.getDailyEarnings(date);
       setState(() {
-        total = dailyTotal;
+        _total = dailyTotal;
       });
     } catch (e) {
       setState(() {
-        total = null;
+        _total = null;
       });
     } finally {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
   Future<void> _getMonthlyStatistics() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
       final report = await _statisticsProvider.getMonthlyEarnings(
-        selectedYear!,
-        selectedMonth!,
+        _selectedYear!,
+        _selectedMonth!,
       );
 
       setState(() {
-        earningsReport = report;
+        _earningsReport = report;
       });
     } catch (e) {
       setState(() {
-        earningsReport = null;
+        _earningsReport = null;
       });
     } finally {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
   Future<void> _getYearlyStatistics() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
-      final report = await _statisticsProvider.getYearlyEarnings(selectedYear!);
+      final report = await _statisticsProvider.getYearlyEarnings(
+        _selectedYear!,
+      );
 
       setState(() {
-        earningsReport = report;
+        _earningsReport = report;
       });
     } catch (e) {
       setState(() {
-        earningsReport = null;
+        _earningsReport = null;
       });
     } finally {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
-  Future<void> getDailyReportPdf() async {
+  Future<void> _getDailyReportPdf() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
       final (bytes, fileName) = await _statisticsProvider.getDailyEarningsPdf(
-        dailyStatisticDate!,
+        _dailyStatisticDate!,
       );
 
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
 
       Navigator.of(context).push(
@@ -141,24 +143,24 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       );
     } catch (e) {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
-  Future<void> getMonthlyReportPdf() async {
+  Future<void> _getMonthlyReportPdf() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
       final (bytes, fileName) = await _statisticsProvider.getMonthlyEarningsPdf(
-        selectedYear!,
-        selectedMonth!,
+        _selectedYear!,
+        _selectedMonth!,
       );
 
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
 
       Navigator.of(context).push(
@@ -168,23 +170,23 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       );
     } catch (e) {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
 
-  Future<void> getYearlyReportPdf() async {
+  Future<void> _getYearlyReportPdf() async {
     setState(() {
-      isLoading = true;
+      _isLoading = true;
     });
 
     try {
       final (bytes, fileName) = await _statisticsProvider.getYearlyEarningsPdf(
-        selectedYear!,
+        _selectedYear!,
       );
 
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
 
       Navigator.of(context).push(
@@ -194,7 +196,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       );
     } catch (e) {
       setState(() {
-        isLoading = false;
+        _isLoading = false;
       });
     }
   }
@@ -308,17 +310,17 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
                   SizedBox(
                     width: 200,
                     child: DropdownButtonFormField<int>(
-                      value: selectedIndex,
-                      items: statisticOptions,
+                      value: _selectedIndex,
+                      items: _statisticOptions,
                       onChanged: (val) {
                         if (val != null) {
                           setState(() {
-                            selectedIndex = val;
-                            dailyStatisticDate = null;
-                            selectedYear = null;
-                            selectedMonth = null;
-                            total = null;
-                            earningsReport = null;
+                            _selectedIndex = val;
+                            _dailyStatisticDate = null;
+                            _selectedYear = null;
+                            _selectedMonth = null;
+                            _total = null;
+                            _earningsReport = null;
                           });
                         }
                       },
@@ -359,7 +361,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
               Builder(
                 builder: (context) {
-                  switch (selectedIndex) {
+                  switch (_selectedIndex) {
                     case 0:
                       return _buildDailyStatistic();
                     case 1:
@@ -383,19 +385,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         DatePickerButton(
-          initialDate: dailyStatisticDate,
+          initialDate: _dailyStatisticDate,
           allowPastDates: true,
           placeHolder: 'Select date',
           onDateSelected: (date) {
             setState(() {
-              dailyStatisticDate = date;
+              _dailyStatisticDate = date;
             });
             _getDailyStatistic(date);
           },
         ),
         SizedBox(height: 8),
 
-        if (isLoading)
+        if (_isLoading)
           Center(
             child: Padding(
               padding: const EdgeInsets.only(top: 60),
@@ -407,9 +409,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               ),
             ),
           )
-        else if (total != null)
-          buildTotalEarningsCard(total: total!, onClick: getDailyReportPdf)
-        else if (dailyStatisticDate == null)
+        else if (_total != null)
+          _buildTotalEarningsCard(total: _total!, onClick: _getDailyReportPdf)
+        else if (_dailyStatisticDate == null)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Text(
@@ -437,25 +439,25 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           children: [
             _dropdown<int>(
               label: 'Year',
-              value: selectedYear,
-              items: years,
+              value: _selectedYear,
+              items: _years,
               onChanged: (val) {
                 setState(() {
-                  selectedYear = val;
-                  selectedMonth = null;
+                  _selectedYear = val;
+                  _selectedMonth = null;
                 });
               },
             ),
             const SizedBox(width: 8),
             _dropdown<int>(
               label: 'Month',
-              value: selectedMonth,
-              items: months,
-              enabled: selectedYear != null,
+              value: _selectedMonth,
+              items: _months,
+              enabled: _selectedYear != null,
               onChanged: (val) {
-                if (selectedYear == null) return;
+                if (_selectedYear == null) return;
                 setState(() {
-                  selectedMonth = val;
+                  _selectedMonth = val;
                 });
                 _getMonthlyStatistics();
               },
@@ -464,7 +466,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         ),
         SizedBox(height: 8),
 
-        if (isLoading)
+        if (_isLoading)
           Center(
             child: Padding(
               padding: const EdgeInsets.only(top: 60),
@@ -476,21 +478,21 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               ),
             ),
           )
-        else if (selectedYear != null &&
-            selectedMonth != null &&
-            earningsReport!.data.isNotEmpty)
+        else if (_selectedYear != null &&
+            _selectedMonth != null &&
+            _earningsReport!.data.isNotEmpty)
           Column(
             children: [
-              if (earningsReport?.total != null)
-                buildTotalEarningsCard(
-                  total: earningsReport!.total,
-                  onClick: getMonthlyReportPdf,
+              if (_earningsReport?.total != null)
+                _buildTotalEarningsCard(
+                  total: _earningsReport!.total,
+                  onClick: _getMonthlyReportPdf,
                 ),
               SizedBox(height: 8),
-              SimpleBarChart(data: earningsReport!.data),
+              SimpleBarChart(data: _earningsReport!.data),
             ],
           )
-        else if (selectedYear == null)
+        else if (_selectedYear == null)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Text(
@@ -498,7 +500,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               style: TextStyle(color: Colors.grey),
             ),
           )
-        else if (selectedMonth == null)
+        else if (_selectedMonth == null)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Text(
@@ -524,18 +526,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       children: [
         _dropdown<int>(
           label: 'Year',
-          value: selectedYear,
-          items: years,
+          value: _selectedYear,
+          items: _years,
           onChanged: (val) {
             setState(() {
-              selectedYear = val;
+              _selectedYear = val;
             });
             _getYearlyStatistics();
           },
         ),
         SizedBox(height: 8),
 
-        if (isLoading)
+        if (_isLoading)
           Center(
             child: Padding(
               padding: const EdgeInsets.only(top: 60),
@@ -547,19 +549,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               ),
             ),
           )
-        else if (selectedYear != null && earningsReport!.data.isNotEmpty)
+        else if (_selectedYear != null && _earningsReport!.data.isNotEmpty)
           Column(
             children: [
-              if (earningsReport?.total != null)
-                buildTotalEarningsCard(
-                  total: earningsReport!.total,
-                  onClick: getYearlyReportPdf,
+              if (_earningsReport?.total != null)
+                _buildTotalEarningsCard(
+                  total: _earningsReport!.total,
+                  onClick: _getYearlyReportPdf,
                 ),
               SizedBox(height: 8),
-              SimpleBarChart(data: earningsReport!.data),
+              SimpleBarChart(data: _earningsReport!.data),
             ],
           )
-        else if (selectedYear == null)
+        else if (_selectedYear == null)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Text(
@@ -579,7 +581,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     );
   }
 
-  Widget buildTotalEarningsCard({
+  Widget _buildTotalEarningsCard({
     required double total,
     VoidCallback? onClick,
   }) {

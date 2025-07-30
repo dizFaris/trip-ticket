@@ -21,7 +21,7 @@ class _TicketActivationScreenState extends State<TicketActivationScreen> {
   bool _isLoading = false;
   String? _successMessage;
   String? _errorMessage;
-  int? purchaseId;
+  int? _purchaseId;
 
   @override
   void initState() {
@@ -35,7 +35,7 @@ class _TicketActivationScreenState extends State<TicketActivationScreen> {
     });
   }
 
-  Future<void> getTicketsPdf() async {
+  Future<void> _getTicketsPdf() async {
     setState(() {
       _isLoading = true;
       _successMessage = null;
@@ -43,13 +43,13 @@ class _TicketActivationScreenState extends State<TicketActivationScreen> {
 
     try {
       final (bytes, fileName) = await _purchaseProvider.getTicketsPdf(
-        purchaseId!,
+        _purchaseId!,
       );
 
       setState(() {
         _isLoading = false;
         _errorMessage = null;
-        purchaseId = null;
+        _purchaseId = null;
       });
 
       Navigator.of(context).push(
@@ -85,7 +85,7 @@ class _TicketActivationScreenState extends State<TicketActivationScreen> {
         _isLoading = false;
         _successMessage = "Purchase completed successfully!";
         _purchaseIdController.text = '';
-        purchaseId = id;
+        _purchaseId = id;
       });
     } catch (e) {
       if (!mounted) return;
@@ -231,7 +231,7 @@ class _TicketActivationScreenState extends State<TicketActivationScreen> {
                     height: 32,
                     width: 32,
                     child: ElevatedButton(
-                      onPressed: getTicketsPdf,
+                      onPressed: _getTicketsPdf,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryYellow,
                         shape: RoundedRectangleBorder(

@@ -23,10 +23,15 @@ class PurchasesScreen extends StatefulWidget {
 }
 
 class _PurchasesScreenState extends State<PurchasesScreen> {
-  DateTime? fromDate;
-  DateTime? toDate;
-  String? selectedStatus;
-  List<String> statuses = ["accepted", "expired", "canceled", "complete"];
+  DateTime? _fromDate;
+  DateTime? _toDate;
+  String? _selectedStatus;
+  final List<String> _statuses = [
+    "accepted",
+    "expired",
+    "canceled",
+    "complete",
+  ];
   final TextEditingController _minTicketCount = TextEditingController();
   final TextEditingController _maxTicketCount = TextEditingController();
   final TextEditingController _minPrice = TextEditingController();
@@ -38,7 +43,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
   int _currentPage = 0;
   int _totalPages = 0;
   List<Purchase> _purchases = [];
-  final headers = [
+  final _headers = [
     {'label': 'ID', 'flex': 1},
     {'label': 'Created at', 'flex': 2},
     {'label': 'Payment', 'flex': 2},
@@ -53,18 +58,29 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     super.initState();
 
     _currentPage = 0;
-    fromDate = null;
-    toDate = null;
-    selectedStatus = null;
+    _fromDate = null;
+    _toDate = null;
+    _selectedStatus = null;
 
     _getPurchases();
   }
 
+  @override
+  void dispose() {
+    _minTicketCount.dispose();
+    _maxTicketCount.dispose();
+    _minPrice.dispose();
+    _maxPrice.dispose();
+    _purchaseId.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
   void _clearFilters() {
     setState(() {
-      fromDate = null;
-      toDate = null;
-      selectedStatus = null;
+      _fromDate = null;
+      _toDate = null;
+      _selectedStatus = null;
       _minTicketCount.text = '';
       _maxTicketCount.text = '';
       _minPrice.text = '';
@@ -85,7 +101,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
       try {
         var filter = {
-          if (selectedStatus != null) 'status': selectedStatus,
+          if (_selectedStatus != null) 'status': _selectedStatus,
           if (_minTicketCount.text.isNotEmpty)
             'MinTicketCount': _minTicketCount.text,
           if (_maxTicketCount.text.isNotEmpty)
@@ -93,10 +109,10 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           if (_minPrice.text.isNotEmpty) 'MinPayment': _minPrice.text,
           if (_maxPrice.text.isNotEmpty) 'MaxPayment': _maxPrice.text,
           if (_purchaseId.text.isNotEmpty) 'FTS': _purchaseId.text,
-          if (fromDate != null)
-            'FromDate': fromDate!.toIso8601String().substring(0, 10),
-          if (toDate != null)
-            'ToDate': toDate!.toIso8601String().substring(0, 10),
+          if (_fromDate != null)
+            '_fromDate': _fromDate!.toIso8601String().substring(0, 10),
+          if (_toDate != null)
+            '_toDate': _toDate!.toIso8601String().substring(0, 10),
         };
 
         var searchResult = await _purchaseProvider.get(
@@ -197,7 +213,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     });
   }
 
-  Future<void> getTicketsPdf(int id) async {
+  Future<void> _getTicketsPdf(int id) async {
     setState(() {
       _isLoading = true;
     });
@@ -317,24 +333,24 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             Row(
               children: [
                 DatePickerButton(
-                  initialDate: fromDate,
+                  initialDate: _fromDate,
                   allowPastDates: true,
                   placeHolder: 'Date from',
                   onDateSelected: (date) {
                     setState(() {
-                      fromDate = date;
+                      _fromDate = date;
                     });
                     _getPurchases();
                   },
                 ),
                 SizedBox(width: 8),
                 DatePickerButton(
-                  initialDate: toDate,
+                  initialDate: _toDate,
                   allowPastDates: true,
                   placeHolder: 'Date to',
                   onDateSelected: (date) {
                     setState(() {
-                      toDate = date;
+                      _toDate = date;
                     });
                     _getPurchases();
                   },
@@ -342,11 +358,11 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                 SizedBox(width: 8),
                 _dropdown<String>(
                   label: 'Status',
-                  value: selectedStatus,
-                  items: statuses,
+                  value: _selectedStatus,
+                  items: _statuses,
                   onChanged: (val) {
                     setState(() {
-                      selectedStatus = val;
+                      _selectedStatus = val;
                     });
                     _getPurchases();
                   },
@@ -554,7 +570,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
               padding: EdgeInsets.all(8),
               color: AppColors.primaryGreen,
               child: Row(
-                children: headers.map((header) {
+                children: _headers.map((header) {
                   return Expanded(
                     flex: header['flex'] as int,
                     child: Text(
@@ -659,7 +675,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                                               width: 32,
                                                               child: ElevatedButton(
                                                                 onPressed: () {
-                                                                  getTicketsPdf(
+                                                                  _getTicketsPdf(
                                                                     purchase.id,
                                                                   );
                                                                   _getPurchases();
