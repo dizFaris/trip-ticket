@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tripticket_desktop/app_colors.dart';
 import 'package:tripticket_desktop/models/menu_model.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/screens/countries_screen.dart';
@@ -59,7 +60,24 @@ class MasterScreenState extends State<MasterScreen> {
                 style: TextStyle(color: Colors.white, fontSize: 16),
               ),
               SizedBox(width: 8),
-              Icon(Icons.person),
+              PopupMenuButton<String>(
+                icon: Icon(Icons.person, color: Colors.white),
+                color: AppColors.primaryGreen,
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    Navigator.pop(context);
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  PopupMenuItem<String>(
+                    value: 'logout',
+                    child: ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text("Logout"),
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(width: 32),
             ],
           ),
