@@ -1,4 +1,5 @@
-﻿using MapsterMapper;
+﻿using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using tripTicket.Model;
 using tripTicket.Model.Requests;
 using tripTicket.Model.SearchObjects;
 using tripTicket.Services.Database;
+using tripTicket.Services.Helpers;
 using tripTicket.Services.Interfaces;
 using tripTicket.Services.PurchaseStateMachine;
 using tripTicket.Services.TripStateMachine;
@@ -138,6 +140,42 @@ namespace tripTicket.Services.Services
             }
 
             return Mapper.Map<Model.Models.Purchase>(entity);
+        }
+
+        public Model.Models.Purchase Complete(int id)
+        {
+            var entity = GetById(id);
+
+            if (entity == null)
+            {
+                throw new UserException("Purchase not found.");
+            }
+
+            var state = BasePurchaseState.CreateState(entity.Status);
+            return state.Complete(id);
+        }
+
+        public async Task<byte[]> GenerateTicketPdfAsync(int purchaseId)
+        {
+            var entity = await Context.Purchases
+                .Include(x => x.Trip)
+                    .ThenInclude(x => x.City)
+                        .ThenInclude(x => x.Country)
+                .Include(x => x.User)
+                .FirstOrDefaultAsync(x => x.Id == purchaseId);
+
+            if (entity == null)
+                throw new UserException("Purchase not found.");
+
+            if (entity.IsPrinted)
+                throw new UserException("Tickets have already been printed for this purchase.");
+
+            var model = entity.Adapt<Model.Models.Purchase>();
+
+            entity.IsPrinted = true;
+            await Context.SaveChangesAsync();
+
+            return TicketPdfGenerator.GenerateTickets(model);
         }
     }
 }

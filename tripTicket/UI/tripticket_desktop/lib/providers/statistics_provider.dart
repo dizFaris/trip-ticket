@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:tripticket_desktop/models/earnings_report_model.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
+import 'package:tripticket_desktop/utils/utils.dart';
 
 class StatisticsProvider {
   static const String _baseUrl = String.fromEnvironment(
@@ -75,9 +76,7 @@ class StatisticsProvider {
     final response = await http.get(uri, headers: _createHeaders());
 
     if (response.statusCode == 200) {
-      final filename = _extractFileName(
-        response.headers['content-disposition'],
-      );
+      final filename = extractFileName(response.headers['content-disposition']);
       return (response.bodyBytes, filename);
     } else {
       throw Exception('Failed to download daily PDF');
@@ -92,9 +91,7 @@ class StatisticsProvider {
     final response = await http.get(uri, headers: _createHeaders());
 
     if (response.statusCode == 200) {
-      final filename = _extractFileName(
-        response.headers['content-disposition'],
-      );
+      final filename = extractFileName(response.headers['content-disposition']);
       return (response.bodyBytes, filename);
     } else {
       throw Exception('Failed to download monthly PDF');
@@ -109,32 +106,10 @@ class StatisticsProvider {
     final response = await http.get(uri, headers: _createHeaders());
 
     if (response.statusCode == 200) {
-      final filename = _extractFileName(
-        response.headers['content-disposition'],
-      );
+      final filename = extractFileName(response.headers['content-disposition']);
       return (response.bodyBytes, filename);
     } else {
       throw Exception('Failed to download yearly PDF');
     }
-  }
-
-  String _extractFileName(String? contentDisposition) {
-    if (contentDisposition == null) return 'report.pdf';
-
-    final utf8Match = RegExp(
-      r"filename\*\=UTF-8''([^;]+)",
-    ).firstMatch(contentDisposition);
-    if (utf8Match != null) {
-      return Uri.decodeFull(utf8Match.group(1)!);
-    }
-
-    final plainMatch = RegExp(
-      r'filename=([^;]+)',
-    ).firstMatch(contentDisposition);
-    if (plainMatch != null) {
-      return plainMatch.group(1)!.replaceAll('"', '').trim();
-    }
-
-    return 'report.pdf';
   }
 }

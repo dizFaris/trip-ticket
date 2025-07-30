@@ -207,6 +207,7 @@ namespace tripTicket.Services.Migrations
                     Discount = table.Column<decimal>(type: "decimal(5,2)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime", nullable: false),
                     Status = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
+                    IsPrinted = table.Column<bool>(type: "bit", nullable: false),
                     PaymentMethod = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false)
                 },
                 constraints: table =>
@@ -216,6 +217,12 @@ namespace tripTicket.Services.Migrations
                         name: "FK_Purchases_Trips_TripId",
                         column: x => x.TripId,
                         principalTable: "Trips",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Purchases_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -326,6 +333,11 @@ namespace tripTicket.Services.Migrations
                 name: "IX_Purchases_TripId",
                 table: "Purchases",
                 column: "TripId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Purchases_UserId",
+                table: "Purchases",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Transactions_PurchaseId",

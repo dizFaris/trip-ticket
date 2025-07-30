@@ -23,5 +23,19 @@ namespace tripTicket.API.Controllers
         {
             return _service.Cancel(id);
         }
+
+        [HttpPut("{id}/complete")]
+        public Purchase Complete(int id)
+        {
+            return _service.Complete(id);
+        }
+
+        [HttpGet("{id}/ticket-pdf")]
+        public async Task<IActionResult> GetYearlyEarningsPdf(int id)
+        {
+            var pdfBytes = await _service.GenerateTicketPdfAsync(id);
+            var fileName = $"Purchase-{id}.pdf";
+            return File(pdfBytes, "application/pdf", fileName);
+        }
     }
 }

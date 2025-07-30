@@ -15,6 +15,7 @@ class Purchase {
   final DateTime createdAt;
   final String status;
   final String paymentMethod;
+  final bool isPrinted;
 
   Purchase({
     required this.id,
@@ -28,6 +29,7 @@ class Purchase {
     required this.createdAt,
     required this.status,
     required this.paymentMethod,
+    required this.isPrinted,
   });
 
   factory Purchase.fromJson(Map<String, dynamic> json) =>

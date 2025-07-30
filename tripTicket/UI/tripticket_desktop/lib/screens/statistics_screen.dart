@@ -408,7 +408,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             ),
           )
         else if (total != null)
-          buildTotalEarningsCard(total: total!, onRefresh: getDailyReportPdf)
+          buildTotalEarningsCard(total: total!, onClick: getDailyReportPdf)
         else if (dailyStatisticDate == null)
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
@@ -484,7 +484,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               if (earningsReport?.total != null)
                 buildTotalEarningsCard(
                   total: earningsReport!.total,
-                  onRefresh: getMonthlyReportPdf,
+                  onClick: getMonthlyReportPdf,
                 ),
               SizedBox(height: 8),
               SimpleBarChart(data: earningsReport!.data),
@@ -553,7 +553,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               if (earningsReport?.total != null)
                 buildTotalEarningsCard(
                   total: earningsReport!.total,
-                  onRefresh: getYearlyReportPdf,
+                  onClick: getYearlyReportPdf,
                 ),
               SizedBox(height: 8),
               SimpleBarChart(data: earningsReport!.data),
@@ -581,7 +581,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
   Widget buildTotalEarningsCard({
     required double total,
-    VoidCallback? onRefresh,
+    VoidCallback? onClick,
   }) {
     return SizedBox(
       width: double.infinity,
@@ -605,7 +605,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             height: 32,
             width: 32,
             child: ElevatedButton(
-              onPressed: onRefresh,
+              onPressed: onClick,
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primaryYellow,
                 shape: RoundedRectangleBorder(

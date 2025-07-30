@@ -1188,8 +1188,33 @@ class _TripScreenState extends State<TripScreen> {
                                 height: 32,
                                 width: 120,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    _cancelTrip();
+                                  onPressed: () async {
+                                    final confirmed = await showDialog<bool>(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: const Text('Confirm Cancel'),
+                                        content: const Text(
+                                          'Are you sure you want to cancel this trip?',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(
+                                              context,
+                                            ).pop(false),
+                                            child: const Text('No'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(context).pop(true),
+                                            child: const Text('Yes'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+
+                                    if (confirmed == true) {
+                                      _cancelTrip();
+                                    }
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primaryRed,

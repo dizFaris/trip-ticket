@@ -86,7 +86,7 @@ namespace tripTicket.Services.PurchaseStateMachine
 
             bus.PubSub.Publish(message);
 
-            return Mapper.Map<Model.Models.Purchase>(entity);
+            return purchase;
         }
 
         public override void ExpirePurchases()

@@ -121,6 +121,9 @@ namespace tripTicket.Services.Migrations
                     b.Property<decimal?>("Discount")
                         .HasColumnType("decimal(5, 2)");
 
+                    b.Property<bool>("IsPrinted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("NumberOfTickets")
                         .HasColumnType("int");
 

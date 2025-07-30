@@ -71,3 +71,21 @@ Color getStatusColor(String status) {
       return AppColors.primaryBlack;
   }
 }
+
+String extractFileName(String? contentDisposition) {
+  if (contentDisposition == null) return 'report.pdf';
+
+  final utf8Match = RegExp(
+    r"filename\*\=UTF-8''([^;]+)",
+  ).firstMatch(contentDisposition);
+  if (utf8Match != null) {
+    return Uri.decodeFull(utf8Match.group(1)!);
+  }
+
+  final plainMatch = RegExp(r'filename=([^;]+)').firstMatch(contentDisposition);
+  if (plainMatch != null) {
+    return plainMatch.group(1)!.replaceAll('"', '').trim();
+  }
+
+  return 'report.pdf';
+}

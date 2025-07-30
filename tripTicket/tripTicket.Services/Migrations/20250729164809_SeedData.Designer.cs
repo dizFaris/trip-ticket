@@ -12,8 +12,8 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    [Migration("20250706172218_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250729164809_SeedData")]
+    partial class SeedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,6 +124,9 @@ namespace tripTicket.Services.Migrations
                     b.Property<decimal?>("Discount")
                         .HasColumnType("decimal(5, 2)");
 
+                    b.Property<bool>("IsPrinted")
+                        .HasColumnType("bit");
+
                     b.Property<int>("NumberOfTickets")
                         .HasColumnType("int");
 
@@ -152,6 +155,8 @@ namespace tripTicket.Services.Migrations
                         .HasName("PK__Purchase__3214EC07591365F4");
 
                     b.HasIndex("TripId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Purchases");
                 });
@@ -565,7 +570,15 @@ namespace tripTicket.Services.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("tripTicket.Services.Database.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Trip");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("tripTicket.Services.Database.Transaction", b =>

@@ -12,8 +12,8 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    [Migration("20250720073843_IncludeUserInPurchase")]
-    partial class IncludeUserInPurchase
+    [Migration("20250729164752_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -123,6 +123,9 @@ namespace tripTicket.Services.Migrations
 
                     b.Property<decimal?>("Discount")
                         .HasColumnType("decimal(5, 2)");
+
+                    b.Property<bool>("IsPrinted")
+                        .HasColumnType("bit");
 
                     b.Property<int>("NumberOfTickets")
                         .HasColumnType("int");

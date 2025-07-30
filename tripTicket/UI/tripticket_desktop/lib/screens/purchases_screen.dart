@@ -9,6 +9,7 @@ import 'package:tripticket_desktop/app_colors.dart';
 import 'package:tripticket_desktop/models/purchase_model.dart';
 import 'package:tripticket_desktop/providers/purchase_provider.dart';
 import 'package:tripticket_desktop/screens/master_screen.dart';
+import 'package:tripticket_desktop/screens/pdf_view_screen.dart';
 import 'package:tripticket_desktop/screens/trips_screen.dart';
 import 'package:tripticket_desktop/utils/utils.dart';
 import 'package:tripticket_desktop/widgets/date_picker.dart';
@@ -194,6 +195,32 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
       _currentPage++;
       _getPurchases();
     });
+  }
+
+  Future<void> getTicketsPdf(int id) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final (bytes, fileName) = await _purchaseProvider.getTicketsPdf(id);
+
+      setState(() {
+        _isLoading = false;
+      });
+
+      Navigator.of(context).pop();
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PdfViewerPage(pdfBytes: bytes, fileName: fileName),
+        ),
+      );
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   Widget _dropdown<T>({
@@ -610,17 +637,57 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                                         ),
                                                       ),
                                                 ),
-                                                child: const Align(
+                                                child: Align(
                                                   alignment:
                                                       Alignment.centerLeft,
-                                                  child: Text(
-                                                    'Purchase Details',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 16,
-                                                    ),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        'Purchase Details',
+                                                        style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 16,
+                                                        ),
+                                                      ),
+                                                      Spacer(),
+                                                      purchase.isPrinted
+                                                          ? SizedBox.shrink()
+                                                          : SizedBox(
+                                                              height: 32,
+                                                              width: 32,
+                                                              child: ElevatedButton(
+                                                                onPressed: () {
+                                                                  getTicketsPdf(
+                                                                    purchase.id,
+                                                                  );
+                                                                  _getPurchases();
+                                                                },
+                                                                style: ElevatedButton.styleFrom(
+                                                                  backgroundColor:
+                                                                      AppColors
+                                                                          .primaryYellow,
+                                                                  shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                          8,
+                                                                        ),
+                                                                  ),
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                ),
+                                                                child: const Icon(
+                                                                  Icons
+                                                                      .description,
+                                                                  color: Colors
+                                                                      .black,
+                                                                  size: 20,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                    ],
                                                   ),
                                                 ),
                                               ),

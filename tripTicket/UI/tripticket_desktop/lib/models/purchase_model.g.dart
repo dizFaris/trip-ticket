@@ -18,6 +18,7 @@ Purchase _$PurchaseFromJson(Map<String, dynamic> json) => Purchase(
   createdAt: DateTime.parse(json['createdAt'] as String),
   status: json['status'] as String,
   paymentMethod: json['paymentMethod'] as String,
+  isPrinted: json['isPrinted'] as bool,
 );
 
 Map<String, dynamic> _$PurchaseToJson(Purchase instance) => <String, dynamic>{
@@ -32,6 +33,7 @@ Map<String, dynamic> _$PurchaseToJson(Purchase instance) => <String, dynamic>{
   'createdAt': instance.createdAt.toIso8601String(),
   'status': instance.status,
   'paymentMethod': instance.paymentMethod,
+  'isPrinted': instance.isPrinted,
 };
 
 TripShortDto _$TripShortDtoFromJson(Map<String, dynamic> json) => TripShortDto(

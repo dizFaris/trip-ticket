@@ -20,6 +20,7 @@ namespace tripTicket.Model.Models
         public DateTime CreatedAt { get; set; }
         public string Status { get; set; } = null!;
         public string PaymentMethod { get; set; } = null!;
+        public bool IsPrinted { get; set; }
 
     }
     public class TripShort

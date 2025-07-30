@@ -276,19 +276,19 @@ namespace tripTicket.Services.Migrations
 
             migrationBuilder.InsertData(
                 table: "Purchases",
-                columns: new[] { "Id", "TripId", "UserId", "NumberOfTickets", "TotalPayment", "Discount", "CreatedAt", "Status", "PaymentMethod" },
+                columns: new[] { "Id", "TripId", "UserId", "NumberOfTickets", "TotalPayment", "Discount", "CreatedAt", "Status", "PaymentMethod", "IsPrinted" },
                 values: new object[,]
                 {
-         { 1, 1, 2, 2, 300m, 0m, DateTime.UtcNow.AddDays(-10), "complete", "Stripe" },
-         { 2, 3, 3, 1, 150m, null, DateTime.UtcNow.AddDays(-9), "complete", "Stripe" },
-         { 3, 4, 4, 4, 600m, 10m, DateTime.UtcNow.AddDays(-8), "complete", "Stripe" },
-         { 4, 5, 5, 1, 180m, null, DateTime.UtcNow.AddDays(-7), "accepted", "Stripe" },
-         { 5, 6, 6, 3, 450m, 15m, DateTime.UtcNow.AddDays(-6), "complete", "Stripe" },
-         { 6, 7, 7, 2, 300m, 0m, DateTime.UtcNow.AddDays(-5), "complete", "Stripe" },
-         { 7, 8, 8, 5, 750m, 25m, DateTime.UtcNow.AddDays(-4), "complete", "Stripe" },
-         { 8, 9, 9, 1, 150m, null, DateTime.UtcNow.AddDays(-3), "complete", "Stripe" },
-         { 9, 10, 10, 2, 300m, 0m, DateTime.UtcNow.AddDays(-2), "accepted", "Stripe" },
-         { 10, 2, 2, 1, 120m, null, DateTime.UtcNow.AddDays(-1), "complete", "Stripe" }
+         { 1, 1, 2, 2, 300m, 0m, DateTime.UtcNow.AddDays(-10), "complete", "Stripe", false },
+         { 2, 3, 3, 1, 150m, null, DateTime.UtcNow.AddDays(-9), "complete", "Stripe", false },
+         { 3, 4, 4, 4, 600m, 10m, DateTime.UtcNow.AddDays(-8), "complete", "Stripe", false },
+         { 4, 5, 5, 1, 180m, null, DateTime.UtcNow.AddDays(-7), "accepted", "Stripe", false },
+         { 5, 6, 6, 3, 450m, 15m, DateTime.UtcNow.AddDays(-6), "complete", "Stripe", false },
+         { 6, 7, 7, 2, 300m, 0m, DateTime.UtcNow.AddDays(-5), "complete", "Stripe", false },
+         { 7, 8, 8, 5, 750m, 25m, DateTime.UtcNow.AddDays(-4), "complete", "Stripe", false },
+         { 8, 9, 9, 1, 150m, null, DateTime.UtcNow.AddDays(-3), "complete", "Stripe", false },
+         { 9, 10, 10, 2, 300m, 0m, DateTime.UtcNow.AddDays(-2), "accepted", "Stripe", false },
+         { 10, 2, 2, 1, 120m, null, DateTime.UtcNow.AddDays(-1), "complete", "Stripe", false },
                 });
 
             migrationBuilder.InsertData(

@@ -20,6 +20,7 @@ public partial class Purchase
     public DateTime CreatedAt { get; set; }
 
     public string Status { get; set; } = null!;
+    public bool IsPrinted { get; set; }
 
     public string PaymentMethod { get; set; } = null!;
     public virtual Trip Trip { get; set; } = null!;
