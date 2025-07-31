@@ -16,11 +16,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'TripTicket',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: Colors.green,
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppColors.primaryGreen,
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        drawerTheme: DrawerThemeData(backgroundColor: AppColors.primaryGreen),
+        listTileTheme: ListTileThemeData(
+          textColor: Colors.white,
+          selectedColor: AppColors.primaryYellow,
+          selectedTileColor: AppColors.primaryGreen,
+          iconColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            textStyle: TextStyle(fontWeight: FontWeight.bold),
+          ),
+        ),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      home: MainScreen(),
+      home: const MainScreen(),
     );
   }
 }
@@ -86,7 +104,13 @@ class MainScreen extends StatelessWidget {
                     ),
                     backgroundColor: AppColors.primaryYellow,
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const RegistrationScreen(),
+                      ),
+                    );
+                  },
                   child: const Text(
                     "Register",
                     style: TextStyle(
@@ -195,19 +219,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-            if (Navigator.canPop(context)) {
-              Navigator.pop(context);
-            }
-          },
-          icon: const Icon(Icons.arrow_back_ios, size: 20, color: Colors.black),
-        ),
-      ),
       body: SizedBox(
         height: MediaQuery.of(context).size.height,
         width: double.infinity,
@@ -293,7 +304,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const RegistrationScreen(),

@@ -21,6 +21,12 @@ String? noSpecialCharacters(
   return regex.hasMatch(value) ? null : message;
 }
 
+String? emailFormat(String? value, [String message = 'Invalid email format.']) {
+  if (value == null || value.trim().isEmpty) return null;
+  final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  return regex.hasMatch(value) ? null : message;
+}
+
 String? onlyNumbers(String? value, [String message = 'Only numbers allowed.']) {
   if (value == null || value.isEmpty) return null;
   final regex = RegExp(r'^\d+$');
