@@ -40,5 +40,38 @@ namespace tripTicket.Services.Services
                 throw new UserException("Bookmark already exists for this trip and user.");
             }
         }
+
+        public object DeleteBookmark(int userId, int tripId)
+        {
+            var bookmark = Context.Bookmarks
+                .FirstOrDefault(b => b.UserId == userId && b.TripId == tripId);
+
+            if (bookmark == null)
+            {
+                throw new UserException("Bookmark not found.");
+            }
+
+            Context.Bookmarks.Remove(bookmark);
+            Context.SaveChanges();
+
+            return true;
+        }
+
+        public bool IsTripBookmarked(int userId, int tripId)
+        {
+            var userExists = Context.Users.Any(u => u.Id == userId);
+            if (!userExists)
+            {
+                throw new UserException("User not found.");
+            }
+
+            var tripExists = Context.Trips.Any(t => t.Id == tripId);
+            if (!tripExists)
+            {
+                throw new UserException("Trip not found.");
+            }
+
+            return Context.Bookmarks.Any(b => b.UserId == userId && b.TripId == tripId);
+        }
     }
 }

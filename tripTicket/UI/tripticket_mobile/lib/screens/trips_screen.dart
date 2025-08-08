@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/models/trip_model.dart';
 import 'package:tripticket_mobile/providers/trip_provider.dart';
+import 'package:tripticket_mobile/screens/trip_details_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 import 'package:tripticket_mobile/widgets/pagination_controls.dart';
 
@@ -293,7 +294,18 @@ class _TripsScreenState extends State<TripsScreen> {
                           ),
                           child: SizedBox(
                             width: cardWidth,
-                            child: _tripWidget(trip),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        TripDetailsScreen(tripId: trip.id),
+                                  ),
+                                );
+                              },
+                              child: _tripWidget(trip),
+                            ),
                           ),
                         );
                       },
@@ -409,7 +421,18 @@ class _TripsScreenState extends State<TripsScreen> {
                         ),
                     itemBuilder: (context, index) {
                       final trip = _trips[index];
-                      return _tripWidget(trip);
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TripDetailsScreen(tripId: trip.id),
+                            ),
+                          );
+                        },
+                        child: _tripWidget(trip),
+                      );
                     },
                   ),
             SizedBox(height: 12),

@@ -663,7 +663,7 @@ class _TripScreenState extends State<TripScreen> {
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
         ),
         value: value,
-        items: _cities.map((city) {
+        items: cities.map((city) {
           return DropdownMenuItem<int>(
             value: city.id,
             child: SizedBox(
