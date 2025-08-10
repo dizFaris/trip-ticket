@@ -1,4 +1,5 @@
 ﻿using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,34 @@ namespace tripTicket.Services.Services
             return true;
         }
 
+        public PagedResult<Model.Models.Bookmark> GetBoomarksByUserId(int userId)
+        {
+            List<Model.Models.Bookmark> result = new List<Model.Models.Bookmark>();
+
+            var query = Context.Set<Database.Bookmark>()
+                .Include(b => b.Trip)
+                    .ThenInclude(t => t.City)
+                        .ThenInclude(c => c.Country)
+                .Include(b => b.Trip)
+                    .ThenInclude(t => t.DepartureCity)
+                        .ThenInclude(dc => dc.Country)
+                .AsQueryable();
+
+            query = query.Where(b => b.UserId == userId);
+
+            int count = query.Count();
+
+            var list = query.ToList();
+
+            result = Mapper.Map(list, result);
+
+            var pagedResult = new PagedResult<Model.Models.Bookmark>();
+            pagedResult.ResultList = result;
+            pagedResult.Count = count;
+
+            return pagedResult;
+        }
+
         public bool IsTripBookmarked(int userId, int tripId)
         {
             var userExists = Context.Users.Any(u => u.Id == userId);
@@ -73,5 +102,26 @@ namespace tripTicket.Services.Services
 
             return Context.Bookmarks.Any(b => b.UserId == userId && b.TripId == tripId);
         }
+
+        public override Model.Models.Bookmark Insert(BookmarkInsertRequest request)
+        {
+            Database.Bookmark entity = Mapper.Map<Database.Bookmark>(request);
+
+            BeforeInsert(request, entity);
+
+            Context.Add(entity);
+            Context.SaveChanges();
+
+            var loadedEntity = Context.Set<Database.Bookmark>()
+                .Include("Trip")
+                .Include("Trip.City")
+                .Include("Trip.City.Country")
+                .Include("Trip.DepartureCity")
+                .Include("Trip.DepartureCity.Country")
+                .FirstOrDefault(e => e.Id == entity.Id);
+
+            return Mapper.Map<Model.Models.Bookmark>(loadedEntity);
+        }
+
     }
 }

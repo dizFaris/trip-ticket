@@ -361,7 +361,8 @@ class _TripsScreenState extends State<TripsScreen> {
                                 ),
                               ],
                             )
-                          : Container(
+                          : trip.tripStatus == "upcoming"
+                          ? Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 4,
                                 vertical: 2,
@@ -378,7 +379,8 @@ class _TripsScreenState extends State<TripsScreen> {
                                   fontSize: 16,
                                 ),
                               ),
-                            ),
+                            )
+                          : SizedBox.shrink(),
                       Spacer(),
                       SizedBox(
                         width: 110,

@@ -15,6 +15,7 @@ namespace tripTicket.Model.Models
         public int TripId { get; set; }
 
         public DateTime? CreatedAt { get; set; }
+        public virtual Trip Trip { get; set; } = null!;
 
     }
 }

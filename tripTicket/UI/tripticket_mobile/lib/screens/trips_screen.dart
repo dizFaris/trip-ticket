@@ -116,6 +116,7 @@ class _TripsScreenState extends State<TripsScreen> {
   }
 
   Future<void> _getTrips() async {
+    if (!mounted) return;
     setState(() {
       _isLoading = true;
     });
@@ -132,27 +133,28 @@ class _TripsScreenState extends State<TripsScreen> {
         pageSize: 8,
       );
 
+      if (!mounted) return;
       setState(() {
         _trips = searchResult.result;
         _totalPages = (searchResult.count / 8).ceil();
         _isLoading = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _trips = [];
       });
 
-      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text("Error"),
+          title: const Text("Error"),
           content: Text(e.toString()),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
+              child: const Text("Ok"),
             ),
           ],
         ),

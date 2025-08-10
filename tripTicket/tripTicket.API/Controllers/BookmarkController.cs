@@ -31,5 +31,11 @@ namespace tripTicket.API.Controllers
             bool isBookmarked = _service.IsTripBookmarked(userId, tripId);
             return Ok(isBookmarked);
         }
+
+        [HttpGet("user/{userId}")]
+        public PagedResult<Bookmark> GetBookmarksByUserId(int userId)
+        {
+            return _service.GetBoomarksByUserId(userId);
+        }
     }
 }
