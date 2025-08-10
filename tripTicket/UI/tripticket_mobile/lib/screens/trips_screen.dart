@@ -302,7 +302,9 @@ class _TripsScreenState extends State<TripsScreen> {
                                     builder: (context) =>
                                         TripDetailsScreen(tripId: trip.id),
                                   ),
-                                );
+                                ).then((value) {
+                                  _getTrips();
+                                });
                               },
                               child: _tripWidget(trip),
                             ),
@@ -415,7 +417,7 @@ class _TripsScreenState extends State<TripsScreen> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.74,
+                          childAspectRatio: 0.76,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),
@@ -429,7 +431,9 @@ class _TripsScreenState extends State<TripsScreen> {
                               builder: (context) =>
                                   TripDetailsScreen(tripId: trip.id),
                             ),
-                          );
+                          ).then((value) {
+                            _getTrips();
+                          });
                         },
                         child: _tripWidget(trip),
                       );
@@ -536,7 +540,10 @@ class _TripsScreenState extends State<TripsScreen> {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 6.0,
+                vertical: 2.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -551,16 +558,42 @@ class _TripsScreenState extends State<TripsScreen> {
                         ),
                       ),
                       const Spacer(),
-                      const Icon(Icons.confirmation_num, color: Colors.white),
-                      const SizedBox(width: 4),
-                      Text(
-                        "${trip.availableTickets} left",
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+                      trip.availableTickets > 0
+                          ? Row(
+                              children: [
+                                const Icon(
+                                  Icons.confirmation_num,
+                                  color: Colors.white,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "${trip.availableTickets} left",
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                "SOLD OUT",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
                     ],
                   ),
                   Row(

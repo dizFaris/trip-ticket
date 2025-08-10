@@ -1,5 +1,6 @@
 ﻿using EasyNetQ;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,10 @@ namespace tripTicket.Services.PurchaseStateMachine
 
         public override Model.Models.Purchase Insert(PurchaseInsertRequest request)
         {
-            var trip = Context.Trips.Find(request.TripId);
+            var trip = Context.Trips
+                .Include(t => t.City)
+                .ThenInclude(c => c.Country)
+                .FirstOrDefault(t => t.Id == request.TripId);
             var user = Context.Users.Find(request.UserId);
 
             if (trip == null)
@@ -32,7 +36,7 @@ namespace tripTicket.Services.PurchaseStateMachine
             if (request.NumberOfTickets <= 0)
                 throw new UserException("Number of tickets must be greater than 0.");
 
-            if (request.NumberOfTickets > (trip.AvailableTickets - trip.PurchasedTickets))
+            if (request.NumberOfTickets > trip.AvailableTickets)
                 throw new UserException("Not enough tickets available for this trip.");
 
             decimal ticketPrice = trip.TicketPrice;
@@ -54,6 +58,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                 throw new UserException($"Invalid total payment. Expected: {total:F2}");
 
             trip.PurchasedTickets += request.NumberOfTickets;
+            trip.AvailableTickets -= request.NumberOfTickets;
 
             var set = Context.Set<Purchase>();
             var entity = Mapper.Map<Purchase>(request);

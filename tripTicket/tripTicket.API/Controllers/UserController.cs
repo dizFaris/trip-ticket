@@ -52,6 +52,7 @@ namespace tripTicket.API.Controllers
             return Ok(user);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{id}/status")]
         public IActionResult ToggleUserStatus(int id, [FromBody] UserToggleActiveRequest request)
         {

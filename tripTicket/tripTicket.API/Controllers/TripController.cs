@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using tripTicket.Model.Models;
 using tripTicket.Model.Requests;
 using tripTicket.Model.SearchObjects;
@@ -17,6 +18,7 @@ namespace tripTicket.API.Controllers
             _service = service;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}/cancel")]
         public Trip Cancel(int id)
         {

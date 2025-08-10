@@ -343,22 +343,42 @@ class _TripsScreenState extends State<TripsScreen> {
                 Padding(
                   padding: EdgeInsets.all(6),
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.confirmation_num),
-                          SizedBox(width: 4),
-                          Text(
-                            "${trip.availableTickets} left",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                      trip.availableTickets > 0
+                          ? Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.confirmation_num),
+                                SizedBox(width: 4),
+                                Text(
+                                  "${trip.availableTickets} left",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                "SOLD OUT",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
                       Spacer(),
                       SizedBox(
                         width: 110,

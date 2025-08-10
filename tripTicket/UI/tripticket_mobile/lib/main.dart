@@ -290,8 +290,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
+                            ? SizedBox(
+                                height: 32,
+                                width: 32,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 4,
+                                    color: AppColors.primaryGreen,
+                                  ),
+                                ),
                               )
                             : const Text(
                                 'Log in',

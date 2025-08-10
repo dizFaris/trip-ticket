@@ -7,6 +7,7 @@ import 'package:tripticket_mobile/models/trip_model.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
 import 'package:tripticket_mobile/providers/bookmarks_provider.dart';
 import 'package:tripticket_mobile/providers/trip_provider.dart';
+import 'package:tripticket_mobile/screens/ticket_purchase_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 
 class TripDetailsScreen extends StatefulWidget {
@@ -140,7 +141,20 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Expanded(
+              child: Center(
+                child: SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 4,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppColors.primaryGreen,
+                    ),
+                  ),
+                ),
+              ),
+            )
           : SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,34 +184,61 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       Positioned(
                         bottom: 16,
                         right: 16,
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            print("Purchase tickets");
-                          },
-                          icon: const Icon(
-                            Icons.shopping_cart,
-                            color: AppColors.primaryYellow,
-                          ),
-                          label: const Text(
-                            "Purchase tickets",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: AppColors.primaryYellow,
-                            ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryGreen,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 4,
-                          ),
-                        ),
+                        child: _trip!.availableTickets > 0
+                            ? ElevatedButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TicketPurchaseScreen(trip: _trip!),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(
+                                  Icons.shopping_cart,
+                                  color: AppColors.primaryYellow,
+                                ),
+                                label: const Text(
+                                  "Purchase tickets",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: AppColors.primaryYellow,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primaryGreen,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 4,
+                                ),
+                              )
+                            : _trip!.tripStatus == "upcoming"
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.red,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Text(
+                                  "SOLD OUT",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              )
+                            : SizedBox.shrink(),
                       ),
 
                       Positioned(
