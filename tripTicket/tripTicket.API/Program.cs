@@ -98,11 +98,14 @@ TypeAdapterConfig<tripTicket.Services.Database.Purchase, tripTicket.Model.Models
     .Map(dest => dest.User, src => src.User.Adapt<UserShort>());
 
 TypeAdapterConfig<tripTicket.Services.Database.Trip, TripShort>.NewConfig()
+    .Map(dest => dest.Id, src => src.Id)
     .Map(dest => dest.City, src => src.City.Name)
     .Map(dest => dest.Country, src => src.City.Country.Name)
     .Map(dest => dest.Photo, src => src.Photo)
     .Map(dest => dest.ExpirationDate, src => src.DepartureDate)
-    .Map(dest => dest.CountryCode, src => src.City.Country.CountryCode);
+    .Map(dest => dest.CountryCode, src => src.City.Country.CountryCode)
+    .Map(dest => dest.FreeCancellationUntil, src => src.FreeCancellationUntil)
+    .Map(dest => dest.CancellationFee, src => src.CancellationFee);
 
 TypeAdapterConfig<tripTicket.Services.Database.User, UserShort>.NewConfig();
 

@@ -37,21 +37,30 @@ Map<String, dynamic> _$PurchaseToJson(Purchase instance) => <String, dynamic>{
 };
 
 TripShortDto _$TripShortDtoFromJson(Map<String, dynamic> json) => TripShortDto(
+  id: (json['id'] as num).toInt(),
   photo: json['photo'] as String?,
   city: json['city'] as String,
   country: json['country'] as String,
   expirationDate: DateTime.parse(json['expirationDate'] as String),
   countryCode: json['countryCode'] as String,
+  freeCancellationUntil: json['freeCancellationUntil'] == null
+      ? null
+      : DateTime.parse(json['freeCancellationUntil'] as String),
+  cancellationFee: (json['cancellationFee'] as num?)?.toDouble(),
 );
 
-Map<String, dynamic> _$TripShortDtoToJson(TripShortDto instance) =>
-    <String, dynamic>{
-      'photo': instance.photo,
-      'city': instance.city,
-      'country': instance.country,
-      'expirationDate': instance.expirationDate.toIso8601String(),
-      'countryCode': instance.countryCode,
-    };
+Map<String, dynamic> _$TripShortDtoToJson(
+  TripShortDto instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'photo': instance.photo,
+  'city': instance.city,
+  'country': instance.country,
+  'expirationDate': instance.expirationDate.toIso8601String(),
+  'countryCode': instance.countryCode,
+  'freeCancellationUntil': instance.freeCancellationUntil?.toIso8601String(),
+  'cancellationFee': instance.cancellationFee,
+};
 
 UserShortDto _$UserShortDtoFromJson(Map<String, dynamic> json) => UserShortDto(
   firstName: json['firstName'] as String,

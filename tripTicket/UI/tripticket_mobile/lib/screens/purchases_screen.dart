@@ -4,6 +4,7 @@ import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/models/purchase_model.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
 import 'package:tripticket_mobile/providers/purchases_provider.dart';
+import 'package:tripticket_mobile/screens/purchase_details_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 import 'package:tripticket_mobile/widgets/pagination_controls.dart';
 
@@ -137,15 +138,15 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(8),
                           onTap: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) =>
-                            //         TripDetailsScreen(tripId: purchase.trip.id),
-                            //   ),
-                            // ).then((value) {
-                            //   _getPurchases();
-                            // });
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    PurchaseDetailsScreen(purchase: purchase),
+                              ),
+                            ).then((value) {
+                              _getPurchases();
+                            });
                           },
                           child: Container(
                             height: 70,

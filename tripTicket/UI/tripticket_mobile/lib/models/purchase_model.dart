@@ -40,18 +40,24 @@ class Purchase {
 
 @JsonSerializable()
 class TripShortDto {
+  final int id;
   final String? photo;
   final String city;
   final String country;
   final DateTime expirationDate;
   final String countryCode;
+  final DateTime? freeCancellationUntil;
+  final double? cancellationFee;
 
   TripShortDto({
+    required this.id,
     this.photo,
     required this.city,
     required this.country,
     required this.expirationDate,
     required this.countryCode,
+    this.freeCancellationUntil,
+    this.cancellationFee,
   });
 
   factory TripShortDto.fromJson(Map<String, dynamic> json) =>

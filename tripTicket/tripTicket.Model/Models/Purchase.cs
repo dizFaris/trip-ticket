@@ -25,11 +25,14 @@ namespace tripTicket.Model.Models
     }
     public class TripShort
     {
+        public int Id { get; set; }
         public byte[]? Photo { get; set; }
         public string City { get; set; } = null!;
         public string Country { get; set; } = null!;
         public string CountryCode {  get; set; } = null!;
         public DateOnly ExpirationDate { get; set; }
+        public DateOnly? FreeCancellationUntil { get; set; }
+        public decimal? CancellationFee { get; set; }
     }
 
     public class UserShort

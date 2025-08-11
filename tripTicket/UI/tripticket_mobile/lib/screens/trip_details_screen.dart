@@ -384,18 +384,17 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                         Text(
                           _trip?.description ?? 'No description provided.',
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             color: Colors.black,
                           ),
                         ),
-                        const SizedBox(height: 8),
                         Divider(),
                         Row(
                           children: [
                             Text(
                               'Departure date:',
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 color: Colors.black,
                               ),
                             ),
@@ -406,7 +405,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                                 10,
                               ),
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -418,7 +417,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                             Text(
                               'Return date:',
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 color: Colors.black,
                               ),
                             ),
@@ -429,7 +428,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                                 10,
                               ),
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -441,7 +440,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                             Text(
                               'Transport type:',
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 color: Colors.black,
                               ),
                             ),
@@ -449,7 +448,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                             Text(
                               _trip!.transportType!,
                               style: const TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -460,7 +459,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                         Text(
                           'Trip details:',
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             color: Colors.black,
                           ),
                         ),
@@ -487,7 +486,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
               Text(
                 'Day ${day.dayNumber}: ${day.title}',
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -497,12 +496,12 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('-', style: TextStyle(fontSize: 14)),
+                      const Text('-', style: TextStyle(fontSize: 16)),
                       const SizedBox(width: 4),
                       Text(
                         item.time.split(':').sublist(0, 2).join(':'),
                         style: const TextStyle(
-                          fontSize: 14,
+                          fontSize: 16,
                           color: AppColors.primaryYellow,
                           fontWeight: FontWeight.bold,
                         ),
@@ -511,7 +510,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       Expanded(
                         child: Text(
                           item.action,
-                          style: const TextStyle(fontSize: 14),
+                          style: const TextStyle(fontSize: 16),
                           softWrap: true,
                           overflow: TextOverflow.visible,
                         ),
