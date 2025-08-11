@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:tripticket_mobile/models/bookmark_model.dart';
-import 'package:tripticket_mobile/models/search_result.dart';
 import 'package:tripticket_mobile/providers/base_provider.dart';
 
 class BookmarkProvider extends BaseProvider<Bookmark> {
@@ -38,31 +35,6 @@ class BookmarkProvider extends BaseProvider<Bookmark> {
       return response.body.toLowerCase() == 'true';
     } else {
       throw UserFriendlyException("Failed to check bookmark status");
-    }
-  }
-
-  Future<SearchResult<Bookmark>> getBookmarksByUserId(int id) async {
-    var url = "${BaseProvider.baseUrl}Bookmark/user/$id";
-
-    var uri = Uri.parse(url);
-    var headers = createHeaders();
-
-    var response = await http.get(uri, headers: headers);
-
-    if (isValidResponse(response)) {
-      var data = jsonDecode(response.body);
-
-      var result = SearchResult<Bookmark>();
-
-      result.count = data['count'];
-
-      for (var item in data['resultList']) {
-        result.result.add(fromJson(item));
-      }
-
-      return result;
-    } else {
-      throw Exception("Unknown error");
     }
   }
 }

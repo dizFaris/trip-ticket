@@ -13,7 +13,6 @@ namespace tripTicket.Services.Interfaces
     public interface IBookmarkService : ICRUDService<Bookmark, BookmarkSearchObject, BookmarkInsertRequest, BookmarkUpdateRequest>
     {
         object DeleteBookmark(int userId, int tripId);
-        PagedResult<Bookmark> GetBoomarksByUserId(int userId);
         bool IsTripBookmarked(int userId, int tripId);
     }
 }

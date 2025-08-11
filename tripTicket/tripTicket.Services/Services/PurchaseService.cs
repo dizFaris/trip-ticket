@@ -75,6 +75,9 @@ namespace tripTicket.Services.Services
             if (search.MaxPayment.HasValue)
                 query = query.Where(p => p.TotalPayment <= search.MaxPayment.Value);
 
+            if (search.UserId.HasValue)
+                query = query.Where(p => p.UserId == search.UserId.Value);
+
             if (!string.IsNullOrWhiteSpace(search.Status))
             {
                 query = query.Where(x => x.Status == search.Status);
@@ -82,7 +85,6 @@ namespace tripTicket.Services.Services
 
             return query;
         }
-
 
         public override Model.Models.Purchase Update(int id, PurchaseUpdateRequest request)
         {

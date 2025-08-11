@@ -69,6 +69,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         AuthProvider.id!,
         id,
       );
+
       setState(() {
         _isBookmarked = isBookmarked;
       });
@@ -141,16 +142,14 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
       body: _isLoading
-          ? Expanded(
-              child: Center(
-                child: SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 4,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryGreen,
-                    ),
+          ? Center(
+              child: SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(
+                  strokeWidth: 4,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    AppColors.primaryGreen,
                   ),
                 ),
               ),

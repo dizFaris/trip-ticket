@@ -8,5 +8,6 @@ namespace tripTicket.Model.SearchObjects
 {
     public class BookmarkSearchObject : BaseSearchObject
     {
+        public int? UserId { get; set; }
     }
 }

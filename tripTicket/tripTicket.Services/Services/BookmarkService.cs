@@ -58,7 +58,7 @@ namespace tripTicket.Services.Services
             return true;
         }
 
-        public PagedResult<Model.Models.Bookmark> GetBoomarksByUserId(int userId)
+        public override PagedResult<Model.Models.Bookmark> GetPaged(BookmarkSearchObject search)
         {
             List<Model.Models.Bookmark> result = new List<Model.Models.Bookmark>();
 
@@ -71,19 +71,34 @@ namespace tripTicket.Services.Services
                         .ThenInclude(dc => dc.Country)
                 .AsQueryable();
 
-            query = query.Where(b => b.UserId == userId);
+            query = AddFilter(search, query);
 
             int count = query.Count();
+
+            if (search?.Page.HasValue == true && search?.PageSize.HasValue == true)
+            {
+                query = query.Skip(search.Page.Value * search.PageSize.Value).Take(search.PageSize.Value);
+            }
 
             var list = query.ToList();
 
             result = Mapper.Map(list, result);
 
-            var pagedResult = new PagedResult<Model.Models.Bookmark>();
+            PagedResult<Model.Models.Bookmark> pagedResult = new PagedResult<Model.Models.Bookmark>();
             pagedResult.ResultList = result;
             pagedResult.Count = count;
 
             return pagedResult;
+        }
+
+        public override IQueryable<Bookmark> AddFilter(BookmarkSearchObject search, IQueryable<Bookmark> query)
+        {
+            query = base.AddFilter(search, query);
+
+            if (search.UserId.HasValue)
+                query = query.Where(p => p.UserId == search.UserId.Value);
+
+            return query;
         }
 
         public bool IsTripBookmarked(int userId, int tripId)
@@ -122,6 +137,5 @@ namespace tripTicket.Services.Services
 
             return Mapper.Map<Model.Models.Bookmark>(loadedEntity);
         }
-
     }
 }

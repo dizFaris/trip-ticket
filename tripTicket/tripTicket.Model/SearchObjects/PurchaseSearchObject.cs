@@ -11,6 +11,8 @@ namespace tripTicket.Model.SearchObjects
         public int? MaxTicketCount { get; set; }
         public decimal? MinPayment { get; set; }
         public decimal? MaxPayment { get; set; }
-        public string? Status {  get; set; }
+        public string? Status { get; set; }
+        public int? UserId { get; set; }
+
     }
 }
