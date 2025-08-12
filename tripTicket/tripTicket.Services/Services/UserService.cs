@@ -119,31 +119,52 @@ namespace tripTicket.Services.Services
             if (!entity.IsActive)
                 throw new UserException("Cannot update data of an inactive user.");
 
-            if (!string.IsNullOrEmpty(request.Password))
+            if (!string.IsNullOrWhiteSpace(request.Phone))
             {
-                var pw = ValidationHelpers.CheckPasswordStrength(request.Password);
-                if (!string.IsNullOrEmpty(pw))
-                {
-                    throw new UserException("Invalid password");
-                }
-            }
-            if (!string.IsNullOrEmpty(request.Phone))
-            {
-                var phoneNumber = ValidationHelpers.CheckPhoneNumber(request.Phone);
-                if (!string.IsNullOrEmpty(phoneNumber))
-                {
+                var phoneError = ValidationHelpers.CheckPhoneNumber(request.Phone);
+                if (!string.IsNullOrEmpty(phoneError))
                     throw new UserException("Invalid phone number");
-                }
             }
-            if (request.Password != null)
+
+            if (!string.IsNullOrWhiteSpace(request.NewPassword))
             {
-                if (request.Password != request.PasswordConfirm)
-                {
-                    throw new UserException("Password and confirm password are not matching");
-                }
+                if (string.IsNullOrWhiteSpace(request.CurrentPassword))
+                    throw new UserException("Current password is required to change your password.");
+
+                var isCurrentPasswordValid = entity.PasswordHash ==
+                    HashGenerator.GenerateHash(entity.PasswordSalt, request.CurrentPassword);
+
+                if (!isCurrentPasswordValid)
+                    throw new UserException("Current password is incorrect.");
+
+                var pwError = ValidationHelpers.CheckPasswordStrength(request.NewPassword);
+                if (!string.IsNullOrEmpty(pwError))
+                    throw new UserException("Invalid password");
+
+                if (request.NewPassword != request.NewPasswordConfirm)
+                    throw new UserException("New password and confirmation do not match.");
+
                 entity.PasswordSalt = HashGenerator.GenerateSalt();
-                entity.PasswordHash = HashGenerator.GenerateHash(entity.PasswordSalt, request.Password);
+                entity.PasswordHash = HashGenerator.GenerateHash(entity.PasswordSalt, request.NewPassword);
             }
+
+            if (!string.IsNullOrWhiteSpace(request.FirstName))
+                entity.FirstName = request.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(request.LastName))
+                entity.LastName = request.LastName;
+
+            if (!string.IsNullOrWhiteSpace(request.Username))
+                entity.Username = request.Username;
+
+            if (!string.IsNullOrWhiteSpace(request.Email))
+                entity.Email = request.Email;
+
+            if (!string.IsNullOrWhiteSpace(request.Phone))
+                entity.Phone = request.Phone;
+
+            if (request.BirthDate.HasValue)
+                entity.BirthDate = request.BirthDate.Value;
         }
 
         public async Task<List<Model.Models.Role>> GetUserRolesAsync(int id)

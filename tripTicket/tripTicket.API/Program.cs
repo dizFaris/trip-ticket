@@ -78,6 +78,10 @@ builder.Services.AddDbContext<TripTicketDbContext>(options =>
 
 builder.Services.AddMapster();
 
+TypeAdapterConfig<UserUpdateRequest, tripTicket.Services.Database.User>
+    .NewConfig()
+    .IgnoreNullValues(true);
+
 TypeAdapterConfig<tripTicket.Services.Database.User, tripTicket.Model.Models.User>.NewConfig()
     .Map(dest => dest.Roles, src => src.UserRoles.Select(ur => ur.Role.Name).ToList());
 
