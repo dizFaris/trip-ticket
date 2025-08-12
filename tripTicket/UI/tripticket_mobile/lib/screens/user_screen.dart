@@ -415,7 +415,7 @@ class _UserScreenState extends State<UserScreen> {
                                         _updateUser();
                                       }
                                     }
-                                  : null, // disabled if nothing changed
+                                  : null,
                               child: const Text(
                                 "Save",
                                 style: TextStyle(
@@ -469,7 +469,6 @@ class _UserScreenState extends State<UserScreen> {
       ),
       validator: (value) {
         if (isPasswordField) {
-          // Password fields are optional unless one is filled
           final hasAnyPassword =
               _currentPasswordController.text.isNotEmpty ||
               _newPasswordController.text.isNotEmpty ||
@@ -487,7 +486,6 @@ class _UserScreenState extends State<UserScreen> {
             }
           }
         } else {
-          // All other fields are required
           if (value == null || value.isEmpty) return "This field is required";
           for (final validator in validators) {
             final result = validator(value);
