@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/models/bookmark_model.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
-import 'package:tripticket_mobile/providers/bookmarks_provider.dart';
+import 'package:tripticket_mobile/providers/bookmark_provider.dart';
 import 'package:tripticket_mobile/screens/trip_details_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 import 'package:tripticket_mobile/widgets/pagination_controls.dart';

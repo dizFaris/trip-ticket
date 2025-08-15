@@ -12,8 +12,8 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    [Migration("20250729164752_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250815153545_SeedData")]
+    partial class SeedData
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -180,11 +180,14 @@ namespace tripTicket.Services.Migrations
 
             modelBuilder.Entity("tripTicket.Services.Database.Transaction", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(8)
                         .IsUnicode(false)
-                        .HasColumnType("char(8)")
+                        .HasColumnType("int")
                         .IsFixedLength();
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(10, 2)");

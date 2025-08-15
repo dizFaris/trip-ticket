@@ -152,7 +152,11 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
   void _cancelPurchase(int id) async {
     try {
-      await _purchaseProvider.cancelPurchase(id);
+      var refundAmount = await _purchaseProvider.cancelPurchase(id);
+
+      var message = refundAmount > 0
+          ? "Refunded amount ${refundAmount.toStringAsFixed(2)} €"
+          : "No money was refunded";
 
       if (!mounted) return;
       final result = await showDialog(
@@ -160,7 +164,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
         barrierDismissible: true,
         builder: (context) => AlertDialog(
           title: Text("Success"),
-          content: Text("Purchase successfully canceled"),
+          content: Text("Purchase successfully canceled. $message"),
           actions: [
             TextButton(
               onPressed: () {
@@ -227,11 +231,16 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
       Navigator.of(context).pop();
 
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => PdfViewerPage(pdfBytes: bytes, fileName: fileName),
-        ),
-      );
+      Navigator.of(context)
+          .push(
+            MaterialPageRoute(
+              builder: (_) =>
+                  PdfViewerPage(pdfBytes: bytes, fileName: fileName),
+            ),
+          )
+          .then((value) {
+            _getPurchases();
+          });
     } catch (e) {
       setState(() {
         _isLoading = false;
@@ -668,18 +677,19 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                                         ),
                                                       ),
                                                       Spacer(),
-                                                      purchase.isPrinted
+                                                      purchase.isPrinted ||
+                                                              purchase.status !=
+                                                                  "complete"
                                                           ? SizedBox.shrink()
                                                           : SizedBox(
                                                               height: 32,
                                                               width: 32,
                                                               child: ElevatedButton(
-                                                                onPressed: () {
-                                                                  _getTicketsPdf(
-                                                                    purchase.id,
-                                                                  );
-                                                                  _getPurchases();
-                                                                },
+                                                                onPressed: () =>
+                                                                    _getTicketsPdf(
+                                                                      purchase
+                                                                          .id,
+                                                                    ),
                                                                 style: ElevatedButton.styleFrom(
                                                                   backgroundColor:
                                                                       AppColors

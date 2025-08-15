@@ -9,6 +9,7 @@ using tripTicket.Model.Requests;
 using tripTicket.Model;
 using tripTicket.Services.Database;
 using tripTicket.Services.TripStateMachine;
+using tripTicket.Model.Response;
 
 namespace tripTicket.Services.PurchaseStateMachine
 {
@@ -28,9 +29,14 @@ namespace tripTicket.Services.PurchaseStateMachine
             throw new UserException("Method not allowed");
         }
 
-        public virtual Model.Models.Purchase Cancel(int id)
+        public virtual Model.Models.Purchase FinalizePurchase(int id, bool paymentSucceeded)
         {
             throw new UserException("Method not allowed");
+        }
+
+        public virtual Task<PurchaseCancelResponse> Cancel(int id)
+        {
+            throw new UserException("Canceling a purchase is not allowed in the current state.");
         }
 
         public virtual Model.Models.Purchase Complete(int id)
@@ -49,8 +55,12 @@ namespace tripTicket.Services.PurchaseStateMachine
             {
                 case "initial":
                     return ServiceProvider.GetService<InitialPurchaseState>();
+                case "pending":
+                    return ServiceProvider.GetService<PendingPurchaseState>();
                 case "accepted":
                     return ServiceProvider.GetService<AcceptedPurchaseState>();
+                case "failed":
+                    throw new UserException("Cannot change failed purchase state");
                 case "expired":
                     throw new UserException("Cannot change expired purchase state");
                 case "canceled":

@@ -5,8 +5,16 @@ import 'package:tripticket_mobile/screens/master_screen.dart';
 import 'package:tripticket_mobile/screens/registration_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 import 'app_colors.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  Stripe.publishableKey =
+      "pk_test_51RvKtcEcSVBxlFlEAu8WftaKB1dIJJkHWDe546DjJh2dOUql1ZXkf4p88rjHfKJ0XPq6jFcBa3dQz3I8wmktOlwq00Pvm6m7IN";
+
+  await Stripe.instance.applySettings();
+
   runApp(const MyApp());
 }
 

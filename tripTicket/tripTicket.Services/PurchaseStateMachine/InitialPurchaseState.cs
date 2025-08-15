@@ -62,7 +62,7 @@ namespace tripTicket.Services.PurchaseStateMachine
 
             var set = Context.Set<Purchase>();
             var entity = Mapper.Map<Purchase>(request);
-            entity.Status = "accepted";
+            entity.Status = "pending";
             entity.CreatedAt = DateTime.Now;
             set.Add(entity);
             Context.SaveChanges();

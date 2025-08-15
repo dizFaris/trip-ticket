@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using tripTicket.Model;
 using tripTicket.Model.Requests;
+using tripTicket.Model.Response;
 using tripTicket.Model.SearchObjects;
 using tripTicket.Services.Database;
 using tripTicket.Services.Helpers;
@@ -31,7 +32,7 @@ namespace tripTicket.Services.Services
             return state.Insert(request);
         }
 
-        public Model.Models.Purchase Cancel(int id)
+        public async Task<PurchaseCancelResponse> CancelAsync(int id)
         {
             var entity = GetById(id);
 
@@ -41,7 +42,7 @@ namespace tripTicket.Services.Services
             }
 
             var state = BasePurchaseState.CreateState(entity.Status);
-            return state.Cancel(id);
+            return await state.Cancel(id);
         }
 
         public override IQueryable<Purchase> AddFilter(PurchaseSearchObject search, IQueryable<Purchase> query)
@@ -108,6 +109,8 @@ namespace tripTicket.Services.Services
                 .AsQueryable();
 
             query = AddFilter(search, query);
+
+            query = query.OrderByDescending(p => p.CreatedAt);
 
             int count = query.Count();
 
@@ -178,6 +181,19 @@ namespace tripTicket.Services.Services
             await Context.SaveChangesAsync();
 
             return TicketPdfGenerator.GenerateTickets(model);
+        }
+
+        public Model.Models.Purchase FinalizePurchase(int id, bool paymentSucceeded)
+        {
+            var entity = Context.Purchases
+                .Include(p => p.Trip)
+                .FirstOrDefault(p => p.Id == id);
+
+            if (entity == null)
+                throw new UserException("Purchase not found.");
+
+            var state = BasePurchaseState.CreateState(entity.Status);
+            return state.FinalizePurchase(id, paymentSucceeded);
         }
     }
 }

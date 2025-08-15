@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/models/trip_model.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
-import 'package:tripticket_mobile/providers/purchases_provider.dart';
+import 'package:tripticket_mobile/providers/purchase_provider.dart';
+import 'package:tripticket_mobile/providers/transaction_provider.dart';
 
 class TicketPurchaseScreen extends StatefulWidget {
   final Trip trip;
@@ -18,11 +19,13 @@ class TicketPurchaseScreen extends StatefulWidget {
 
 class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
   final PurchaseProvider _purchaseProvider = PurchaseProvider();
+  final TransactionProvider _transactionProvider = TransactionProvider();
   Timer? _debounce;
   int _ticketCount = 1;
   double _totalPayment = 0;
   ImageProvider? _tripImage;
   bool _isLoading = false;
+  String? _purchaseStatusText;
 
   @override
   void initState() {
@@ -72,27 +75,53 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
     };
 
     try {
-      await _purchaseProvider.insert(purchase);
+      setState(() {
+        _purchaseStatusText = 'Creating purchase...';
+      });
+      var purchaseResult = await _purchaseProvider.insert(purchase);
+
+      setState(() {
+        _purchaseStatusText = 'Waiting for payment...';
+      });
+      var paymentResult = await _transactionProvider.payWithPaymentSheet(
+        purchaseResult.id,
+      );
+
+      setState(() {
+        _purchaseStatusText = 'Processing transaction...';
+      });
+
+      var transaction = {
+        'PurchaseId': purchaseResult.id,
+        'Amount': purchaseResult.totalPayment,
+        'PaymentMethod': 'Stripe',
+        'Status': paymentResult.success ? 'complete' : 'failed',
+        'TransactionDate': DateTime.now().toIso8601String(),
+        'StripeTransactionId': paymentResult.stripeTransactionId,
+      };
+
+      await _transactionProvider.insert(transaction);
+
+      setState(() {
+        _purchaseStatusText = 'Finalizing purchase...';
+      });
+      await _purchaseProvider.finalizePurchase(
+        purchaseResult.id,
+        paymentResult.success,
+      );
+
       if (!mounted) return;
 
-      await showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => AlertDialog(
-          title: Text("Success"),
-          content: Text("Purchase successfully added"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
-                Navigator.pop(context);
-              },
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
+      setState(() {
+        _purchaseStatusText = paymentResult.success
+            ? "Purchase successfully completed!"
+            : "Payment failed";
+      });
+
+      await Future.delayed(Duration(seconds: 1));
+      if (!mounted) return;
+      Navigator.pop(context);
+      Navigator.pop(context);
     } on Exception catch (e) {
       if (!mounted) return;
 
@@ -112,6 +141,7 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
     }
     setState(() {
       _isLoading = false;
+      _purchaseStatusText = null;
     });
   }
 
@@ -138,19 +168,42 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
-      body: _isLoading
-          ? const Expanded(
-              child: Center(
-                child: SizedBox(
-                  width: 32,
-                  height: 32,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 4,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primaryGreen,
+      body:
+          (_isLoading ||
+              (_purchaseStatusText != null && _purchaseStatusText!.isNotEmpty))
+          ? Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Status text on top
+                  if (_purchaseStatusText != null &&
+                      _purchaseStatusText!.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        _purchaseStatusText!,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primaryBlack,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                ),
+
+                  // Loader below the text, shown only if loading
+                  if (_isLoading)
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 4,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.primaryGreen,
+                        ),
+                      ),
+                    ),
+                ],
               ),
             )
           : SingleChildScrollView(

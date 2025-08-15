@@ -18,6 +18,7 @@ using tripTicket.API;
 using Microsoft.OpenApi.Models;
 using tripTicket.Model.Models;
 using QuestPDF.Infrastructure;
+using MapsterMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,11 +28,23 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBookmarkService, BookmarkService>();
 builder.Services.AddTransient<IPurchaseService, PurchaseService>();
 builder.Services.AddTransient<IUserActivityService, UserActivityService>();
-builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<ITripStatisticService, TripStatisticService>();
 builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICityService, CityService>();
 builder.Services.AddTransient<IStatisticsService, StatisticsService>();
+builder.Services.AddTransient<ITransactionService>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    var context = sp.GetRequiredService<TripTicketDbContext>();
+    var mapper = sp.GetRequiredService<IMapper>();
+
+    var secretKey = config["Stripe:SecretKey"]
+                    ?? Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY")
+                    ?? "sk_test_placeholder";
+
+    return new TransactionService(secretKey, context, mapper);
+});
+
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();
@@ -42,6 +55,7 @@ builder.Services.AddTransient<LockedTripState>();
 // Purchase state machine
 // Trip state machine
 builder.Services.AddTransient<BasePurchaseState>();
+builder.Services.AddTransient<PendingPurchaseState>();
 builder.Services.AddTransient<InitialPurchaseState>();
 builder.Services.AddTransient<AcceptedPurchaseState>();
 

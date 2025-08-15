@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Transactions;
 
 namespace tripTicket.Model.Requests
 {
-    public class PurchaseUpdateRequest
+    public class TransactionPaymentIntentRequest
     {
-        public bool PaymentSucceeded { get; set; }
+        public int PurchaseId { get; set; }
     }
 }

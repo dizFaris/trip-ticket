@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using tripTicket.Model.Models;
 using tripTicket.Model.Requests;
+using tripTicket.Model.Response;
 using tripTicket.Model.SearchObjects;
 using tripTicket.Services.Interfaces;
 using tripTicket.Services.Services;
@@ -19,15 +20,21 @@ namespace tripTicket.API.Controllers
         }
 
         [HttpPut("{id}/cancel")]
-        public Purchase Cancel(int id)
+        public async Task<PurchaseCancelResponse> CancelAsync(int id)
         {
-            return _service.Cancel(id);
+            return await _service.CancelAsync(id);
         }
 
         [HttpPut("{id}/complete")]
         public Purchase Complete(int id)
         {
             return _service.Complete(id);
+        }
+
+        [HttpPut("{id}/finalize")]
+        public Purchase Finalize(int id, [FromBody] PurchaseUpdateRequest request)
+        {
+            return _service.FinalizePurchase(id, request.PaymentSucceeded);
         }
 
         [HttpGet("{id}/ticket-pdf")]

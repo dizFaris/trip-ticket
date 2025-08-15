@@ -97,12 +97,13 @@ class _TripsScreenState extends State<TripsScreen> {
         page: 0,
         pageSize: 8,
       );
-
+      if (!mounted) return;
       setState(() {
         _forYouTrips = searchResult.result;
         _isLoadingForYou = false;
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _forYouTrips = [];
         _isLoadingForYou = false;
@@ -414,7 +415,7 @@ class _TripsScreenState extends State<TripsScreen> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.76,
+                          childAspectRatio: 0.73,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),

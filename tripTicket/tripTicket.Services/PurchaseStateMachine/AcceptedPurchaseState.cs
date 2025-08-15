@@ -2,6 +2,7 @@
 using EasyNetQ;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 using tripTicket.Model;
 using tripTicket.Model.Models;
+using tripTicket.Model.Response;
 using tripTicket.Services.Database;
+using tripTicket.Services.Interfaces;
 using tripTicket.Services.Messages;
 
 namespace tripTicket.Services.PurchaseStateMachine
@@ -20,7 +23,7 @@ namespace tripTicket.Services.PurchaseStateMachine
         {
         }
 
-        public override Model.Models.Purchase Cancel(int id)
+        public override async Task<PurchaseCancelResponse> Cancel(int id)
         {
             var set = Context.Set<Database.Purchase>();
             var entity = set.Find(id);
@@ -36,6 +39,27 @@ namespace tripTicket.Services.PurchaseStateMachine
             var user = Context.Users.Find(entity.UserId);
             var trip = Context.Trips.Find(entity.TripId);
 
+            // Calculate refund
+            decimal refundAmount;
+            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+
+            if (!trip.FreeCancellationUntil.HasValue || today <= trip.FreeCancellationUntil.Value)
+            {
+                refundAmount = entity.TotalPayment;
+            }
+            else
+            {
+                var feePercentage = trip.CancellationFee ?? 0m;
+                refundAmount = entity.TotalPayment - (entity.TotalPayment * feePercentage / 100);
+            }
+
+            var transaction = Context.Transactions.FirstOrDefault(t => t.PurchaseId == entity.Id);
+            var transactionService = ServiceProvider.GetService<ITransactionService>();
+            if (transaction != null && !string.IsNullOrEmpty(transaction.StripeTransactionId))
+            {
+                await transactionService.RefundTransactionAsync(transaction.StripeTransactionId, refundAmount);
+            }
+
             var bus = RabbitHutch.CreateBus("host=localhost");
             var purchase = Mapper.Map<Model.Models.Purchase>(entity);
 
@@ -49,7 +73,11 @@ namespace tripTicket.Services.PurchaseStateMachine
 
             bus.PubSub.Publish(message);
 
-            return purchase;
+            return new PurchaseCancelResponse
+            {
+                Purchase = purchase,
+                RefundAmount = refundAmount
+            };
         }
 
         public override Model.Models.Purchase Complete(int id)

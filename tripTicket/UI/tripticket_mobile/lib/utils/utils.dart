@@ -63,6 +63,8 @@ String capitalize(String input) {
 
 Color getStatusColor(String status) {
   switch (status.toLowerCase()) {
+    case 'pending':
+      return AppColors.primaryYellow;
     case 'upcoming':
     case 'accepted':
       return AppColors.primaryBlue;
@@ -70,6 +72,7 @@ Color getStatusColor(String status) {
     case 'expired':
       return AppColors.primaryBlack;
     case 'canceled':
+    case 'failed':
       return AppColors.primaryRed;
     case 'complete':
       return AppColors.secondaryGreen;

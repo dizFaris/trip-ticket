@@ -5,7 +5,7 @@ import 'package:country_flags/country_flags.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/models/purchase_model.dart';
 import 'package:barcode_widget/barcode_widget.dart';
-import 'package:tripticket_mobile/providers/purchases_provider.dart';
+import 'package:tripticket_mobile/providers/purchase_provider.dart';
 import 'package:tripticket_mobile/screens/trip_details_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 
@@ -38,7 +38,13 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
       setState(() {
         _isLoading = true;
       });
-      await _purchaseProvider.cancelPurchase(widget.purchase.id);
+      var refundAmount = await _purchaseProvider.cancelPurchase(
+        widget.purchase.id,
+      );
+
+      var message = refundAmount > 0
+          ? "Refunded amount ${refundAmount.toStringAsFixed(2)} €"
+          : "No money was refunded";
 
       if (!mounted) return;
       await showDialog(
@@ -46,7 +52,7 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
         barrierDismissible: true,
         builder: (context) => AlertDialog(
           title: Text("Success"),
-          content: Text("Purchase successfully canceled"),
+          content: Text("Purchase successfully canceled. $message"),
           actions: [
             TextButton(
               onPressed: () {
@@ -311,7 +317,7 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                 ),
                               ),
                               Text(
-                                "${widget.purchase.trip.cancellationFee} €",
+                                "${widget.purchase.trip.cancellationFee} %",
                                 style: const TextStyle(
                                   fontSize: 20,
                                   fontWeight: FontWeight.bold,

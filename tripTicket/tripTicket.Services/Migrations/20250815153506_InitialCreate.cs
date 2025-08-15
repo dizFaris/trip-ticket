@@ -274,7 +274,8 @@ namespace tripTicket.Services.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "char(8)", unicode: false, fixedLength: true, maxLength: 8, nullable: false),
+                    Id = table.Column<int>(type: "int", unicode: false, fixedLength: true, maxLength: 8, nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     PurchaseId = table.Column<int>(type: "int", unicode: false, fixedLength: true, maxLength: 8, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Status = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),

@@ -177,11 +177,14 @@ namespace tripTicket.Services.Migrations
 
             modelBuilder.Entity("tripTicket.Services.Database.Transaction", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(8)
                         .IsUnicode(false)
-                        .HasColumnType("char(8)")
+                        .HasColumnType("int")
                         .IsFixedLength();
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(10, 2)");

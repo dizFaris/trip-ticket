@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/models/purchase_model.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
-import 'package:tripticket_mobile/providers/purchases_provider.dart';
+import 'package:tripticket_mobile/providers/purchase_provider.dart';
 import 'package:tripticket_mobile/screens/purchase_details_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 import 'package:tripticket_mobile/widgets/pagination_controls.dart';

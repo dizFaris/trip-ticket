@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -13,7 +14,7 @@ class PurchaseProvider extends BaseProvider<Purchase> {
     return Purchase.fromJson(data);
   }
 
-  Future<void> cancelPurchase(int id) async {
+  Future<double> cancelPurchase(int id) async {
     var url = "${BaseProvider.baseUrl}Purchase/$id/cancel";
     var uri = Uri.parse(url);
     var headers = createHeaders();
@@ -23,6 +24,12 @@ class PurchaseProvider extends BaseProvider<Purchase> {
     if (!isValidResponse(response)) {
       throw UserFriendlyException("Failed to cancel purchase");
     }
+
+    var data = jsonDecode(response.body);
+
+    double refundAmount = (data['refundAmount'] as num).toDouble();
+
+    return refundAmount;
   }
 
   Future<void> completePurchase(int id) async {

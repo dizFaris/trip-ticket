@@ -21,7 +21,5 @@ namespace tripTicket.Model.Models
         public DateTime TransactionDate { get; set; }
 
         public string StripeTransactionId { get; set; } = null!;
-
-        public virtual Purchase Purchase { get; set; } = null!;
     }
 }
