@@ -216,6 +216,10 @@ namespace tripTicket.Services.Migrations
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id")
                         .HasName("PK__Transact__3214EC07E2C01878");
 

@@ -13,6 +13,7 @@ namespace tripTicket.Model.Requests
 
         public decimal Amount { get; set; }
         public string PaymentMethod { get; set; } = null!;
+        public string Type { get; set; } = null!;
         public string Status { get; set; } = null!;
 
         public DateTime TransactionDate { get; set; }

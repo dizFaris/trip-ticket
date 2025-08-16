@@ -57,5 +57,44 @@ namespace tripTicket.Services.Services
 
             return await service.CreateAsync(refundOptions);
         }
+
+        public override IQueryable<Transaction> AddFilter(TransactionSearchObject search, IQueryable<Transaction> query)
+        {
+            query = base.AddFilter(search, query);
+
+            if (!string.IsNullOrWhiteSpace(search.FTS))
+            {
+                query = query.Where(p => p.Id.ToString().Contains(search.FTS) 
+                    || p.StripeTransactionId.ToString().Contains(search.FTS));
+            }
+
+            if (search.FromDate.HasValue)
+            {
+                query = query.Where(p => p.TransactionDate.Date >= search.FromDate.Value.Date);
+            }
+
+            if (search.ToDate.HasValue)
+            {
+                query = query.Where(p => p.TransactionDate.Date <= search.ToDate.Value.Date);
+            }
+
+            if (search.MinAmount.HasValue)
+                query = query.Where(p => p.Amount >= search.MinAmount.Value);
+
+            if (search.MaxAmount.HasValue)
+                query = query.Where(p => p.Amount <= search.MaxAmount.Value);
+
+            if (!string.IsNullOrWhiteSpace(search.Status))
+            {
+                query = query.Where(x => x.Status == search.Status);
+            }
+
+            if (!string.IsNullOrWhiteSpace(search.Type))
+            {
+                query = query.Where(x => x.Type == search.Type);
+            }
+
+            return query;
+        }
     }
 }

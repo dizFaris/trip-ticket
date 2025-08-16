@@ -18,6 +18,8 @@ namespace tripTicket.Model.Models
 
         public string PaymentMethod { get; set; } = null!;
 
+        public string Type { get; set; } = null!;
+
         public DateTime TransactionDate { get; set; }
 
         public string StripeTransactionId { get; set; } = null!;

@@ -101,7 +101,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
       try {
         var filter = {
-          if (_selectedStatus != null) 'status': _selectedStatus,
+          if (_selectedStatus != null) 'Status': _selectedStatus,
           if (_minTicketCount.text.isNotEmpty)
             'MinTicketCount': _minTicketCount.text,
           if (_maxTicketCount.text.isNotEmpty)

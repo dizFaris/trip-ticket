@@ -36,6 +36,9 @@ namespace tripTicket.Services.PurchaseStateMachine
             if (request.NumberOfTickets <= 0)
                 throw new UserException("Number of tickets must be greater than 0.");
 
+            if (trip.TripStatus != "upcoming")
+                throw new UserException("You can only purchase tickets for upcoming trips.");
+
             if (request.NumberOfTickets > trip.AvailableTickets)
                 throw new UserException("Not enough tickets available for this trip.");
 

@@ -95,6 +95,7 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
         'PurchaseId': purchaseResult.id,
         'Amount': purchaseResult.totalPayment,
         'PaymentMethod': 'Stripe',
+        'Type': 'Payment',
         'Status': paymentResult.success ? 'complete' : 'failed',
         'TransactionDate': DateTime.now().toIso8601String(),
         'StripeTransactionId': paymentResult.stripeTransactionId,

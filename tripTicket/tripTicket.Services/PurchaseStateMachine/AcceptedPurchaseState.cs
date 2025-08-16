@@ -55,9 +55,36 @@ namespace tripTicket.Services.PurchaseStateMachine
 
             var transaction = Context.Transactions.FirstOrDefault(t => t.PurchaseId == entity.Id);
             var transactionService = ServiceProvider.GetService<ITransactionService>();
+
+            string refundStatus = "failed";
+            string refundStripeId = string.Empty;
+
             if (transaction != null && !string.IsNullOrEmpty(transaction.StripeTransactionId))
             {
-                await transactionService.RefundTransactionAsync(transaction.StripeTransactionId, refundAmount);
+                try
+                {
+                    var refund = await transactionService.RefundTransactionAsync(transaction.StripeTransactionId, refundAmount);
+                    refundStatus = refund.Status == "succeeded" ? "complete" : "failed";
+                    refundStripeId = refund.Id;
+                }
+                catch (Exception ex)
+                {
+                    refundStatus = "failed";
+                }
+
+                var refundTransaction = new Database.Transaction
+                {
+                    PurchaseId = entity.Id,
+                    Amount = refundAmount,
+                    Status = refundStatus,
+                    PaymentMethod = "Stripe",
+                    Type = "Refund",
+                    TransactionDate = DateTime.UtcNow,
+                    StripeTransactionId = refundStripeId
+                };
+
+                Context.Transactions.Add(refundTransaction);
+                Context.SaveChanges();
             }
 
             var bus = RabbitHutch.CreateBus("host=localhost");
@@ -68,7 +95,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                 PurchaseId = entity.Id,
                 Email = user.Email,
                 Name = user.FirstName,
-                RefundAmount = entity.TotalPayment - (trip.CancellationFee ?? 0m)
+                RefundAmount = refundAmount
             };
 
             bus.PubSub.Publish(message);
@@ -79,6 +106,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                 RefundAmount = refundAmount
             };
         }
+
 
         public override Model.Models.Purchase Complete(int id)
         {

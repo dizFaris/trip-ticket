@@ -280,6 +280,7 @@ namespace tripTicket.Services.Migrations
                     Amount = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
                     Status = table.Column<string>(type: "varchar(20)", unicode: false, maxLength: 20, nullable: false),
                     PaymentMethod = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TransactionDate = table.Column<DateTime>(type: "datetime", nullable: false),
                     StripeTransactionId = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false)
                 },

@@ -12,7 +12,7 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    [Migration("20250815153545_SeedData")]
+    [Migration("20250816101018_SeedData")]
     partial class SeedData
     {
         /// <inheritdoc />
@@ -218,6 +218,10 @@ namespace tripTicket.Services.Migrations
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id")
                         .HasName("PK__Transact__3214EC07E2C01878");

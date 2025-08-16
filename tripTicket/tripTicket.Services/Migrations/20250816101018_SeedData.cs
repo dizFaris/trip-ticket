@@ -333,19 +333,19 @@ namespace tripTicket.Services.Migrations
 
             migrationBuilder.InsertData(
                 table: "Transactions",
-                columns: new[] { "Id", "PurchaseId", "Amount", "Status", "PaymentMethod", "TransactionDate", "StripeTransactionId" },
+                columns: new[] { "Id", "PurchaseId", "Amount", "Status", "PaymentMethod", "Type", "TransactionDate", "StripeTransactionId" },
                 values: new object[,]
                 {
-                     { 1, 1, 2401.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-12), "stripe_txn_0001" },
-                     { 2, 2, 1500.75m, "complete", "Stripe", DateTime.UtcNow.AddDays(-8), "stripe_txn_0002" },
-                     { 3, 3, 2200.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-7), "stripe_txn_0003" },
-                     { 4, 4, 2200.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-3), "stripe_txn_0004" },
-                     { 5, 5, 6900.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-5), "stripe_txn_0005" },
-                     { 6, 6, 1400.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-1), "stripe_txn_0006" },
-                     { 7, 7, 1400.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-2), "stripe_txn_0007" },
-                     { 8, 8, 1700.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-4), "stripe_txn_0008" },
-                     { 9, 9, 3150.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-6), "stripe_txn_0009" },
-                     { 10, 10, 1300.00m, "complete", "Stripe", DateTime.UtcNow.AddDays(-10), "stripe_txn_0010" }
+                     { 1, 1, 2401.00m, "complete", "Stripe", "Payment", DateTime.UtcNow.AddDays(-12), "stripe_txn_0001" },
+                     { 2, 2, 1500.75m, "complete", "Stripe", "Refund", DateTime.UtcNow.AddDays(-8), "stripe_txn_0002" },
+                     { 3, 3, 2200.00m, "complete", "Stripe", "Payment", DateTime.UtcNow.AddDays(-7), "stripe_txn_0003" },
+                     { 4, 4, 2200.00m, "complete", "Stripe", "Refund", DateTime.UtcNow.AddDays(-3), "stripe_txn_0004" },
+                     { 5, 5, 6900.00m, "complete", "Stripe", "Payment", DateTime.UtcNow.AddDays(-5), "stripe_txn_0005" },
+                     { 6, 6, 1400.00m, "complete", "Stripe", "Refund", DateTime.UtcNow.AddDays(-1), "stripe_txn_0006" },
+                     { 7, 7, 1400.00m, "complete", "Stripe", "Payment", DateTime.UtcNow.AddDays(-2), "stripe_txn_0007" },
+                     { 8, 8, 1700.00m, "complete", "Stripe", "Refund", DateTime.UtcNow.AddDays(-4), "stripe_txn_0008" },
+                     { 9, 9, 3150.00m, "complete", "Stripe", "Payment", DateTime.UtcNow.AddDays(-6), "stripe_txn_0009" },
+                     { 10, 10, 1300.00m, "complete", "Stripe", "Refund", DateTime.UtcNow.AddDays(-10), "stripe_txn_0010" }
                 });
         }
 
