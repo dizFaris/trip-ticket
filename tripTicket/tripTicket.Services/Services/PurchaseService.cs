@@ -1,9 +1,11 @@
 ﻿using Mapster;
 using MapsterMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using tripTicket.Model;
@@ -21,9 +23,11 @@ namespace tripTicket.Services.Services
     public class PurchaseService : BaseCRUDService<Model.Models.Purchase, PurchaseSearchObject, Database.Purchase, PurchaseInsertRequest, PurchaseUpdateRequest>, IPurchaseService
     {
         public BasePurchaseState BasePurchaseState { get; set; }
-        public PurchaseService(TripTicketDbContext context, IMapper mapper, BasePurchaseState basePurchaseState) : base(context, mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public PurchaseService(TripTicketDbContext context, IMapper mapper, BasePurchaseState basePurchaseState, IHttpContextAccessor httpContextAccessor) : base(context, mapper)
         {
             BasePurchaseState = basePurchaseState;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public override Model.Models.Purchase Insert(PurchaseInsertRequest request)
@@ -37,8 +41,17 @@ namespace tripTicket.Services.Services
             var entity = GetById(id);
 
             if (entity == null)
-            {
                 throw new UserException("Purchase not found.");
+
+            var user = _httpContextAccessor.HttpContext.User;
+
+            var isAdmin = user.IsInRole("Admin");
+
+            var username = user.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (!isAdmin && entity.User.Username != username)
+            {
+                throw new UserException("You are not allowed to cancel this purchase.");
             }
 
             var state = BasePurchaseState.CreateState(entity.Status);
@@ -84,6 +97,8 @@ namespace tripTicket.Services.Services
                 query = query.Where(x => x.Status == search.Status);
             }
 
+            query = query.OrderByDescending(p => p.CreatedAt);
+
             return query;
         }
 
@@ -109,8 +124,6 @@ namespace tripTicket.Services.Services
                 .AsQueryable();
 
             query = AddFilter(search, query);
-
-            query = query.OrderByDescending(p => p.CreatedAt);
 
             int count = query.Count();
 

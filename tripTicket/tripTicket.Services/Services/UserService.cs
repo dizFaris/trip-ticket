@@ -54,6 +54,8 @@ namespace tripTicket.Services.Services
                 filteredQuery = filteredQuery.Where(x => x.IsActive == search.IsActive.Value);
             }
 
+            filteredQuery = filteredQuery.OrderByDescending(p => p.CreatedAt);
+
             return filteredQuery;
         }
 

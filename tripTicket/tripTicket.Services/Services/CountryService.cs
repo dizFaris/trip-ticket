@@ -58,6 +58,8 @@ namespace tripTicket.Services.Services
                 filteredQuery = filteredQuery.Where(x => x.Name.Contains(search.FTS));
             }
 
+            filteredQuery = filteredQuery.OrderBy(c => c.Name);
+
             return filteredQuery;
         }
 

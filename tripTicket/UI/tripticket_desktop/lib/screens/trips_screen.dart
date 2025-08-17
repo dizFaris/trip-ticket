@@ -120,10 +120,10 @@ class _TripsScreenState extends State<TripsScreen> {
 
       try {
         var filter = {
-          if (_selectedStatus != null) 'status': _selectedStatus,
-          if (_selectedYear != null) 'year': _selectedYear.toString(),
-          if (_selectedMonth != null) 'month': _selectedMonth.toString(),
-          if (_selectedDay != null) 'day': _selectedDay.toString(),
+          if (_selectedStatus != null) 'Status': _selectedStatus,
+          if (_selectedYear != null) 'Year': _selectedYear.toString(),
+          if (_selectedMonth != null) 'Month': _selectedMonth.toString(),
+          if (_selectedDay != null) 'Day': _selectedDay.toString(),
           if (_ftsController.text.isNotEmpty) 'FTS': _ftsController.text,
         };
 

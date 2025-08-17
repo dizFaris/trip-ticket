@@ -94,6 +94,8 @@ namespace tripTicket.Services.Services
                 query = query.Where(x => x.Type == search.Type);
             }
 
+            query = query.OrderByDescending(p => p.TransactionDate);
+
             return query;
         }
     }

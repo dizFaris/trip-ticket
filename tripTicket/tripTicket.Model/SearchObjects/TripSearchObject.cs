@@ -13,5 +13,7 @@ namespace tripTicket.Model.SearchObjects
         public int? Month { get; set; }
         public int? Day { get; set; }
         public string? Status { get; set; }
+        public DateOnly? FromDate { get; set; }
+        public DateOnly? ToDate { get; set; }
     }
 }

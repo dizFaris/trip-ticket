@@ -45,6 +45,21 @@ class MyApp extends StatelessWidget {
           ),
         ),
         iconTheme: IconThemeData(color: Colors.white),
+        dialogTheme: DialogThemeData(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          titleTextStyle: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryGreen,
+          ),
+          contentTextStyle: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(foregroundColor: AppColors.primaryGreen),
+        ),
       ),
       home: const MainScreen(),
     );
@@ -276,6 +291,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(8.0),
                             ),
                             errorText: passwordError,
+                            errorMaxLines: 3,
                           ),
                           onSubmitted: (_) {
                             _login();

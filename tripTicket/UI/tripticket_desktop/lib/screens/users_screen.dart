@@ -51,6 +51,13 @@ class _UsersScreenState extends State<UsersScreen> {
     _getUsers();
   }
 
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _userId.dispose();
+    super.dispose();
+  }
+
   void _clearFilters() {
     setState(() {
       _userId.text = '';
@@ -73,11 +80,11 @@ class _UsersScreenState extends State<UsersScreen> {
       try {
         var filter = {
           if (_userId.text.isNotEmpty) 'FTS': _userId.text,
-          if (_isActive != null) '_isActive': _isActive,
+          if (_isActive != null) 'IsActive': _isActive,
           if (_fromDate != null)
-            '_fromDate': _fromDate!.toIso8601String().substring(0, 10),
+            'FromDate': _fromDate!.toIso8601String().substring(0, 10),
           if (_toDate != null)
-            '_toDate': _toDate!.toIso8601String().substring(0, 10),
+            'ToDate': _toDate!.toIso8601String().substring(0, 10),
         };
 
         var searchResult = await _userProvider.get(
@@ -118,7 +125,7 @@ class _UsersScreenState extends State<UsersScreen> {
   Future<void> _toggleUserActiveStatus(int userId, bool isActive) async {
     try {
       await _userProvider.patch(userId, {
-        "_isActive": isActive,
+        "isActive": isActive,
       }, customPath: "status");
 
       setState(() {
@@ -230,6 +237,7 @@ class _UsersScreenState extends State<UsersScreen> {
                   initialDate: _fromDate,
                   allowPastDates: true,
                   placeHolder: 'Birth from',
+                  lastDate: _toDate ?? DateTime(2100),
                   onDateSelected: (date) {
                     setState(() {
                       _fromDate = date;
@@ -242,6 +250,7 @@ class _UsersScreenState extends State<UsersScreen> {
                   initialDate: _toDate,
                   allowPastDates: true,
                   placeHolder: 'Birth to',
+                  firstDate: _fromDate ?? DateTime(1950),
                   onDateSelected: (date) {
                     setState(() {
                       _toDate = date;

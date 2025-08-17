@@ -36,6 +36,22 @@ class MyApp extends StatelessWidget {
           ),
         ),
         iconTheme: IconThemeData(color: Colors.white),
+        dialogTheme: DialogThemeData(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          titleTextStyle: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: AppColors.primaryGreen,
+          ),
+          contentTextStyle: TextStyle(fontSize: 16, color: Colors.black87),
+        ),
+
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(foregroundColor: AppColors.primaryGreen),
+        ),
       ),
       home: const LoginScreen(),
     );

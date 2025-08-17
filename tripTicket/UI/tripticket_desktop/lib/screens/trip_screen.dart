@@ -104,6 +104,17 @@ class _TripScreenState extends State<TripScreen> {
     }
   }
 
+  @override
+  void dispose() {
+    _priceController.dispose();
+    _availableTicketsController.dispose();
+    _descriptionController.dispose();
+    _cancellationFeeController.dispose();
+    _discountPercentageController.dispose();
+    _minTicketsForDiscountController.dispose();
+    super.dispose();
+  }
+
   void _getTripData(int tripId) async {
     setState(() {
       _isLoading = true;
@@ -551,17 +562,6 @@ class _TripScreenState extends State<TripScreen> {
         ),
       );
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _priceController.dispose();
-    _availableTicketsController.dispose();
-    _descriptionController.dispose();
-    _cancellationFeeController.dispose();
-    _discountPercentageController.dispose();
-    _minTicketsForDiscountController.dispose();
   }
 
   Widget _countryDropdown({

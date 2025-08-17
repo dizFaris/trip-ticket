@@ -31,6 +31,8 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     "expired",
     "canceled",
     "complete",
+    "failed",
+    "pending",
   ];
   final TextEditingController _minTicketCount = TextEditingController();
   final TextEditingController _maxTicketCount = TextEditingController();
@@ -67,12 +69,12 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _minTicketCount.dispose();
     _maxTicketCount.dispose();
     _minPrice.dispose();
     _maxPrice.dispose();
     _purchaseId.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 
@@ -95,6 +97,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
     _debounce = Timer(const Duration(milliseconds: 300), () async {
+      if (!mounted) return;
       setState(() {
         _isLoading = true;
       });
@@ -110,9 +113,9 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           if (_maxPrice.text.isNotEmpty) 'MaxPayment': _maxPrice.text,
           if (_purchaseId.text.isNotEmpty) 'FTS': _purchaseId.text,
           if (_fromDate != null)
-            '_fromDate': _fromDate!.toIso8601String().substring(0, 10),
+            'FromDate': _fromDate!.toIso8601String().substring(0, 10),
           if (_toDate != null)
-            '_toDate': _toDate!.toIso8601String().substring(0, 10),
+            'ToDate': _toDate!.toIso8601String().substring(0, 10),
         };
 
         var searchResult = await _purchaseProvider.get(
@@ -121,12 +124,14 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           pageSize: 15,
         );
 
+        if (!mounted) return;
         setState(() {
           _purchases = searchResult.result;
           _isLoading = false;
           _totalPages = (searchResult.count / 15).ceil();
         });
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
           _purchases = [];
@@ -345,6 +350,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                   initialDate: _fromDate,
                   allowPastDates: true,
                   placeHolder: 'Date from',
+                  lastDate: _toDate ?? DateTime(2100),
                   onDateSelected: (date) {
                     setState(() {
                       _fromDate = date;
@@ -357,6 +363,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                   initialDate: _toDate,
                   allowPastDates: true,
                   placeHolder: 'Date to',
+                  firstDate: _fromDate ?? DateTime(1950),
                   onDateSelected: (date) {
                     setState(() {
                       _toDate = date;

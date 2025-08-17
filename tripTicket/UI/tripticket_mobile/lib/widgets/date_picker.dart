@@ -8,6 +8,8 @@ class DatePickerButton extends StatefulWidget {
   final bool enabled;
   final bool allowPastDates;
   final String placeHolder;
+  final DateTime? firstDate;
+  final DateTime? lastDate;
 
   const DatePickerButton({
     super.key,
@@ -16,6 +18,8 @@ class DatePickerButton extends StatefulWidget {
     this.enabled = true,
     this.allowPastDates = false,
     this.placeHolder = 'Select date',
+    this.firstDate,
+    this.lastDate,
   });
 
   @override
@@ -56,9 +60,13 @@ class DatePickerButtonState extends State<DatePickerButton> {
         onPressed: widget.enabled
             ? () async {
                 final DateTime now = DateTime.now();
-                final DateTime minDate = widget.allowPastDates
-                    ? DateTime(1950)
-                    : now.add(const Duration(days: 5));
+                final DateTime minDate =
+                    widget.firstDate ??
+                    (widget.allowPastDates
+                        ? DateTime(1950)
+                        : now.add(const Duration(days: 5)));
+
+                final DateTime maxDate = widget.lastDate ?? DateTime(2100);
 
                 final DateTime initialPickerDate =
                     (selectedDate != null && selectedDate!.isAfter(minDate))
@@ -69,7 +77,25 @@ class DatePickerButtonState extends State<DatePickerButton> {
                   context: context,
                   initialDate: initialPickerDate,
                   firstDate: minDate,
-                  lastDate: DateTime(2100),
+                  lastDate: maxDate,
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: ColorScheme.light(
+                          primary: AppColors.primaryGreen,
+                          onPrimary: Colors.white,
+                          onSurface: Colors.black,
+                          secondary: AppColors.primaryYellow,
+                        ),
+                        textButtonTheme: TextButtonThemeData(
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.primaryGreen,
+                          ),
+                        ),
+                      ),
+                      child: child!,
+                    );
+                  },
                 );
                 if (picked != null && picked != selectedDate) {
                   setState(() {

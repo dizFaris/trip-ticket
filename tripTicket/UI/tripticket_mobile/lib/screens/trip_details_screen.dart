@@ -183,7 +183,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       Positioned(
                         bottom: 16,
                         right: 16,
-                        child: _trip!.availableTickets > 0
+                        child:
+                            _trip!.availableTickets > 0 &&
+                                _trip!.tripStatus == "upcoming"
                             ? ElevatedButton.icon(
                                 onPressed: () {
                                   Navigator.push(

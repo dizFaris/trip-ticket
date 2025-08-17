@@ -29,6 +29,13 @@ class _TicketActivationScreenState extends State<TicketActivationScreen> {
     _purchaseIdController.addListener(_onTextChanged);
   }
 
+  @override
+  void dispose() {
+    _purchaseIdController.dispose();
+    _purchaseIdController.removeListener(_onTextChanged);
+    super.dispose();
+  }
+
   void _onTextChanged() {
     setState(() {
       _isButtonEnabled = _purchaseIdController.text.trim().isNotEmpty;
@@ -62,13 +69,6 @@ class _TicketActivationScreenState extends State<TicketActivationScreen> {
         _isLoading = false;
       });
     }
-  }
-
-  @override
-  void dispose() {
-    _purchaseIdController.removeListener(_onTextChanged);
-    _purchaseIdController.dispose();
-    super.dispose();
   }
 
   void _completePurchase(int id) async {

@@ -60,10 +60,10 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _minPrice.dispose();
     _maxPrice.dispose();
     _purchaseId.dispose();
-    _debounce?.cancel();
     super.dispose();
   }
 
@@ -97,9 +97,9 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           if (_maxPrice.text.isNotEmpty) 'MaxAmount': _maxPrice.text,
           if (_purchaseId.text.isNotEmpty) 'FTS': _purchaseId.text,
           if (_fromDate != null)
-            '_fromDate': _fromDate!.toIso8601String().substring(0, 10),
+            'FromDate': _fromDate!.toIso8601String().substring(0, 10),
           if (_toDate != null)
-            '_toDate': _toDate!.toIso8601String().substring(0, 10),
+            'ToDate': _toDate!.toIso8601String().substring(0, 10),
         };
 
         var searchResult = await _transactionProvider.get(
@@ -250,6 +250,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   initialDate: _fromDate,
                   allowPastDates: true,
                   placeHolder: 'Date from',
+                  lastDate: _toDate ?? DateTime(2100),
                   onDateSelected: (date) {
                     setState(() {
                       _fromDate = date;
@@ -262,6 +263,7 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                   initialDate: _toDate,
                   allowPastDates: true,
                   placeHolder: 'Date to',
+                  firstDate: _fromDate ?? DateTime(1950),
                   onDateSelected: (date) {
                     setState(() {
                       _toDate = date;

@@ -7,6 +7,7 @@ import 'package:tripticket_mobile/models/trip_model.dart';
 import 'package:tripticket_mobile/providers/trip_provider.dart';
 import 'package:tripticket_mobile/screens/trip_details_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
+import 'package:tripticket_mobile/widgets/date_picker.dart';
 import 'package:tripticket_mobile/widgets/pagination_controls.dart';
 
 class TripsScreen extends StatefulWidget {
@@ -29,11 +30,15 @@ class _TripsScreenState extends State<TripsScreen> {
   int _totalPages = 0;
   final List<String> _statuses = ["upcoming", "locked", "canceled", "complete"];
   String? _selectedStatus;
+  DateTime? _fromDate;
+  DateTime? _toDate;
 
   @override
   void initState() {
     super.initState();
     _currentPage = 0;
+    _fromDate = null;
+    _toDate = null;
     _getTrips();
     _getForYouTrips();
   }
@@ -121,6 +126,10 @@ class _TripsScreenState extends State<TripsScreen> {
       var filter = {
         if (_selectedStatus != null) 'status': _selectedStatus,
         if (_ftsController.text.isNotEmpty) 'FTS': _ftsController.text,
+        if (_fromDate != null)
+          'FromDate': _fromDate!.toIso8601String().substring(0, 10),
+        if (_toDate != null)
+          'ToDate': _toDate!.toIso8601String().substring(0, 10),
       };
 
       var searchResult = await _tripProvider.get(
@@ -191,10 +200,17 @@ class _TripsScreenState extends State<TripsScreen> {
                   ),
                   const Divider(height: 1),
                   ...items.map((item) {
+                    final isSelected = item == value;
                     return ListTile(
+                      tileColor: isSelected ? Colors.white24 : null,
                       title: Text(
                         capitalize(item.toString()),
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: isSelected ? Colors.yellow : Colors.white,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                        ),
                       ),
                       onTap: () => Navigator.of(context).pop(item),
                     );
@@ -213,7 +229,7 @@ class _TripsScreenState extends State<TripsScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
         decoration: BoxDecoration(
-          color: AppColors.primaryGray,
+          color: value != null ? AppColors.primaryGreen : AppColors.primaryGray,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -226,7 +242,10 @@ class _TripsScreenState extends State<TripsScreen> {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.keyboard_arrow_down, color: Colors.black),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: value != null ? AppColors.primaryYellow : Colors.black,
+            ),
           ],
         ),
       ),
@@ -353,9 +372,11 @@ class _TripsScreenState extends State<TripsScreen> {
             const SizedBox(height: 8),
 
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  width: 140,
+                  width: 50,
+                  height: 40,
                   child: _dropdown<String>(
                     context: context,
                     label: 'Status',
@@ -369,14 +390,39 @@ class _TripsScreenState extends State<TripsScreen> {
                     },
                   ),
                 ),
-                SizedBox(width: 8),
+                DatePickerButton(
+                  initialDate: _fromDate,
+                  allowPastDates: true,
+                  placeHolder: 'Date from',
+                  lastDate: _toDate ?? DateTime(2100),
+                  onDateSelected: (date) {
+                    setState(() {
+                      _fromDate = date;
+                    });
+                    _getTrips();
+                  },
+                ),
+                DatePickerButton(
+                  initialDate: _toDate,
+                  allowPastDates: true,
+                  placeHolder: 'Date to',
+                  firstDate: _fromDate ?? DateTime(1950),
+                  onDateSelected: (date) {
+                    setState(() {
+                      _toDate = date;
+                    });
+                    _getTrips();
+                  },
+                ),
                 SizedBox(
-                  height: 32,
-                  width: 32,
+                  height: 40,
+                  width: 40,
                   child: ElevatedButton(
                     onPressed: () {
                       setState(() {
                         _selectedStatus = null;
+                        _fromDate = null;
+                        _toDate = null;
                       });
                       _getTrips();
                     },
@@ -405,6 +451,16 @@ class _TripsScreenState extends State<TripsScreen> {
                       child: CircularProgressIndicator(
                         strokeWidth: 4,
                         color: AppColors.primaryGreen,
+                      ),
+                    ),
+                  )
+                : _trips.isEmpty
+                ? SizedBox(
+                    height: 300,
+                    child: Center(
+                      child: Text(
+                        'No trips found',
+                        style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                       ),
                     ),
                   )

@@ -38,8 +38,8 @@ class CitiesScreenState extends State<CitiesScreen> {
 
   @override
   void dispose() {
-    _ftsController.dispose();
     _debounce?.cancel();
+    _ftsController.dispose();
     super.dispose();
   }
 

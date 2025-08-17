@@ -102,7 +102,19 @@ namespace tripTicket.Services.Services
                     filteredQuery = filteredQuery.Where(x => x.TripStatus == search.Status);
                 }
 
-            return filteredQuery;
+                if (search.FromDate.HasValue)
+                {
+                    filteredQuery = filteredQuery.Where(p => p.DepartureDate >= search.FromDate.Value);
+                }
+
+                if (search.ToDate.HasValue)
+                {
+                    filteredQuery = filteredQuery.Where(p => p.DepartureDate <= search.ToDate.Value);
+                }
+
+                filteredQuery = filteredQuery.OrderByDescending(p => p.CreatedAt);
+
+                return filteredQuery;
             }
 
             public override Model.Models.Trip Insert(TripInsertRequest request)

@@ -37,8 +37,8 @@ class CountriesScreenState extends State<CountriesScreen> {
 
   @override
   void dispose() {
-    _ftsController.dispose();
     _debounce?.cancel();
+    _ftsController.dispose();
     super.dispose();
   }
 

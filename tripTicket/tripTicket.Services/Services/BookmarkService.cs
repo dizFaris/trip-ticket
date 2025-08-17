@@ -98,6 +98,8 @@ namespace tripTicket.Services.Services
             if (search.UserId.HasValue)
                 query = query.Where(p => p.UserId == search.UserId.Value);
 
+            query = query.OrderByDescending(p => p.CreatedAt);
+
             return query;
         }
 
