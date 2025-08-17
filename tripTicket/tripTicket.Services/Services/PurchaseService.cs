@@ -196,7 +196,7 @@ namespace tripTicket.Services.Services
             return TicketPdfGenerator.GenerateTickets(model);
         }
 
-        public Model.Models.Purchase FinalizePurchase(int id, bool paymentSucceeded)
+        public async Task<Model.Models.Purchase> FinalizePurchase(int id, bool paymentSucceeded)
         {
             var entity = Context.Purchases
                 .Include(p => p.Trip)
@@ -206,7 +206,7 @@ namespace tripTicket.Services.Services
                 throw new UserException("Purchase not found.");
 
             var state = BasePurchaseState.CreateState(entity.Status);
-            return state.FinalizePurchase(id, paymentSucceeded);
+            return await state.FinalizePurchase(id, paymentSucceeded);
         }
     }
 }

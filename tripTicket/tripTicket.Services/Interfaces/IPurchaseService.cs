@@ -13,7 +13,7 @@ namespace tripTicket.Services.Interfaces
 {
     public interface IPurchaseService : ICRUDService<Purchase, PurchaseSearchObject, PurchaseInsertRequest, PurchaseUpdateRequest>
     {
-        public Purchase FinalizePurchase(int id, bool paymentSucceeded);
+        public Task<Purchase> FinalizePurchase(int id, bool paymentSucceeded);
         Task<PurchaseCancelResponse> CancelAsync(int id);
         public Purchase Complete(int id);
         Task<byte[]> GenerateTicketPdfAsync(int id);

@@ -29,7 +29,7 @@ namespace tripTicket.Services.PurchaseStateMachine
             throw new UserException("Method not allowed");
         }
 
-        public virtual Model.Models.Purchase FinalizePurchase(int id, bool paymentSucceeded)
+        public virtual Task<Model.Models.Purchase> FinalizePurchase(int id, bool paymentSucceeded)
         {
             throw new UserException("Method not allowed");
         }

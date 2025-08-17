@@ -271,6 +271,34 @@ namespace tripTicket.Services.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserRecommendations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TripId = table.Column<int>(type: "int", nullable: false),
+                    Score = table.Column<decimal>(type: "decimal(6,5)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRecommendations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserRecommendations_Trips_TripId",
+                        column: x => x.TripId,
+                        principalTable: "Trips",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_UserRecommendations_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transactions",
                 columns: table => new
                 {
@@ -372,6 +400,17 @@ namespace tripTicket.Services.Migrations
                 column: "TripId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserRecommendations_TripId",
+                table: "UserRecommendations",
+                column: "TripId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserRecommendations_UserId_TripId",
+                table: "UserRecommendations",
+                columns: new[] { "UserId", "TripId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserRoles_RoleId",
                 table: "UserRoles",
                 column: "RoleId");
@@ -405,6 +444,9 @@ namespace tripTicket.Services.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserActivity");
+
+            migrationBuilder.DropTable(
+                name: "UserRecommendations");
 
             migrationBuilder.DropTable(
                 name: "UserRoles");

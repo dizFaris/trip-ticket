@@ -12,8 +12,8 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    [Migration("20250816101018_SeedData")]
-    partial class SeedData
+    [Migration("20250817121137_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -516,6 +516,38 @@ namespace tripTicket.Services.Migrations
                     b.ToTable("UserActivity", (string)null);
                 });
 
+            modelBuilder.Entity("tripTicket.Services.Database.UserRecommendation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("decimal(6,5)");
+
+                    b.Property<int>("TripId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TripId");
+
+                    b.HasIndex("UserId", "TripId")
+                        .IsUnique();
+
+                    b.ToTable("UserRecommendations", (string)null);
+                });
+
             modelBuilder.Entity("tripTicket.Services.Database.UserRole", b =>
                 {
                     b.Property<int>("Id")
@@ -649,6 +681,25 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("Trip");
                 });
 
+            modelBuilder.Entity("tripTicket.Services.Database.UserRecommendation", b =>
+                {
+                    b.HasOne("tripTicket.Services.Database.Trip", "Trip")
+                        .WithMany("UserRecommendations")
+                        .HasForeignKey("TripId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("tripTicket.Services.Database.User", "User")
+                        .WithMany("Recommendations")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Trip");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("tripTicket.Services.Database.UserRole", b =>
                 {
                     b.HasOne("tripTicket.Services.Database.Role", "Role")
@@ -697,6 +748,8 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("TripPurchases");
 
                     b.Navigation("TripStatistics");
+
+                    b.Navigation("UserRecommendations");
                 });
 
             modelBuilder.Entity("tripTicket.Services.Database.TripDay", b =>
@@ -707,6 +760,8 @@ namespace tripTicket.Services.Migrations
             modelBuilder.Entity("tripTicket.Services.Database.User", b =>
                 {
                     b.Navigation("Bookmarks");
+
+                    b.Navigation("Recommendations");
 
                     b.Navigation("UserRoles");
                 });

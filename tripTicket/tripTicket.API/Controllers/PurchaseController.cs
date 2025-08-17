@@ -32,9 +32,9 @@ namespace tripTicket.API.Controllers
         }
 
         [HttpPut("{id}/finalize")]
-        public Purchase Finalize(int id, [FromBody] PurchaseUpdateRequest request)
+        public async Task<Purchase> Finalize(int id, [FromBody] PurchaseUpdateRequest request)
         {
-            return _service.FinalizePurchase(id, request.PaymentSucceeded);
+            return await _service.FinalizePurchase(id, request.PaymentSucceeded);
         }
 
         [HttpGet("{id}/ticket-pdf")]

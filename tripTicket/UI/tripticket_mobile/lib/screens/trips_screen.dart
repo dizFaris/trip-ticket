@@ -21,10 +21,10 @@ class _TripsScreenState extends State<TripsScreen> {
   final TripProvider _tripProvider = TripProvider();
   final TextEditingController _ftsController = TextEditingController();
   final ScrollController _pageScrollController = ScrollController();
-  List<Trip> _forYouTrips = [];
+  List<Trip> _tripRecommendations = [];
   List<Trip> _trips = [];
   bool _isLoading = true;
-  bool _isLoadingForYou = true;
+  bool _isLoadingRecommendations = true;
   bool _isPaging = false;
   int _currentPage = 0;
   int _totalPages = 0;
@@ -40,7 +40,7 @@ class _TripsScreenState extends State<TripsScreen> {
     _fromDate = null;
     _toDate = null;
     _getTrips();
-    _getForYouTrips();
+    _getTripRecommendations();
   }
 
   @override
@@ -87,31 +87,24 @@ class _TripsScreenState extends State<TripsScreen> {
     });
   }
 
-  Future<void> _getForYouTrips() async {
+  Future<void> _getTripRecommendations() async {
     setState(() {
-      _isLoadingForYou = true;
+      _isLoadingRecommendations = true;
     });
 
     try {
-      var filter = {
-        if (_ftsController.text.isNotEmpty) 'FTS': _ftsController.text,
-      };
+      var recommendations = await _tripProvider.getRecommendations();
 
-      var searchResult = await _tripProvider.get(
-        filter: filter,
-        page: 0,
-        pageSize: 8,
-      );
       if (!mounted) return;
       setState(() {
-        _forYouTrips = searchResult.result;
-        _isLoadingForYou = false;
+        _tripRecommendations = recommendations;
+        _isLoadingRecommendations = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _forYouTrips = [];
-        _isLoadingForYou = false;
+        _tripRecommendations = [];
+        _isLoadingRecommendations = false;
       });
     }
   }
@@ -124,7 +117,7 @@ class _TripsScreenState extends State<TripsScreen> {
 
     try {
       var filter = {
-        if (_selectedStatus != null) 'status': _selectedStatus,
+        'status': _selectedStatus ?? 'upcoming',
         if (_ftsController.text.isNotEmpty) 'FTS': _ftsController.text,
         if (_fromDate != null)
           'FromDate': _fromDate!.toIso8601String().substring(0, 10),
@@ -272,65 +265,68 @@ class _TripsScreenState extends State<TripsScreen> {
           controller: _pageScrollController,
           padding: const EdgeInsets.all(16),
           children: [
-            const Text(
-              'For you',
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+            if (_tripRecommendations.isNotEmpty) ...[
+              const Text(
+                'For you',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
-            ),
-            const Divider(),
-            SizedBox(
-              height: 250,
-              child: _isLoadingForYou
-                  ? SizedBox(
-                      height: 32,
-                      width: 32,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4,
-                          color: AppColors.primaryGreen,
+              const Divider(),
+              SizedBox(
+                height: 250,
+                child: _isLoadingRecommendations
+                    ? const Center(
+                        child: SizedBox(
+                          height: 32,
+                          width: 32,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 4,
+                            color: AppColors.primaryGreen,
+                          ),
                         ),
-                      ),
-                    )
-                  : ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _forYouTrips.length,
-                      itemBuilder: (context, index) {
-                        final screenWidth = MediaQuery.of(context).size.width;
-                        final double horizontalPadding = 16 * 2;
-                        final double spacing = 12;
-                        final double cardWidth =
-                            (screenWidth - horizontalPadding - spacing) / 2;
+                      )
+                    : ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _tripRecommendations.length,
+                        itemBuilder: (context, index) {
+                          final screenWidth = MediaQuery.of(context).size.width;
+                          final double horizontalPadding = 16 * 2;
+                          final double spacing = 12;
+                          final double cardWidth =
+                              (screenWidth - horizontalPadding - spacing) / 2;
 
-                        final trip = _forYouTrips[index];
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            left: index == 0 ? 0 : spacing,
-                          ),
-                          child: SizedBox(
-                            width: cardWidth,
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        TripDetailsScreen(tripId: trip.id),
-                                  ),
-                                ).then((value) {
-                                  _getTrips();
-                                });
-                              },
-                              child: _tripWidget(trip),
+                          final trip = _tripRecommendations[index];
+                          return Padding(
+                            padding: EdgeInsets.only(
+                              left: index == 0 ? 0 : spacing,
                             ),
-                          ),
-                        );
-                      },
-                    ),
-            ),
-            const SizedBox(height: 20),
+                            child: SizedBox(
+                              width: cardWidth,
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          TripDetailsScreen(tripId: trip.id),
+                                    ),
+                                  ).then((value) {
+                                    _getTrips();
+                                    _getTripRecommendations();
+                                  });
+                                },
+                                child: _tripWidget(trip),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+              const SizedBox(height: 20),
+            ],
             const Text(
               'Upcoming trips',
               style: TextStyle(
@@ -487,6 +483,7 @@ class _TripsScreenState extends State<TripsScreen> {
                             ),
                           ).then((value) {
                             _getTrips();
+                            _getTripRecommendations();
                           });
                         },
                         child: _tripWidget(trip),

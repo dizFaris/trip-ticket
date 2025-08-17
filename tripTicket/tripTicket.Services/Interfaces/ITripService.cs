@@ -12,5 +12,6 @@ namespace tripTicket.Services.Interfaces
     public interface ITripService : ICRUDService<Trip, TripSearchObject, TripInsertRequest, TripUpdateRequest>
     {
         public Trip Cancel(int id);
+        public List<Trip> GetRecommendedTrips(int userId);
     }
 }

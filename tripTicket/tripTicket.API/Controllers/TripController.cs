@@ -24,5 +24,12 @@ namespace tripTicket.API.Controllers
         {
              return _service.Cancel(id);
         }
+
+        [HttpGet("recommendations/{userId}")]
+        public IActionResult GetRecommendations(int userId)
+        {
+            var trips = _service.GetRecommendedTrips(userId);
+            return Ok(trips);
+        }
     }
 }

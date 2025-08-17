@@ -34,6 +34,7 @@ builder.Services.AddTransient<ITripStatisticService, TripStatisticService>();
 builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICityService, CityService>();
 builder.Services.AddTransient<IStatisticsService, StatisticsService>();
+builder.Services.AddTransient<IRecommendationService, RecommendationService>();
 builder.Services.AddTransient<ITransactionService>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
