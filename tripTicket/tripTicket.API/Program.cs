@@ -47,7 +47,8 @@ builder.Services.AddTransient<ITransactionService>(sp =>
 
     return new TransactionService(secretKey, context, mapper);
 });
-
+builder.Services.AddSingleton<IMessageService>(sp =>
+    new RabbitMqBus("host=localhost"));
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();
@@ -56,7 +57,6 @@ builder.Services.AddTransient<UpcomingTripState>();
 builder.Services.AddTransient<LockedTripState>();
 
 // Purchase state machine
-// Trip state machine
 builder.Services.AddTransient<BasePurchaseState>();
 builder.Services.AddTransient<PendingPurchaseState>();
 builder.Services.AddTransient<InitialPurchaseState>();

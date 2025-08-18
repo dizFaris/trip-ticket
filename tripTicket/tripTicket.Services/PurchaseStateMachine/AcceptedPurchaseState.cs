@@ -19,14 +19,21 @@ namespace tripTicket.Services.PurchaseStateMachine
 {
     public class AcceptedPurchaseState : BasePurchaseState
     {
-        public AcceptedPurchaseState(TripTicketDbContext context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        private readonly IMessageService _messageService;
+
+        public AcceptedPurchaseState(TripTicketDbContext context, IMapper mapper, IServiceProvider serviceProvider, IMessageService messageService) : base(context, mapper, serviceProvider)
         {
+            _messageService = messageService;
         }
 
         public override async Task<PurchaseCancelResponse> Cancel(int id)
         {
-            var set = Context.Set<Database.Purchase>();
-            var entity = set.Find(id);
+            var entity = Context.Purchases
+                .Include(p => p.User)
+                .Include(p => p.Trip)
+                    .ThenInclude(t => t.City)
+                    .ThenInclude(c => c.Country)
+                .FirstOrDefault(p => p.Id == id);
 
             if (entity == null)
             {
@@ -59,6 +66,7 @@ namespace tripTicket.Services.PurchaseStateMachine
             string refundStatus = "failed";
             string refundStripeId = string.Empty;
 
+
             if (transaction != null && !string.IsNullOrEmpty(transaction.StripeTransactionId))
             {
                 try
@@ -85,20 +93,24 @@ namespace tripTicket.Services.PurchaseStateMachine
 
                 Context.Transactions.Add(refundTransaction);
                 Context.SaveChanges();
+
+                PurchaseCanceled message = new PurchaseCanceled
+                {
+                    PurchaseId = entity.Id,
+                    Email = user.Email,
+                    Name = user.FirstName,
+                    RefundAmount = refundAmount,
+                    DepartureDate = entity.Trip.DepartureDate,
+                    NumberOfTickets = entity.NumberOfTickets,
+                    TotalPayment = entity.TotalPayment,
+                    TripCity = entity.Trip.City.Name,
+                    TripCountry = entity.Trip.City.Country.Name
+                };
+
+                _messageService.Publish(message);
             }
 
-            var bus = RabbitHutch.CreateBus("host=localhost");
             var purchase = Mapper.Map<Model.Models.Purchase>(entity);
-
-            PurchaseCanceled message = new PurchaseCanceled
-            {
-                PurchaseId = entity.Id,
-                Email = user.Email,
-                Name = user.FirstName,
-                RefundAmount = refundAmount
-            };
-
-            bus.PubSub.Publish(message);
 
             return new PurchaseCancelResponse
             {
@@ -125,7 +137,6 @@ namespace tripTicket.Services.PurchaseStateMachine
             var user = Context.Users.Find(entity.UserId);
             var trip = Context.Trips.Find(entity.TripId);
 
-            var bus = RabbitHutch.CreateBus("host=localhost");
             var purchase = Mapper.Map<Model.Models.Purchase>(entity);
 
             PurchaseCompleted message = new PurchaseCompleted
@@ -140,7 +151,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                 TripCountry = trip.City.Country.Name
             };
 
-            bus.PubSub.Publish(message);
+            _messageService.Publish(message);
 
             return purchase;
         }
@@ -160,16 +171,19 @@ namespace tripTicket.Services.PurchaseStateMachine
                 var user = Context.Users.Find(purchase.UserId);
                 var trip = Context.Trips.Find(purchase.TripId);
 
-                var bus = RabbitHutch.CreateBus("host=localhost");
-
                 PurchaseExpired message = new PurchaseExpired
                 {
                     PurchaseId = purchase.Id,
                     Email = user.Email,
                     Name = user.FirstName,
+                    DepartureDate = purchase.Trip.DepartureDate,
+                    NumberOfTickets = purchase.NumberOfTickets,
+                    TotalPayment = purchase.TotalPayment,
+                    TripCity = purchase.Trip.City.Name,
+                    TripCountry = purchase.Trip.City.Country.Name
                 };
 
-                bus.PubSub.Publish(message);
+                _messageService.Publish(message);
             }
 
             Context.SaveChanges();

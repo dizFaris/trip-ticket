@@ -70,22 +70,7 @@ namespace tripTicket.Services.PurchaseStateMachine
             set.Add(entity);
             Context.SaveChanges();
 
-            var bus = RabbitHutch.CreateBus("host=localhost");
             var purchase = Mapper.Map<Model.Models.Purchase>(entity);
-
-            PurchaseSuccessful message = new PurchaseSuccessful 
-            {
-                PurchaseId = entity.Id,
-                Email = user.Email,
-                Name = user.FirstName,
-                DepartureDate = trip.DepartureDate,
-                NumberOfTickets = entity.NumberOfTickets,
-                TotalPayment = entity.TotalPayment,
-                TripCity = trip.City.Name,
-                TripCountry = trip.City.Country.Name
-            };
-
-            bus.PubSub.Publish(message);
 
             return purchase;
         }

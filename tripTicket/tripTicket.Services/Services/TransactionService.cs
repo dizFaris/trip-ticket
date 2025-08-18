@@ -17,7 +17,6 @@ namespace tripTicket.Services.Services
     public class TransactionService : BaseCRUDService<Model.Models.Transaction, TransactionSearchObject, Database.Transaction, TransactionInsertRequest, TransactionUpdateRequest>, ITransactionService
     {
         private readonly string _secretKey;
-        private string? secretKey;
 
         public TransactionService(string secretKey, TripTicketDbContext context, IMapper mapper) : base(context, mapper)
         {
