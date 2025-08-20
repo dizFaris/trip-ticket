@@ -279,25 +279,6 @@ namespace tripTicket.Services.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "UserActivity",
-                columns: new[] { "UserActivityId", "UserId", "ActionType", "ActionDate", "TripId", "PurchaseId", "AdditionalInfo" },
-                values: new object[,]
-                {
-                     { 1, 1, "Login", DateTime.UtcNow.AddDays(-10), null, null, null },
-                     { 2, 1, "BookmarkTrip", DateTime.UtcNow.AddDays(-9), 3, null, null },
-                     { 3, 1, "PurchaseTicket", DateTime.UtcNow.AddDays(-8), 3, "PUR1", "Bought 2 tickets" },
-                     { 4, 2, "Login", DateTime.UtcNow.AddDays(-7), null, null, null },
-                     { 5, 2, "BookmarkTrip", DateTime.UtcNow.AddDays(-6), 5, null, null },
-                     { 6, 2, "PurchaseTicket", DateTime.UtcNow.AddDays(-5), 5, "PUR2", "Bought 1 ticket" },
-                     { 7, 2, "CancelPurchase", DateTime.UtcNow.AddDays(-3), 5, "PUR2", "Canceled purchase" },
-                     { 8, 3, "Login", DateTime.UtcNow.AddDays(-4), null, null, null },
-                     { 9, 3, "BookmarkTrip", DateTime.UtcNow.AddDays(-3), 7, null, null },
-                     { 10, 3, "PurchaseTicket", DateTime.UtcNow.AddDays(-2), 7, "PUR3", "Bought 4 tickets" },
-                     { 11, 4, "Login", DateTime.UtcNow.AddDays(-1), null, null, null },
-                     { 12, 4, "BookmarkTrip", DateTime.UtcNow, 1, null, null }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Bookmarks",
                 columns: new[] { "Id", "UserId", "TripId", "CreatedAt" },
                 values: new object[,]

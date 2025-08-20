@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 using tripTicket.Model.Models;
 using tripTicket.Model.Requests;
 using tripTicket.Model.SearchObjects;
-using tripTicket.Services.Services;
 
 namespace tripTicket.Services.Interfaces
 {
-    public interface ITripStatisticService : ICRUDService<TripStatistic, TripStatisticSearchObject, TripStatisticInsertRequest, TripStatisticUpdateRequest>
+    public interface ISupportReplyService : ICRUDService<SupportReply, SupportReplySearchObject, SupportReplyInsertRequest, SupportReplyUpdateRequest>
     {
     }
 }

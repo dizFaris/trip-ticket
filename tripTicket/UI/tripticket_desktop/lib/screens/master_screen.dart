@@ -4,6 +4,8 @@ import 'package:tripticket_desktop/models/menu_model.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
 import 'package:tripticket_desktop/screens/countries_screen.dart';
 import 'package:tripticket_desktop/screens/purchases_screen.dart';
+import 'package:tripticket_desktop/screens/support_replies_screen.dart';
+import 'package:tripticket_desktop/screens/support_tickets_screen.dart';
 import 'package:tripticket_desktop/screens/transactions_screen.dart';
 import 'package:tripticket_desktop/screens/statistics_screen.dart';
 import 'package:tripticket_desktop/screens/ticket_activation_screen.dart';
@@ -28,13 +30,21 @@ final List<DrawerItem> drawerItems = [
   DrawerItem(title: 'Transactions', screen: TransactionsScreen()),
   DrawerItem(title: 'Users', screen: UsersScreen()),
   DrawerItem(title: 'Reports', screen: StatisticsScreen()),
+  DrawerItem(title: 'Support Tickets', screen: SupportTicketsScreen()),
+  DrawerItem(title: 'Support Replies', screen: SupportRepliesScreen()),
 ];
 
 class MasterScreenState extends State<MasterScreen> {
   Widget _selectedScreen = TripsScreen();
   int _selectedIndex = 0;
+  DateTime _lastChange = DateTime.fromMillisecondsSinceEpoch(0);
 
   void _changeScreen(int index) {
+    final now = DateTime.now();
+    if (now.difference(_lastChange) < Duration(seconds: 1)) return;
+
+    _lastChange = now;
+
     setState(() {
       _selectedIndex = index;
       _selectedScreen = drawerItems[index].screen;

@@ -32,6 +32,10 @@ class MyApp extends StatelessWidget {
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
           iconTheme: IconThemeData(color: Colors.white),
         ),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primaryGreen,
+          primary: AppColors.primaryGreen,
+        ),
         drawerTheme: DrawerThemeData(backgroundColor: AppColors.primaryGreen),
         listTileTheme: ListTileThemeData(
           textColor: Colors.white,
@@ -335,20 +339,20 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RegistrationScreen(),
-                        ),
-                      );
-                    },
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text("Don't have an account? "),
-                        Text(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      const Text("Don't have an account? "),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const RegistrationScreen(),
+                            ),
+                          );
+                        },
+                        child: const Text(
                           "Sign up",
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
@@ -356,8 +360,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: AppColors.primaryYellow,
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                   Container(
                     padding: const EdgeInsets.only(top: 10),

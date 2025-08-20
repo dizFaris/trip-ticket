@@ -9,7 +9,7 @@ using tripTicket.Model.SearchObjects;
 
 namespace tripTicket.Services.Interfaces
 {
-    public interface IUserActivityService : ICRUDService<UserActivity, UserActivitySearchObject, UserActivityInsertRequest, UserActivityUpdateRequest>
+    public interface ISupportTicketService : ICRUDService<SupportTicket, SupportTicketSearchObject, SupportTicketInsertRequest, SupportTicketUpdateRequest>
     {
     }
 }

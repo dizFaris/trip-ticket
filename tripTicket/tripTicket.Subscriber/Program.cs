@@ -1,8 +1,8 @@
 ﻿using EasyNetQ;
-using tripTicket.Services.Messages;
 using tripTicket.Subscriber.MailSenderService;
 using DotNetEnv;
 using tripTicket.Subscriber;
+using tripTicket.Model.Messages;
 
 Console.WriteLine("Starting TripTicket Mail Listener...");
 Env.Load();
@@ -21,6 +21,10 @@ var expiredTemplate = await File.ReadAllTextAsync(expiredTemplatePath);
 var completeTemplatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PurchaseComplete.html");
 var completeTemplate = await File.ReadAllTextAsync(completeTemplatePath);
 
+var supportTicketReplyTemplatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "SupportTicketReply.html");
+var supportTicketReplyTemplate = await File.ReadAllTextAsync(supportTicketReplyTemplatePath);
+
+
 IBus bus = null;
 int retries = 5;
 for (int i = 0; i < retries; i++)
@@ -28,6 +32,7 @@ for (int i = 0; i < retries; i++)
     try
     {
         bus = RabbitHutch.CreateBus("host=localhost");
+        Console.WriteLine("Successfully connected to RabbitMQ");
         break;
     }
     catch (Exception ex)
@@ -163,6 +168,34 @@ if (bus != null)
             catch (Exception ex)
             {
                 Console.WriteLine($"Error processing PurchaseCompleted message: {ex}");
+            }
+        });
+
+        await bus.PubSub.SubscribeAsync<SupportTicketReply>("trip_service_support_ticket", async msg =>
+        {
+            try
+            {
+                Console.WriteLine($"Support ticket reply. Support ticket ID: {msg.TicketId}");
+
+                var filledHtml = supportTicketReplyTemplate
+                    .Replace("{{Name}}", msg.Name)
+                    .Replace("{{TicketId}}", msg.TicketId.ToString())
+                    .Replace("{{Subject}}", msg.Subject)
+                    .Replace("{{Message}}", msg.Message);
+
+                var email = new Email
+                {
+                    EmailTo = msg.Email,
+                    ReceiverName = msg.Name ?? "Customer",
+                    Subject = "Trip Ticket Support Reply",
+                    Message = filledHtml
+                };
+
+                await mailSender.SendEmail(email);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing SupportTicketReply message: {ex}");
             }
         });
     }

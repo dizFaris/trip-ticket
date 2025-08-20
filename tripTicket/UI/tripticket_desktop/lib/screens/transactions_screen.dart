@@ -114,12 +114,12 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
           _totalPages = (searchResult.count / 15).ceil();
         });
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
           _transactions = [];
         });
 
-        if (!mounted) return;
         showDialog(
           context: context,
           builder: (context) => AlertDialog(

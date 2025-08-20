@@ -29,12 +29,12 @@ builder.Services.AddTransient<ITripService, TripService>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IBookmarkService, BookmarkService>();
 builder.Services.AddTransient<IPurchaseService, PurchaseService>();
-builder.Services.AddTransient<IUserActivityService, UserActivityService>();
-builder.Services.AddTransient<ITripStatisticService, TripStatisticService>();
 builder.Services.AddTransient<ICountryService, CountryService>();
 builder.Services.AddTransient<ICityService, CityService>();
 builder.Services.AddTransient<IStatisticsService, StatisticsService>();
 builder.Services.AddTransient<IRecommendationService, RecommendationService>();
+builder.Services.AddTransient<ISupportTicketService, SupportTicketService>();
+builder.Services.AddTransient<ISupportReplyService, SupportReplyService>();
 builder.Services.AddTransient<ITransactionService>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();

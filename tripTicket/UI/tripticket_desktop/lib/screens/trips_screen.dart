@@ -19,11 +19,6 @@ class TripsScreen extends StatefulWidget {
   State<TripsScreen> createState() => _TripsScreenState();
 }
 
-String _formatDate(DateTime? date) {
-  if (date == null) return '';
-  return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
-}
-
 class _TripsScreenState extends State<TripsScreen> {
   final TripProvider _tripProvider = TripProvider();
   List<Trip> _trips = [];
@@ -243,7 +238,7 @@ class _TripsScreenState extends State<TripsScreen> {
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              _formatDate(trip.departureDate),
+              formatDate(trip.departureDate),
               style: const TextStyle(color: AppColors.primaryYellow),
             ),
           ),

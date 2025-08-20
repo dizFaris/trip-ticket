@@ -23,6 +23,10 @@ class MyApp extends StatelessWidget {
           titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
           iconTheme: IconThemeData(color: Colors.white),
         ),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primaryGreen,
+          primary: AppColors.primaryGreen,
+        ),
         drawerTheme: DrawerThemeData(backgroundColor: AppColors.primaryGreen),
         listTileTheme: ListTileThemeData(
           textColor: Colors.white,

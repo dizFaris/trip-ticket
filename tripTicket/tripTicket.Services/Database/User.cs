@@ -29,4 +29,6 @@ public partial class User
     public virtual ICollection<Bookmark> Bookmarks { get; set; } = new List<Bookmark>();
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     public virtual ICollection<UserRecommendation> Recommendations { get; set; } = new List<UserRecommendation>();
+    public virtual ICollection<SupportTicket> SupportTickets { get; set; } = new List<SupportTicket>();
+    public virtual ICollection<SupportReply> SupportReplies { get; set; } = new List<SupportReply>();
 }

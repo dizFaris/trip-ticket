@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using tripTicket.Model.Models;
 
-namespace tripTicket.Services.Messages
+namespace tripTicket.Model.Messages
 {
     public class PurchaseSuccessful
     {

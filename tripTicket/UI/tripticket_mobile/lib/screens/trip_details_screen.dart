@@ -9,6 +9,7 @@ import 'package:tripticket_mobile/providers/bookmark_provider.dart';
 import 'package:tripticket_mobile/providers/trip_provider.dart';
 import 'package:tripticket_mobile/screens/ticket_purchase_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
+import 'package:tripticket_mobile/widgets/icon_button.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final int tripId;
@@ -249,11 +250,11 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildIconButton(
+                            CircleIconButton(
                               icon: Icons.arrow_back,
                               onPressed: () => Navigator.pop(context),
                             ),
-                            _buildIconButton(
+                            CircleIconButton(
                               icon: _isBookmarked
                                   ? Icons.bookmark
                                   : Icons.bookmark_border,
@@ -525,30 +526,6 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
           ),
         );
       }).toList(),
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    Color? color,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(216),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(51),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: color ?? Colors.black),
-        onPressed: onPressed,
-      ),
     );
   }
 }

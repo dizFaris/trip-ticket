@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
 import 'package:tripticket_mobile/providers/user_provider.dart';
+import 'package:tripticket_mobile/screens/support_ticket_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/widgets/date_picker.dart';
@@ -117,6 +118,8 @@ class _UserScreenState extends State<UserScreen> {
           ],
         ),
       );
+
+      _getUserData();
     } catch (e) {
       if (!mounted) return;
 
@@ -394,25 +397,51 @@ class _UserScreenState extends State<UserScreen> {
                                           showDialog(
                                             context: context,
                                             builder: (context) => AlertDialog(
-                                              title: Text("Validation Error"),
-                                              content: Text(
+                                              title: const Text(
+                                                "Validation Error",
+                                              ),
+                                              content: const Text(
                                                 "Birth date is required.",
                                               ),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
                                                       Navigator.pop(context),
-                                                  child: Text("Ok"),
+                                                  child: const Text("Ok"),
                                                 ),
                                               ],
                                             ),
                                           );
                                           return;
                                         }
-                                        setState(() {
-                                          _isLoading = true;
-                                        });
-                                        _updateUser();
+
+                                        showDialog(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                            title: const Text("Confirm Save"),
+                                            content: const Text(
+                                              "Are you sure you want to save the changes?",
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.of(
+                                                  ctx,
+                                                ).pop(), // cancel
+                                                child: const Text("Cancel"),
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  Navigator.of(ctx).pop();
+                                                  setState(() {
+                                                    _isLoading = true;
+                                                  });
+                                                  _updateUser();
+                                                },
+                                                child: const Text("Confirm"),
+                                              ),
+                                            ],
+                                          ),
+                                        );
                                       }
                                     }
                                   : null,
@@ -422,6 +451,31 @@ class _UserScreenState extends State<UserScreen> {
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Text("Having trouble? "),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => SupportTicketScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                "Contact support",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 18,
+                                  color: AppColors.primaryYellow,
                                 ),
                               ),
                             ),

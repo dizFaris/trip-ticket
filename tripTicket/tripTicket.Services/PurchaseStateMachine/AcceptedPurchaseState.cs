@@ -9,11 +9,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using tripTicket.Model;
+using tripTicket.Model.Messages;
 using tripTicket.Model.Models;
 using tripTicket.Model.Response;
 using tripTicket.Services.Database;
 using tripTicket.Services.Interfaces;
-using tripTicket.Services.Messages;
 
 namespace tripTicket.Services.PurchaseStateMachine
 {

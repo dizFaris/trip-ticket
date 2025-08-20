@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using tripTicket.Model;
 using tripTicket.Model.Requests;
 using tripTicket.Services.Database;
-using tripTicket.Services.Messages;
 
 namespace tripTicket.Services.PurchaseStateMachine
 {

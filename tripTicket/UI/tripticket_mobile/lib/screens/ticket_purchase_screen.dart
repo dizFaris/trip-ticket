@@ -7,6 +7,7 @@ import 'package:tripticket_mobile/models/trip_model.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
 import 'package:tripticket_mobile/providers/purchase_provider.dart';
 import 'package:tripticket_mobile/providers/transaction_provider.dart';
+import 'package:tripticket_mobile/widgets/icon_button.dart';
 
 class TicketPurchaseScreen extends StatefulWidget {
   final Trip trip;
@@ -228,7 +229,7 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
                         top: MediaQuery.of(context).padding.top + 10,
                         left: 16,
                         child: SizedBox(
-                          child: _buildIconButton(
+                          child: CircleIconButton(
                             icon: Icons.arrow_back,
                             onPressed: () => Navigator.pop(context),
                           ),
@@ -457,7 +458,31 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
                             Spacer(),
 
                             ElevatedButton.icon(
-                              onPressed: _createPurchase,
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    title: const Text("Confirm Purchase"),
+                                    content: const Text(
+                                      "Are you sure you want to proceed with this purchase?",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(ctx).pop(),
+                                        child: const Text("Cancel"),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          Navigator.of(ctx).pop();
+                                          _createPurchase();
+                                        },
+                                        child: const Text("Confirm"),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                               icon: const Icon(
                                 Icons.shopping_cart,
                                 color: AppColors.primaryYellow,
@@ -491,30 +516,6 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
                 ],
               ),
             ),
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    Color? color,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(216),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(51),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: color ?? Colors.black),
-        onPressed: onPressed,
-      ),
     );
   }
 

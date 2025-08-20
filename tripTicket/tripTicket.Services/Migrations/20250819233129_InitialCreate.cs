@@ -40,24 +40,6 @@ namespace tripTicket.Services.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserActivity",
-                columns: table => new
-                {
-                    UserActivityId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    ActionType = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: false),
-                    ActionDate = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
-                    TripId = table.Column<int>(type: "int", nullable: true),
-                    PurchaseId = table.Column<string>(type: "varchar(8)", unicode: false, maxLength: 8, nullable: true),
-                    AdditionalInfo = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK__UserActi__825604839D5B68E9", x => x.UserActivityId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -98,6 +80,30 @@ namespace tripTicket.Services.Migrations
                         principalTable: "Countries",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SupportTickets",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Subject = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ResolvedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SupportTickets", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SupportTickets_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,6 +173,33 @@ namespace tripTicket.Services.Migrations
                         principalTable: "Cities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SupportReplies",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TicketId = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SupportReplies", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SupportReplies_SupportTickets_TicketId",
+                        column: x => x.TicketId,
+                        principalTable: "SupportTickets",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SupportReplies_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -370,6 +403,21 @@ namespace tripTicket.Services.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SupportReplies_TicketId",
+                table: "SupportReplies",
+                column: "TicketId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportReplies_UserId",
+                table: "SupportReplies",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SupportTickets_UserId",
+                table: "SupportTickets",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Transactions_PurchaseId",
                 table: "Transactions",
                 column: "PurchaseId");
@@ -434,6 +482,9 @@ namespace tripTicket.Services.Migrations
                 name: "Bookmarks");
 
             migrationBuilder.DropTable(
+                name: "SupportReplies");
+
+            migrationBuilder.DropTable(
                 name: "Transactions");
 
             migrationBuilder.DropTable(
@@ -443,13 +494,13 @@ namespace tripTicket.Services.Migrations
                 name: "TripStatistics");
 
             migrationBuilder.DropTable(
-                name: "UserActivity");
-
-            migrationBuilder.DropTable(
                 name: "UserRecommendations");
 
             migrationBuilder.DropTable(
                 name: "UserRoles");
+
+            migrationBuilder.DropTable(
+                name: "SupportTickets");
 
             migrationBuilder.DropTable(
                 name: "Purchases");

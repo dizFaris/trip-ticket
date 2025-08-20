@@ -8,6 +8,7 @@ import 'package:barcode_widget/barcode_widget.dart';
 import 'package:tripticket_mobile/providers/purchase_provider.dart';
 import 'package:tripticket_mobile/screens/trip_details_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
+import 'package:tripticket_mobile/widgets/icon_button.dart';
 
 class PurchaseDetailsScreen extends StatefulWidget {
   final Purchase purchase;
@@ -135,7 +136,7 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                         top: MediaQuery.of(context).padding.top + 10,
                         left: 16,
                         child: SizedBox(
-                          child: _buildIconButton(
+                          child: CircleIconButton(
                             icon: Icons.arrow_back,
                             onPressed: () => Navigator.pop(context),
                           ),
@@ -396,7 +397,33 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                   backgroundColor: AppColors.primaryRed,
                                 ),
                                 onPressed: () {
-                                  _cancelPurchase();
+                                  showDialog(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Text("Cancel Purchase"),
+                                      content: const Text(
+                                        "Are you sure you want to cancel this purchase?",
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.of(ctx).pop(),
+                                          child: const Text("No"),
+                                        ),
+                                        ElevatedButton(
+                                          onPressed: () {
+                                            Navigator.of(ctx).pop();
+                                            _cancelPurchase();
+                                          },
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor:
+                                                AppColors.primaryRed,
+                                          ),
+                                          child: const Text("Yes"),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 },
                                 child: const Text(
                                   "Cancel",
@@ -445,30 +472,6 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                 ],
               ),
             ),
-    );
-  }
-
-  Widget _buildIconButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-    Color? color,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withAlpha(216),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(51),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: IconButton(
-        icon: Icon(icon, color: color ?? Colors.black),
-        onPressed: onPressed,
-      ),
     );
   }
 }

@@ -36,10 +36,12 @@ public partial class TripTicketDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
-    public virtual DbSet<UserActivity> UserActivities { get; set; }
     public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<UserRole> UserRoles { get; set; }
     public virtual DbSet<UserRecommendation> UserRecommendations { get; set; }
+
+    public virtual DbSet<SupportTicket> SupportTickets { get; set; }
+    public virtual DbSet<SupportReply> SupportReplies { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -229,24 +231,18 @@ public partial class TripTicketDbContext : DbContext
             entity.Property(e => e.Phone).HasMaxLength(20);
         });
 
-        modelBuilder.Entity<UserActivity>(entity =>
+        modelBuilder.Entity<SupportTicket>(entity =>
         {
-            entity.HasKey(e => e.UserActivityId).HasName("PK__UserActi__825604839D5B68E9");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Subject).IsRequired();
+            entity.Property(e => e.Message).IsRequired();
+            entity.Property(e => e.Status).HasMaxLength(50).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
 
-            entity.ToTable("UserActivity");
-
-            entity.Property(e => e.ActionDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.ActionType)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.AdditionalInfo)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-            entity.Property(e => e.PurchaseId)
-                .HasMaxLength(8)
-                .IsUnicode(false);
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.SupportTickets)
+                  .HasForeignKey(e => e.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<UserRecommendation>(b =>
@@ -271,6 +267,19 @@ public partial class TripTicketDbContext : DbContext
             b.Property(x => x.CreatedAt)
              .HasDefaultValueSql("GETUTCDATE()");
         });
+
+        modelBuilder.Entity<SupportReply>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Message).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            entity.HasOne(e => e.Ticket)
+                  .WithMany(t => t.Replies)
+                  .HasForeignKey(e => e.TicketId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
 
         OnModelCreatingPartial(modelBuilder);
     }

@@ -299,20 +299,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ],
                         ),
                         SizedBox(height: 16),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const LoginScreen(),
-                              ),
-                            );
-                          },
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text("Already registered? "),
-                              Text(
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            const Text("Already registered? "),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                  ),
+                                );
+                              },
+                              child: const Text(
                                 "Log in",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
@@ -320,8 +320,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                   color: AppColors.primaryYellow,
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

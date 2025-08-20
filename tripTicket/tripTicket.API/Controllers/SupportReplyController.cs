@@ -8,9 +8,9 @@ namespace tripTicket.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class TripStatisticController : BaseCRUDController<TripStatistic, TripStatisticSearchObject, TripStatisticInsertRequest, TripStatisticUpdateRequest>
+    public class SupportReplyController : BaseCRUDController<SupportReply, SupportReplySearchObject, SupportReplyInsertRequest, SupportReplyUpdateRequest>
     {
-        public TripStatisticController(ITripStatisticService service) : base(service)
+        public SupportReplyController(ISupportReplyService service) : base(service)
         {
         }
     }

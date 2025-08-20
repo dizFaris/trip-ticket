@@ -32,9 +32,9 @@ class _UsersScreenState extends State<UsersScreen> {
     {'label': 'Username', 'flex': 1},
     {'label': 'First name', 'flex': 1},
     {'label': 'Last name', 'flex': 1},
-    {'label': 'Email', 'flex': 2},
-    {'label': 'Phone', 'flex': 2},
-    {'label': 'Birth date', 'flex': 2},
+    {'label': 'Email', 'flex': 3},
+    {'label': 'Phone', 'flex': 1},
+    {'label': 'Birth date', 'flex': 1},
     {'label': 'Created at', 'flex': 2},
     {'label': '', 'flex': 1},
   ];
@@ -99,12 +99,12 @@ class _UsersScreenState extends State<UsersScreen> {
           _totalPages = (searchResult.count / 15).ceil();
         });
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
           _users = [];
         });
 
-        if (!mounted) return;
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -462,13 +462,13 @@ class _UsersScreenState extends State<UsersScreen> {
                                       flex: 1,
                                       child: Text(user.username),
                                     ),
-                                    Expanded(flex: 2, child: Text(user.email)),
+                                    Expanded(flex: 3, child: Text(user.email)),
                                     Expanded(
-                                      flex: 2,
+                                      flex: 1,
                                       child: Text(user.phone ?? ''),
                                     ),
                                     Expanded(
-                                      flex: 2,
+                                      flex: 1,
                                       child: Text(
                                         user.birthDate.toString().substring(
                                           0,

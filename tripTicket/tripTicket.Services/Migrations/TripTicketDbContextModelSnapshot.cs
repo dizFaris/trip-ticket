@@ -175,6 +175,73 @@ namespace tripTicket.Services.Migrations
                     b.ToTable("Roles");
                 });
 
+            modelBuilder.Entity("tripTicket.Services.Database.SupportReply", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TicketId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TicketId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupportReplies");
+                });
+
+            modelBuilder.Entity("tripTicket.Services.Database.SupportTicket", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SupportTickets");
+                });
+
             modelBuilder.Entity("tripTicket.Services.Database.Transaction", b =>
                 {
                     b.Property<int>("Id")
@@ -472,47 +539,6 @@ namespace tripTicket.Services.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("tripTicket.Services.Database.UserActivity", b =>
-                {
-                    b.Property<int>("UserActivityId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserActivityId"));
-
-                    b.Property<DateTime?>("ActionDate")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
-
-                    b.Property<string>("ActionType")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
-
-                    b.Property<string>("AdditionalInfo")
-                        .HasMaxLength(255)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("PurchaseId")
-                        .HasMaxLength(8)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(8)");
-
-                    b.Property<int?>("TripId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserActivityId")
-                        .HasName("PK__UserActi__825604839D5B68E9");
-
-                    b.ToTable("UserActivity", (string)null);
-                });
-
             modelBuilder.Entity("tripTicket.Services.Database.UserRecommendation", b =>
                 {
                     b.Property<int>("Id")
@@ -613,6 +639,32 @@ namespace tripTicket.Services.Migrations
                         .IsRequired();
 
                     b.Navigation("Trip");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("tripTicket.Services.Database.SupportReply", b =>
+                {
+                    b.HasOne("tripTicket.Services.Database.SupportTicket", "Ticket")
+                        .WithMany("Replies")
+                        .HasForeignKey("TicketId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("tripTicket.Services.Database.User", null)
+                        .WithMany("SupportReplies")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Ticket");
+                });
+
+            modelBuilder.Entity("tripTicket.Services.Database.SupportTicket", b =>
+                {
+                    b.HasOne("tripTicket.Services.Database.User", "User")
+                        .WithMany("SupportTickets")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -736,6 +788,11 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("UserRoles");
                 });
 
+            modelBuilder.Entity("tripTicket.Services.Database.SupportTicket", b =>
+                {
+                    b.Navigation("Replies");
+                });
+
             modelBuilder.Entity("tripTicket.Services.Database.Trip", b =>
                 {
                     b.Navigation("Bookmarks");
@@ -759,6 +816,10 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("Bookmarks");
 
                     b.Navigation("Recommendations");
+
+                    b.Navigation("SupportReplies");
+
+                    b.Navigation("SupportTickets");
 
                     b.Navigation("UserRoles");
                 });

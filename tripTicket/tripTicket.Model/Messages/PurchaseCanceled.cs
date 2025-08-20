@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace tripTicket.Services.Messages
+namespace tripTicket.Model.Messages
 {
     public class PurchaseCanceled
     {
