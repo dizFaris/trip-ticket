@@ -35,6 +35,7 @@ builder.Services.AddTransient<IStatisticsService, StatisticsService>();
 builder.Services.AddTransient<IRecommendationService, RecommendationService>();
 builder.Services.AddTransient<ISupportTicketService, SupportTicketService>();
 builder.Services.AddTransient<ISupportReplyService, SupportReplyService>();
+builder.Services.AddTransient<ITripReviewService, TripReviewService>();
 builder.Services.AddTransient<ITransactionService>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();

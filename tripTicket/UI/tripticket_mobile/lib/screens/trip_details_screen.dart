@@ -4,10 +4,13 @@ import 'package:country_flags/country_flags.dart';
 import 'package:flutter/material.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/models/trip_model.dart';
+import 'package:tripticket_mobile/models/trip_review_model.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
 import 'package:tripticket_mobile/providers/bookmark_provider.dart';
 import 'package:tripticket_mobile/providers/trip_provider.dart';
+import 'package:tripticket_mobile/providers/trip_review_provider.dart';
 import 'package:tripticket_mobile/screens/ticket_purchase_screen.dart';
+import 'package:tripticket_mobile/screens/trip_review_screen.dart';
 import 'package:tripticket_mobile/utils/utils.dart';
 import 'package:tripticket_mobile/widgets/icon_button.dart';
 
@@ -23,10 +26,21 @@ class TripDetailsScreen extends StatefulWidget {
 class _TripDetailsScreenState extends State<TripDetailsScreen> {
   final TripProvider _tripProvider = TripProvider();
   final BookmarkProvider _bookmarkProvider = BookmarkProvider();
+  final TripReviewProvider _tripReviewProvider = TripReviewProvider();
   bool _isLoading = true;
   bool _isBookmarked = false;
   Trip? _trip;
   Timer? _debounce;
+  final Map<String, IconData> _transportTypes = {
+    'Bus': Icons.directions_bus,
+    'Plane': Icons.flight,
+    'Car': Icons.directions_car,
+    'Train': Icons.train,
+    'Boat': Icons.directions_boat,
+    'Bike': Icons.directions_bike,
+  };
+  List<TripReview> _tripReviews = [];
+  double _averageRating = 0;
 
   @override
   void initState() {
@@ -52,15 +66,38 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
 
     try {
       var trip = await _tripProvider.getById(tripId);
+
       setState(() {
         _trip = trip;
-        _isLoading = false;
       });
+
+      if (trip.tripStatus == "complete") {
+        var rating = await _tripReviewProvider.getAverageRating(tripId);
+
+        setState(() {
+          _averageRating = rating;
+        });
+        await _getTripReviews();
+      }
     } catch (e) {
       debugPrint("Error loading trip: $e");
+    } finally {
       setState(() {
         _isLoading = false;
       });
+    }
+  }
+
+  Future<void> _getTripReviews() async {
+    try {
+      var filter = {"TripId": widget.tripId};
+      var reviews = await _tripReviewProvider.get(filter: filter);
+
+      setState(() {
+        _tripReviews = reviews.result;
+      });
+    } catch (e) {
+      debugPrint("Error loading trip reviews: $e");
     }
   }
 
@@ -184,25 +221,81 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                       Positioned(
                         bottom: 16,
                         right: 16,
-                        child:
-                            _trip!.availableTickets > 0 &&
-                                _trip!.tripStatus == "upcoming"
+                        child: _trip!.tripStatus == "upcoming"
+                            ? (_trip!.availableTickets > 0
+                                  ? ElevatedButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                TicketPurchaseScreen(
+                                                  trip: _trip!,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      icon: const Icon(
+                                        Icons.shopping_cart,
+                                        color: AppColors.primaryYellow,
+                                      ),
+                                      label: const Text(
+                                        "Purchase tickets",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                          color: AppColors.primaryYellow,
+                                        ),
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primaryGreen,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            12,
+                                          ),
+                                        ),
+                                        elevation: 4,
+                                      ),
+                                    )
+                                  : Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Text(
+                                        "SOLD OUT",
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ))
+                            : _trip!.tripStatus == "complete"
                             ? ElevatedButton.icon(
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) =>
-                                          TicketPurchaseScreen(trip: _trip!),
+                                          TripReviewScreen(trip: _trip!),
                                     ),
                                   );
                                 },
                                 icon: const Icon(
-                                  Icons.shopping_cart,
+                                  Icons.rate_review,
                                   color: AppColors.primaryYellow,
                                 ),
                                 label: const Text(
-                                  "Purchase tickets",
+                                  "Add Review",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
@@ -211,6 +304,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primaryGreen,
+                                  foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 16,
                                     vertical: 12,
@@ -221,26 +315,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                                   elevation: 4,
                                 ),
                               )
-                            : _trip!.tripStatus == "upcoming"
-                            ? Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: const Text(
-                                  "SOLD OUT",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              )
-                            : SizedBox.shrink(),
+                            : const SizedBox.shrink(),
                       ),
 
                       Positioned(
@@ -374,6 +449,49 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        if (_trip!.tripStatus == "complete")
+                          Row(
+                            children: [
+                              ...List.generate(5, (index) {
+                                if (_averageRating == 0) {
+                                  return const Icon(
+                                    Icons.star_border,
+                                    color: Colors.amber,
+                                    size: 24,
+                                  );
+                                } else if (index + 1 <= _averageRating) {
+                                  return const Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                    size: 24,
+                                  );
+                                } else if (index < _averageRating) {
+                                  return const Icon(
+                                    Icons.star_half,
+                                    color: Colors.amber,
+                                    size: 24,
+                                  );
+                                } else {
+                                  return const Icon(
+                                    Icons.star_border,
+                                    color: Colors.amber,
+                                    size: 24,
+                                  );
+                                }
+                              }),
+                              const SizedBox(width: 8),
+                              Text(
+                                _averageRating == 0
+                                    ? "No reviews yet"
+                                    : "$_averageRating",
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
                         const SizedBox(height: 4),
                         Text(
                           _trip!.tripType!,
@@ -393,68 +511,83 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                         ),
                         Divider(),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Departure date:',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: const [
+                                Text(
+                                  'Departure date:',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Return date:',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Transport type:',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
                             ),
                             const SizedBox(width: 12),
-                            Text(
-                              _trip!.departureDate.toIso8601String().substring(
-                                0,
-                                10,
-                              ),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              'Return date:',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              _trip!.returnDate.toIso8601String().substring(
-                                0,
-                                10,
-                              ),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              'Transport type:',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              _trip!.transportType!,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _trip!.departureDate
+                                      .toIso8601String()
+                                      .substring(0, 10),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  _trip!.returnDate.toIso8601String().substring(
+                                    0,
+                                    10,
+                                  ),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Text(
+                                      _trip!.transportType!,
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Icon(
+                                      _transportTypes[_trip!.transportType] ??
+                                          Icons.help_outline,
+                                      size: 20,
+                                      color: Colors.black,
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -467,6 +600,78 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                           ),
                         ),
                         buildTripDays(_trip!.tripDays),
+                        Divider(),
+                        if (_tripReviews.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          const Text(
+                            'Reviews:',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          Column(
+                            children: _tripReviews.map((review) {
+                              return Container(
+                                margin: const EdgeInsets.symmetric(vertical: 4),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          review.user.username,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                        Text(
+                                          "${review.createdAt.toLocal().day}/${review.createdAt.toLocal().month}/${review.createdAt.toLocal().year}",
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Row(
+                                      children: List.generate(5, (index) {
+                                        return Icon(
+                                          index < review.rating
+                                              ? Icons.star
+                                              : Icons.star_border,
+                                          color: Colors.amber,
+                                          size: 18,
+                                        );
+                                      }),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    if (review.comment != null &&
+                                        review.comment!.isNotEmpty)
+                                      Text(
+                                        review.comment!,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                         const SizedBox(height: 50),
                       ],
                     ),

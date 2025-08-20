@@ -164,186 +164,261 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "Purchase details",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Text(
-                          'Purchase ID: ${widget.purchase.id}',
-                          style: const TextStyle(
-                            fontSize: 20,
-                            color: Colors.black,
-                          ),
-                        ),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Status: ',
+                              "Purchase details",
                               style: const TextStyle(
-                                fontSize: 20,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color: getStatusColor(widget.purchase.status),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                widget.purchase.status.toUpperCase(),
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
+                            const SizedBox(height: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 180,
+                                      child: Text(
+                                        'Purchase ID:',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        '${widget.purchase.id}',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Text(
-                              'Created at: ',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              widget.purchase.createdAt
-                                  .toIso8601String()
-                                  .substring(0, 10),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryYellow,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Text(
-                              'Destination: ',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              "${widget.purchase.trip.city} / ",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                            CountryFlag.fromCountryCode(
-                              widget.purchase.trip.countryCode,
-                              height: 16,
-                              width: 20,
-                              shape: const Circle(),
-                            ),
-                            const SizedBox(width: 12),
-                            Text(
-                              widget.purchase.trip.country,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        Row(
-                          children: [
-                            Text(
-                              'Expires at: ',
-                              style: const TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              widget.purchase.trip.expirationDate
-                                  .toIso8601String()
-                                  .substring(0, 10),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryYellow,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        if (widget.purchase.trip.freeCancellationUntil != null)
-                          Row(
-                            children: [
-                              Text(
-                                'Free cancellation untill: ',
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black,
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 180,
+                                      child: Text(
+                                        'Status:',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: getStatusColor(
+                                          widget.purchase.status,
+                                        ),
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        widget.purchase.status.toUpperCase(),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              Text(
-                                widget.purchase.trip.freeCancellationUntil!
-                                    .toIso8601String()
-                                    .substring(0, 10),
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryYellow,
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 180,
+                                      child: Text(
+                                        'Created at:',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      widget.purchase.createdAt
+                                          .toIso8601String()
+                                          .substring(0, 10),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-
-                        if (widget.purchase.trip.cancellationFee != null)
-                          Row(
-                            children: [
-                              Text(
-                                "Cancellation fee: ",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black,
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 180,
+                                      child: Text(
+                                        'Destination:',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "${widget.purchase.trip.city} / ",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                        CountryFlag.fromCountryCode(
+                                          widget.purchase.trip.countryCode,
+                                          height: 16,
+                                          width: 20,
+                                          shape: const Circle(),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          widget.purchase.trip.country,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              Text(
-                                "${widget.purchase.trip.cancellationFee} %",
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryYellow,
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 180,
+                                      child: Text(
+                                        'Expires at:',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      widget.purchase.trip.expirationDate
+                                          .toIso8601String()
+                                          .substring(0, 10),
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-
-                        Row(
-                          children: [
-                            Text(
-                              "Tickets purchased: ",
-                              style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              "${widget.purchase.numberOfTickets}",
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primaryYellow,
-                              ),
+                                const SizedBox(height: 4),
+                                if (widget
+                                        .purchase
+                                        .trip
+                                        .freeCancellationUntil !=
+                                    null)
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 180,
+                                        child: Text(
+                                          'Free cancel until:',
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        widget
+                                            .purchase
+                                            .trip
+                                            .freeCancellationUntil!
+                                            .toIso8601String()
+                                            .substring(0, 10),
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                const SizedBox(height: 4),
+                                if (widget.purchase.trip.cancellationFee !=
+                                    null)
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 180,
+                                        child: Text(
+                                          'Cancellation fee:',
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      Text(
+                                        "${widget.purchase.trip.cancellationFee} %",
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 180,
+                                      child: Text(
+                                        'Tickets purchased:',
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    Text(
+                                      "${widget.purchase.numberOfTickets}",
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -355,7 +430,7 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                             Text(
                               "TOTAL: ",
                               style: TextStyle(
-                                fontSize: 26,
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
@@ -363,9 +438,9 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                             Text(
                               "${widget.purchase.totalPayment} €",
                               style: const TextStyle(
-                                fontSize: 26,
+                                fontSize: 28,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primaryYellow,
+                                color: AppColors.primaryGreen,
                               ),
                             ),
                           ],

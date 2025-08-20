@@ -31,4 +31,5 @@ public partial class User
     public virtual ICollection<UserRecommendation> Recommendations { get; set; } = new List<UserRecommendation>();
     public virtual ICollection<SupportTicket> SupportTickets { get; set; } = new List<SupportTicket>();
     public virtual ICollection<SupportReply> SupportReplies { get; set; } = new List<SupportReply>();
+    public virtual ICollection<TripReview> TripReviews { get; set; } = new List<TripReview>();
 }

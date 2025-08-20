@@ -28,7 +28,6 @@ class _CounterWidgetState extends State<CounterWidget> {
       mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(icon: const Icon(Icons.remove), onPressed: _decrement),
-        // Number display
         Text(
           '$_count',
           style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),

@@ -424,9 +424,8 @@ class _UserScreenState extends State<UserScreen> {
                                             ),
                                             actions: [
                                               TextButton(
-                                                onPressed: () => Navigator.of(
-                                                  ctx,
-                                                ).pop(), // cancel
+                                                onPressed: () =>
+                                                    Navigator.of(ctx).pop(),
                                                 child: const Text("Cancel"),
                                               ),
                                               ElevatedButton(

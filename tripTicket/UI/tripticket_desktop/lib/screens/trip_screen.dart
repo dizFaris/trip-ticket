@@ -10,6 +10,7 @@ import 'package:tripticket_desktop/providers/city_provider.dart';
 import 'package:tripticket_desktop/providers/country_provider.dart';
 import 'package:tripticket_desktop/providers/trip_provider.dart';
 import 'package:tripticket_desktop/screens/master_screen.dart';
+import 'package:tripticket_desktop/screens/trip_reviews_screen.dart';
 import 'package:tripticket_desktop/screens/trips_screen.dart';
 import 'package:tripticket_desktop/widgets/date_picker.dart';
 import 'package:tripticket_desktop/utils/utils.dart';
@@ -29,7 +30,7 @@ class _TripScreenState extends State<TripScreen> {
   final TripProvider _tripProvider = TripProvider();
   final CountryProvider _countryProvider = CountryProvider();
   final CityProvider _cityProvider = CityProvider();
-
+  Trip? _trip;
   bool get _isEditing => widget.tripId != null;
   bool _isLoading = true;
   List<Country> _countries = [];
@@ -146,6 +147,8 @@ class _TripScreenState extends State<TripScreen> {
     );
 
     setState(() {
+      _trip = trip;
+
       _selectedCityId = trip.city.id;
       _cities = tripCountryCities;
 
@@ -1200,7 +1203,7 @@ class _TripScreenState extends State<TripScreen> {
                                 SizedBox(
                                   width: 170,
                                   child: Text(
-                                    "Short _description",
+                                    "Short description",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -1537,6 +1540,7 @@ class _TripScreenState extends State<TripScreen> {
                             : const SizedBox.shrink(),
 
                         SizedBox(width: 8),
+
                         SizedBox(
                           height: 32,
                           width: 120,
@@ -1558,6 +1562,39 @@ class _TripScreenState extends State<TripScreen> {
                             ),
                           ),
                         ),
+                        _tripStatus == "complete"
+                            ? Row(
+                                children: [
+                                  SizedBox(width: 8),
+                                  SizedBox(
+                                    height: 32,
+                                    width: 120,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        masterScreenKey.currentState
+                                            ?.navigateTo(
+                                              TripReviewsScreen(trip: _trip!),
+                                            );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: AppColors.primaryGreen,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "REVIEWS",
+                                        style: TextStyle(
+                                          color: AppColors.primaryYellow,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
                         SizedBox(width: 8),
                         _isEditing
                             ? _tripStatus == "upcoming"

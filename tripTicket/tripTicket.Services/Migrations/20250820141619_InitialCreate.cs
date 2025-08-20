@@ -281,26 +281,32 @@ namespace tripTicket.Services.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TripStatistics",
+                name: "TripReviews",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TripId = table.Column<int>(type: "int", nullable: false),
-                    TotalViews = table.Column<int>(type: "int", nullable: true, defaultValue: 0),
-                    TotalRevenue = table.Column<decimal>(type: "decimal(10,2)", nullable: true, defaultValue: 0.00m),
-                    TotalDiscountsApplied = table.Column<decimal>(type: "decimal(10,2)", nullable: true, defaultValue: 0.00m),
-                    TotalTicketsSold = table.Column<int>(type: "int", nullable: true, defaultValue: 0),
-                    LastUpdated = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())")
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Rating = table.Column<int>(type: "int", nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK__TripStat__9B3192CC57176F94", x => x.Id);
+                    table.PrimaryKey("PK_TripReviews", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TripStatistics_Trip",
+                        name: "FK_TripReviews_Trips_TripId",
                         column: x => x.TripId,
                         principalTable: "Trips",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TripReviews_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -433,6 +439,16 @@ namespace tripTicket.Services.Migrations
                 column: "TripId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TripReviews_TripId",
+                table: "TripReviews",
+                column: "TripId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TripReviews_UserId",
+                table: "TripReviews",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Trips_CityId",
                 table: "Trips",
                 column: "CityId");
@@ -441,11 +457,6 @@ namespace tripTicket.Services.Migrations
                 name: "IX_Trips_DepartureCityId",
                 table: "Trips",
                 column: "DepartureCityId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_TripStatistics_TripId",
-                table: "TripStatistics",
-                column: "TripId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserRecommendations_TripId",
@@ -491,7 +502,7 @@ namespace tripTicket.Services.Migrations
                 name: "TripDayItems");
 
             migrationBuilder.DropTable(
-                name: "TripStatistics");
+                name: "TripReviews");
 
             migrationBuilder.DropTable(
                 name: "UserRecommendations");

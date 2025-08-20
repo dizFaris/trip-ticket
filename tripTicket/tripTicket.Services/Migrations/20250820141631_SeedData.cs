@@ -262,23 +262,6 @@ namespace tripTicket.Services.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "TripStatistics",
-                columns: new[] { "Id", "TripId", "TotalViews", "TotalRevenue", "TotalDiscountsApplied", "TotalTicketsSold", "LastUpdated" },
-                values: new object[,]
-                {
-                     { 1, 1, 1250, 37500.00m, 1500.00m, 150, DateTime.UtcNow.AddDays(-1) },
-                     { 2, 2, 980, 24500.00m, 1200.00m, 100, DateTime.UtcNow.AddDays(-2) },
-                     { 3, 3, 700, 21000.00m, 900.00m, 90, DateTime.UtcNow.AddDays(-3) },
-                     { 4, 4, 1340, 40200.00m, 1800.00m, 160, DateTime.UtcNow.AddDays(-1) },
-                     { 5, 5, 560, 11200.00m, 600.00m, 80, DateTime.UtcNow.AddDays(-5) },
-                     { 6, 6, 890, 26700.00m, 1100.00m, 110, DateTime.UtcNow.AddDays(-2) },
-                     { 7, 7, 720, 21600.00m, 700.00m, 90, DateTime.UtcNow.AddDays(-4) },
-                     { 8, 8, 450, 13500.00m, 400.00m, 75, DateTime.UtcNow.AddDays(-7) },
-                     { 9, 9, 980, 29400.00m, 1300.00m, 105, DateTime.UtcNow.AddDays(-2) },
-                     { 10, 10, 670, 20100.00m, 800.00m, 85, DateTime.UtcNow.AddDays(-3) }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Bookmarks",
                 columns: new[] { "Id", "UserId", "TripId", "CreatedAt" },
                 values: new object[,]

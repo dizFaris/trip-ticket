@@ -396,7 +396,9 @@ class _TripsScreenState extends State<TripsScreen> {
                             ),
                           ),
                           child: Text(
-                            "Edit trip",
+                            trip.tripStatus == "complete"
+                                ? "View trip"
+                                : "Edit trip",
                             style: TextStyle(color: Colors.black),
                           ),
                         ),

@@ -460,7 +460,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                     style: TextStyle(fontSize: 20),
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(3),
+                      LengthLimitingTextInputFormatter(5),
                     ],
                     decoration: InputDecoration(
                       labelText: null,
@@ -493,7 +493,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                     style: TextStyle(fontSize: 20),
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(3),
+                      LengthLimitingTextInputFormatter(5),
                     ],
                     decoration: InputDecoration(
                       labelText: null,

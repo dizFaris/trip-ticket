@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using EasyNetQ.Internals;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
 
 namespace tripTicket.Services.Database;
 
@@ -32,16 +33,14 @@ public partial class TripTicketDbContext : DbContext
 
     public virtual DbSet<TripDayItem> TripDayItems { get; set; }
 
-    public virtual DbSet<TripStatistic> TripStatistics { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<UserRole> UserRoles { get; set; }
     public virtual DbSet<UserRecommendation> UserRecommendations { get; set; }
-
     public virtual DbSet<SupportTicket> SupportTickets { get; set; }
     public virtual DbSet<SupportReply> SupportReplies { get; set; }
+    public virtual DbSet<TripReview> TripReviews { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -194,28 +193,6 @@ public partial class TripTicketDbContext : DbContext
                 .HasConstraintName("FK__TripDayIt__TripD__44FF419A");
         });
 
-        modelBuilder.Entity<TripStatistic>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__TripStat__9B3192CC57176F94");
-
-            entity.Property(e => e.LastUpdated)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.TotalDiscountsApplied)
-                .HasDefaultValue(0.00m)
-                .HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.TotalRevenue)
-                .HasDefaultValue(0.00m)
-                .HasColumnType("decimal(10, 2)");
-            entity.Property(e => e.TotalTicketsSold).HasDefaultValue(0);
-            entity.Property(e => e.TotalViews).HasDefaultValue(0);
-
-            entity.HasOne(d => d.Trip).WithMany(p => p.TripStatistics)
-                .HasForeignKey(d => d.TripId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_TripStatistics_Trip");
-        });
-
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Users__3214EC072EFF9310");
@@ -277,6 +254,24 @@ public partial class TripTicketDbContext : DbContext
             entity.HasOne(e => e.Ticket)
                   .WithMany(t => t.Replies)
                   .HasForeignKey(e => e.TicketId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<TripReview>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Rating).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+
+            entity.HasOne(e => e.Trip)
+                  .WithMany(t => t.TripReviews)
+                  .HasForeignKey(e => e.TripId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.User)
+                  .WithMany(u => u.TripReviews)
+                  .HasForeignKey(e => e.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

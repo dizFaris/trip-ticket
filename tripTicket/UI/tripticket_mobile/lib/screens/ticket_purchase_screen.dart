@@ -177,7 +177,6 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Status text on top
                   if (_purchaseStatusText != null &&
                       _purchaseStatusText!.isNotEmpty)
                     Padding(
@@ -193,7 +192,6 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
                       ),
                     ),
 
-                  // Loader below the text, shown only if loading
                   if (_isLoading)
                     SizedBox(
                       width: 32,

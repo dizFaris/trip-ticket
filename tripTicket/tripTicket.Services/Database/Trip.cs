@@ -52,8 +52,7 @@ public partial class Trip
 
     public virtual ICollection<TripDay> TripDays { get; set; } = new List<TripDay>();
 
-    public virtual ICollection<TripStatistic> TripStatistics { get; set; } = new List<TripStatistic>();
     public virtual ICollection<Purchase> TripPurchases { get; set; } = new List<Purchase>();
     public virtual ICollection<UserRecommendation> UserRecommendations { get; set; } = new List<UserRecommendation>();
-
+    public virtual ICollection<TripReview> TripReviews { get; set; } = new List<TripReview>();
 }

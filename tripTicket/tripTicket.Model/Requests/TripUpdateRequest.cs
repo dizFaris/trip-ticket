@@ -23,6 +23,7 @@ namespace tripTicket.Model.Requests
         public string Description { get; set; }
 
         public DateOnly? FreeCancellationUntil { get; set; }
+        public int AvailableTickets { get; set; }
 
         public byte[]? Photo { get; set; }
 

@@ -12,8 +12,8 @@ using tripTicket.Services.Database;
 namespace tripTicket.Services.Migrations
 {
     [DbContext(typeof(TripTicketDbContext))]
-    [Migration("20250819233141_SeedData")]
-    partial class SeedData
+    [Migration("20250820141619_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -439,7 +439,7 @@ namespace tripTicket.Services.Migrations
                     b.ToTable("TripDayItems");
                 });
 
-            modelBuilder.Entity("tripTicket.Services.Database.TripStatistic", b =>
+            modelBuilder.Entity("tripTicket.Services.Database.TripReview", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -447,40 +447,28 @@ namespace tripTicket.Services.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime?>("LastUpdated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime")
-                        .HasDefaultValueSql("(getdate())");
+                    b.Property<string>("Comment")
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("TotalDiscountsApplied")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(10, 2)")
-                        .HasDefaultValue(0.00m);
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("TotalRevenue")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(10, 2)")
-                        .HasDefaultValue(0.00m);
-
-                    b.Property<int?>("TotalTicketsSold")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.Property<int?>("TotalViews")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<int>("TripId")
                         .HasColumnType("int");
 
-                    b.HasKey("Id")
-                        .HasName("PK__TripStat__9B3192CC57176F94");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("TripId");
 
-                    b.ToTable("TripStatistics");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TripReviews");
                 });
 
             modelBuilder.Entity("tripTicket.Services.Database.User", b =>
@@ -722,15 +710,23 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("TripDay");
                 });
 
-            modelBuilder.Entity("tripTicket.Services.Database.TripStatistic", b =>
+            modelBuilder.Entity("tripTicket.Services.Database.TripReview", b =>
                 {
                     b.HasOne("tripTicket.Services.Database.Trip", "Trip")
-                        .WithMany("TripStatistics")
+                        .WithMany("TripReviews")
                         .HasForeignKey("TripId")
-                        .IsRequired()
-                        .HasConstraintName("FK_TripStatistics_Trip");
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("tripTicket.Services.Database.User", "User")
+                        .WithMany("TripReviews")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Trip");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("tripTicket.Services.Database.UserRecommendation", b =>
@@ -804,7 +800,7 @@ namespace tripTicket.Services.Migrations
 
                     b.Navigation("TripPurchases");
 
-                    b.Navigation("TripStatistics");
+                    b.Navigation("TripReviews");
 
                     b.Navigation("UserRecommendations");
                 });
@@ -823,6 +819,8 @@ namespace tripTicket.Services.Migrations
                     b.Navigation("SupportReplies");
 
                     b.Navigation("SupportTickets");
+
+                    b.Navigation("TripReviews");
 
                     b.Navigation("UserRoles");
                 });
