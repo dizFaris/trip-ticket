@@ -52,7 +52,7 @@ class _TripScreenState extends State<TripScreen> {
   DateTime? _freeCancellationUntil;
   List<int>? _selectedPhoto;
   String? _tripStatus;
-
+  bool _isSaving = false;
   bool get _inputEnabled =>
       !_isEditing || (_isEditing && _tripStatus == 'upcoming');
 
@@ -215,12 +215,12 @@ class _TripScreenState extends State<TripScreen> {
         }
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
         _countries = [];
       });
 
-      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -258,6 +258,31 @@ class _TripScreenState extends State<TripScreen> {
   }
 
   Future<void> _addNewTrip() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to add this trip?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
     final tripData = {
       "CityId": _selectedCityId,
       "DepartureCityId": _departureCityId,
@@ -297,6 +322,9 @@ class _TripScreenState extends State<TripScreen> {
           ],
         ),
       );
+      setState(() {
+        _isSaving = false;
+      });
       return;
     }
 
@@ -320,7 +348,9 @@ class _TripScreenState extends State<TripScreen> {
           ],
         ),
       );
-
+      setState(() {
+        _isSaving = false;
+      });
       if (result == true || result == null) {
         masterScreenKey.currentState?.navigateTo(TripsScreen());
       }
@@ -340,10 +370,38 @@ class _TripScreenState extends State<TripScreen> {
           ],
         ),
       );
+      setState(() {
+        _isSaving = false;
+      });
     }
   }
 
   Future<void> _saveTrip() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: const Text('Are you sure you want to edit this trip?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Yes'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true) {
+      return;
+    }
+
+    setState(() {
+      _isSaving = true;
+    });
     final tripData = {
       "CityId": _selectedCityId,
       "DepartureCityId": _departureCityId,
@@ -383,6 +441,9 @@ class _TripScreenState extends State<TripScreen> {
           ],
         ),
       );
+      setState(() {
+        _isSaving = false;
+      });
       return;
     }
 
@@ -406,7 +467,9 @@ class _TripScreenState extends State<TripScreen> {
           ],
         ),
       );
-
+      setState(() {
+        _isSaving = false;
+      });
       if (result == true || result == null) {
         masterScreenKey.currentState?.navigateTo(TripsScreen());
       }
@@ -426,6 +489,9 @@ class _TripScreenState extends State<TripScreen> {
           ],
         ),
       );
+      setState(() {
+        _isSaving = false;
+      });
     }
   }
 
@@ -938,6 +1004,10 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 DatePickerButton(
+                                  firstDate: DateTime.now().add(
+                                    Duration(days: 5),
+                                  ),
+                                  lastDate: _returnDate ?? DateTime(2100),
                                   initialDate: _departureDate,
                                   enabled: _inputEnabled,
                                   onDateSelected: (date) {
@@ -963,6 +1033,10 @@ class _TripScreenState extends State<TripScreen> {
                                 ),
                                 SizedBox(width: 8),
                                 DatePickerButton(
+                                  firstDate:
+                                      _departureDate ??
+                                      DateTime.now().add(Duration(days: 5)),
+                                  lastDate: DateTime(2100),
                                   initialDate: _returnDate,
                                   enabled: _inputEnabled,
                                   onDateSelected: (date) {
@@ -1602,9 +1676,7 @@ class _TripScreenState extends State<TripScreen> {
                                       height: 32,
                                       width: 120,
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          _saveTrip();
-                                        },
+                                        onPressed: _isSaving ? null : _saveTrip,
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor:
                                               AppColors.primaryGreen,
@@ -1627,9 +1699,7 @@ class _TripScreenState extends State<TripScreen> {
                                 height: 32,
                                 width: 120,
                                 child: ElevatedButton(
-                                  onPressed: () {
-                                    _addNewTrip();
-                                  },
+                                  onPressed: _isSaving ? null : _addNewTrip,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: AppColors.primaryGreen,
                                     shape: RoundedRectangleBorder(

@@ -386,6 +386,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       children: [
         DatePickerButton(
           initialDate: _dailyStatisticDate,
+          firstDate: DateTime(2025),
           allowPastDates: true,
           placeHolder: 'Select date',
           onDateSelected: (date) {

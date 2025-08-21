@@ -176,6 +176,7 @@ class _SupportRepliesScreenState extends State<SupportRepliesScreen> {
                   initialDate: _fromDate,
                   allowPastDates: true,
                   placeHolder: 'Date from',
+                  firstDate: DateTime(2025),
                   lastDate: _toDate ?? DateTime(2100),
                   onDateSelected: (date) {
                     setState(() {
@@ -189,7 +190,7 @@ class _SupportRepliesScreenState extends State<SupportRepliesScreen> {
                   initialDate: _toDate,
                   allowPastDates: true,
                   placeHolder: 'Date to',
-                  firstDate: _fromDate ?? DateTime(1950),
+                  firstDate: _fromDate ?? DateTime(2025),
                   onDateSelected: (date) {
                     setState(() {
                       _toDate = date;
@@ -302,6 +303,8 @@ class _SupportRepliesScreenState extends State<SupportRepliesScreen> {
                                           ],
                                         ),
                                         if (isExpanded) ...[
+                                          const SizedBox(height: 4),
+                                          Text(reply.ticket!.message),
                                           if (reply.ticket!.resolvedAt !=
                                               null) ...[
                                             const SizedBox(height: 4),
@@ -323,7 +326,7 @@ class _SupportRepliesScreenState extends State<SupportRepliesScreen> {
                                             ),
                                           ),
                                           const SizedBox(height: 4),
-                                          Text(reply.ticket!.message),
+                                          Text(reply.message),
                                         ],
                                       ],
                                     ),

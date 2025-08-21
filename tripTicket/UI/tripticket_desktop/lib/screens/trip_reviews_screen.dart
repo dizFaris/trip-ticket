@@ -129,7 +129,7 @@ class _TripReviewsScreenState extends State<TripReviewsScreen> {
           : _tripReviews.isEmpty
           ? const Center(child: Text("No reviews yet"))
           : Column(
-              crossAxisAlignment: CrossAxisAlignment.start, // 👈 align left
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
                   padding: const EdgeInsets.symmetric(

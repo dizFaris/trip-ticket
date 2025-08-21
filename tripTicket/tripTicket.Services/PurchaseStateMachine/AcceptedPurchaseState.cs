@@ -78,6 +78,8 @@ namespace tripTicket.Services.PurchaseStateMachine
                 catch (Exception ex)
                 {
                     refundStatus = "failed";
+                    refundStripeId = transaction.StripeTransactionId;
+                    refundAmount = 0;
                 }
 
                 var refundTransaction = new Database.Transaction
@@ -160,22 +162,23 @@ namespace tripTicket.Services.PurchaseStateMachine
         {
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-            var purchasesToExpire = Context.Purchases.Include(p => p.Trip)
-                .Where(t => t.Status == "accepted" && t.Trip.DepartureDate <= today)
+            var purchasesToExpire = Context.Purchases
+                .Include(p => p.Trip)
+                    .ThenInclude(t => t.City)
+                        .ThenInclude(c => c.Country)
+                .Include(p => p.User)
+                .Where(p => p.Status == "accepted" && p.Trip.DepartureDate <= today)
                 .ToList();
 
             foreach (var purchase in purchasesToExpire)
             {
                 purchase.Status = "expired";
 
-                var user = Context.Users.Find(purchase.UserId);
-                var trip = Context.Trips.Find(purchase.TripId);
-
-                PurchaseExpired message = new PurchaseExpired
+                var message = new PurchaseExpired
                 {
                     PurchaseId = purchase.Id,
-                    Email = user.Email,
-                    Name = user.FirstName,
+                    Email = purchase.User.Email,
+                    Name = purchase.User.FirstName,
                     DepartureDate = purchase.Trip.DepartureDate,
                     NumberOfTickets = purchase.NumberOfTickets,
                     TotalPayment = purchase.TotalPayment,

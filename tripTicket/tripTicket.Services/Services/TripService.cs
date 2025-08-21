@@ -113,7 +113,7 @@ namespace tripTicket.Services.Services
                 filteredQuery = filteredQuery.Where(p => p.DepartureDate <= search.ToDate.Value);
             }
 
-            filteredQuery = filteredQuery.OrderByDescending(p => p.CreatedAt);
+            filteredQuery = filteredQuery.OrderByDescending(p => p.DepartureDate);
 
             return filteredQuery;
         }
@@ -171,17 +171,17 @@ namespace tripTicket.Services.Services
             Context.SaveChanges();
         }
 
-        public Model.Models.Trip Cancel(int id)
+        public async Task<Model.Models.Trip> Cancel(int id)
         {
             var entity = GetById(id);
 
             if (entity == null)
             {
-               throw new UserException("Trip not found.");
+                throw new UserException("Trip not found.");
             }
 
             var state = BaseTripState.CreateState(entity.TripStatus);
-            return state.Cancel(id);
+            return await state.Cancel(id);
         }
 
         public virtual List<Model.Models.Trip> GetRecommendedTrips(int userId)

@@ -20,9 +20,9 @@ namespace tripTicket.API.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/cancel")]
-        public Trip Cancel(int id)
+        public async Task<Trip> Cancel(int id)
         {
-             return _service.Cancel(id);
+             return await _service.Cancel(id);
         }
 
         [HttpGet("recommendations/{userId}")]
