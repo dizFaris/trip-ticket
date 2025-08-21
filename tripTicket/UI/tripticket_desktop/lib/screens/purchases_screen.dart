@@ -737,164 +737,301 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                                             CrossAxisAlignment
                                                                 .start,
                                                         children: [
-                                                          Text(
-                                                            "Purchase ID: ${purchase.id}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            "Customer: ${purchase.user.firstName} ${purchase.user.lastName}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
                                                           Row(
                                                             children: [
-                                                              Text(
-                                                                "Status:",
-                                                                style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "Purchase ID:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "Customer:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 12,
+                                                                  ),
+                                                                  Text(
+                                                                    "Status:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 12,
+                                                                  ),
+                                                                  Text(
+                                                                    "Created at:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "Expires at:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "Destination:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "Country:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "Payment:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "Ticket count:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "Discount:",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                               SizedBox(
                                                                 width: 8,
                                                               ),
-                                                              Container(
-                                                                padding:
-                                                                    const EdgeInsets.symmetric(
+                                                              Column(
+                                                                crossAxisAlignment:
+                                                                    CrossAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Text(
+                                                                    "${purchase.id}",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "${purchase.user.firstName} ${purchase.user.lastName}",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Container(
+                                                                    padding: const EdgeInsets.symmetric(
                                                                       horizontal:
                                                                           8,
                                                                       vertical:
                                                                           4,
                                                                     ),
-                                                                decoration: BoxDecoration(
-                                                                  color: getStatusColor(
-                                                                    purchase
-                                                                        .status,
-                                                                  ),
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                        6,
+                                                                    decoration: BoxDecoration(
+                                                                      color: getStatusColor(
+                                                                        purchase
+                                                                            .status,
                                                                       ),
-                                                                ),
-                                                                child: Text(
-                                                                  purchase
-                                                                      .status
-                                                                      .toUpperCase(),
-                                                                  style: const TextStyle(
-                                                                    color: Colors
-                                                                        .white,
-                                                                    fontWeight:
-                                                                        FontWeight
-                                                                            .w600,
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                            6,
+                                                                          ),
+                                                                    ),
+                                                                    child: Text(
+                                                                      purchase
+                                                                          .status
+                                                                          .toUpperCase(),
+                                                                      style: const TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                      ),
+                                                                    ),
                                                                   ),
-                                                                ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    DateFormat(
+                                                                      'dd-MM-yyyy',
+                                                                    ).format(
+                                                                      purchase
+                                                                          .createdAt,
+                                                                    ),
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    DateFormat(
+                                                                      'dd-MM-yyyy',
+                                                                    ).format(
+                                                                      purchase
+                                                                          .trip
+                                                                          .expirationDate,
+                                                                    ),
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+
+                                                                  Text(
+                                                                    purchase
+                                                                        .trip
+                                                                        .city,
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+
+                                                                  Row(
+                                                                    children: [
+                                                                      Text(
+                                                                        purchase
+                                                                            .trip
+                                                                            .country,
+                                                                        style: TextStyle(
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        width:
+                                                                            8,
+                                                                      ),
+                                                                      CountryFlag.fromCountryCode(
+                                                                        purchase
+                                                                            .trip
+                                                                            .countryCode,
+                                                                        height:
+                                                                            15,
+                                                                        width:
+                                                                            20,
+                                                                        shape:
+                                                                            const Circle(),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "${purchase.totalPayment.toStringAsFixed(2)} €",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    "${purchase.numberOfTickets}",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                  SizedBox(
+                                                                    height: 8,
+                                                                  ),
+                                                                  Text(
+                                                                    purchase.discount !=
+                                                                            null
+                                                                        ? "${purchase.discount!.toStringAsFixed(2)} %"
+                                                                        : "0.00%",
+                                                                    style: TextStyle(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ],
                                                               ),
                                                             ],
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            "Created at: ${DateFormat('dd-MM-yyyy').format(purchase.createdAt)}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            "Expires at: ${DateFormat('dd-MM-yyyy').format(purchase.trip.expirationDate)}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            "Destination: ${purchase.trip.city}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Row(
-                                                            children: [
-                                                              Text(
-                                                                "Country:",
-                                                                style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 8,
-                                                              ),
-                                                              Text(
-                                                                purchase
-                                                                    .trip
-                                                                    .country,
-                                                                style: TextStyle(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 8,
-                                                              ),
-                                                              CountryFlag.fromCountryCode(
-                                                                purchase
-                                                                    .trip
-                                                                    .countryCode,
-                                                                height: 15,
-                                                                width: 20,
-                                                                shape:
-                                                                    const Circle(),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            "Payment: ${purchase.totalPayment.toStringAsFixed(2)} €",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            "Ticket count: ${purchase.numberOfTickets}",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                          SizedBox(height: 8),
-                                                          Text(
-                                                            purchase.discount !=
-                                                                    null
-                                                                ? "Discount: ${purchase.discount!.toStringAsFixed(2)} %"
-                                                                : "Discount: 0.00%",
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
                                                           ),
                                                           Spacer(),
                                                           Row(

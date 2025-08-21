@@ -21,7 +21,7 @@ namespace tripTicket.Services.Services
         public async Task UpdateUserRecommendationsAsync(int userId)
         {
             var purchasedTrips = await Context.Purchases
-                .Where(p => p.UserId == userId && p.Status == "complete")
+                .Where(p => p.UserId == userId)
                 .Select(p => p.Trip)
                 .ToListAsync();
 

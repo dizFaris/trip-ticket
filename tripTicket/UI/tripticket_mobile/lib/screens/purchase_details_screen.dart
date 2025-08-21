@@ -365,9 +365,9 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                           color: Colors.black,
                                         ),
                                       ),
+                                      const SizedBox(height: 4),
                                     ],
                                   ),
-                                const SizedBox(height: 4),
                                 if (widget.purchase.trip.cancellationFee !=
                                     null)
                                   Row(
@@ -392,9 +392,9 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                           color: Colors.black,
                                         ),
                                       ),
+                                      const SizedBox(height: 4),
                                     ],
                                   ),
-                                const SizedBox(height: 4),
                                 Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -490,10 +490,6 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                             Navigator.of(ctx).pop();
                                             _cancelPurchase();
                                           },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                AppColors.primaryRed,
-                                          ),
                                           child: const Text("Yes"),
                                         ),
                                       ],
