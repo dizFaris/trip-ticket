@@ -1,5 +1,4 @@
-﻿using EasyNetQ;
-using MapsterMapper;
+﻿using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -56,7 +55,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                     TripCountry = purchase.Trip.City.Country.Name
                 };
 
-                _messageService.Publish(message);
+                _messageService.Publish(message, "trip_service");
 
                 var recommendationService = new RecommendationService(Context);
                 await recommendationService.UpdateUserRecommendationsAsync(purchase.UserId);

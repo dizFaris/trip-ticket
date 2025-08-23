@@ -8,6 +8,6 @@ namespace tripTicket.Services.Interfaces
 {
     public interface IMessageService
     {
-        void Publish<T>(T message);
+        void Publish<T>(T message, string queueName);
     }
 }

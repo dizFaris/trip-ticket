@@ -1,212 +1,192 @@
-﻿using EasyNetQ;
+﻿using DotNetEnv;
 using tripTicket.Subscriber.MailSenderService;
-using DotNetEnv;
-using tripTicket.Subscriber;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+using System.Text;
+using Newtonsoft.Json;
 using tripTicket.Model.Messages;
+using tripTicket.Subscriber;
 
-Console.WriteLine("Starting TripTicket Mail Listener...");
 Env.Load();
-
 var mailSender = new MailSenderService();
 
+Console.WriteLine("Starting TripTicket Mail Listener...");
+
 var purchaseTemplatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PurchaseSuccessful.html");
-var purchaseTemplate = await File.ReadAllTextAsync(purchaseTemplatePath);
-
 var canceledTemplatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PurchaseCanceled.html");
-var canceledTemplate = await File.ReadAllTextAsync(canceledTemplatePath);
-
 var expiredTemplatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PurchaseExpired.html");
-var expiredTemplate = await File.ReadAllTextAsync(expiredTemplatePath);
-
 var completeTemplatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "PurchaseComplete.html");
-var completeTemplate = await File.ReadAllTextAsync(completeTemplatePath);
-
 var supportTicketReplyTemplatePath = Path.Combine(AppContext.BaseDirectory, "Templates", "SupportTicketReply.html");
+
+var purchaseTemplate = await File.ReadAllTextAsync(purchaseTemplatePath);
+var canceledTemplate = await File.ReadAllTextAsync(canceledTemplatePath);
+var expiredTemplate = await File.ReadAllTextAsync(expiredTemplatePath);
+var completeTemplate = await File.ReadAllTextAsync(completeTemplatePath);
 var supportTicketReplyTemplate = await File.ReadAllTextAsync(supportTicketReplyTemplatePath);
 
-
-IBus bus = null;
-int retries = 5;
-for (int i = 0; i < retries; i++)
+var factory = new ConnectionFactory()
 {
+    HostName = Environment.GetEnvironmentVariable("_rabbitMqHost") ?? "localhost",
+    UserName = Environment.GetEnvironmentVariable("_rabbitMqUser") ?? "guest",
+    Password = Environment.GetEnvironmentVariable("_rabbitMqPassword") ?? "guest",
+    Port = int.Parse(Environment.GetEnvironmentVariable("_rabbitMqPort") ?? "5672")
+};
+
+using var connection = factory.CreateConnection();
+using var channel = connection.CreateModel();
+
+string[] queues = { "trip_service", "trip_service_cancel", "trip_service_expire", "trip_service_complete", "trip_service_support_ticket" };
+foreach (var q in queues)
+{
+    channel.QueueDeclare(queue: q, durable: false, exclusive: false, autoDelete: false, arguments: null);
+}
+
+var consumer = new EventingBasicConsumer(channel);
+consumer.Received += async (sender, args) =>
+{
+    var messageBody = Encoding.UTF8.GetString(args.Body.ToArray());
     try
     {
-        bus = RabbitHutch.CreateBus("host=localhost");
-        Console.WriteLine("Successfully connected to RabbitMQ");
-        break;
+        switch (args.RoutingKey)
+        {
+            case "trip_service":
+                var purchase = JsonConvert.DeserializeObject<PurchaseSuccessful>(messageBody);
+                if (purchase != null)
+                {
+                    Console.WriteLine($"Purchase successful: {purchase.PurchaseId}");
+                    var filledHtml = purchaseTemplate
+                        .Replace("{{Name}}", purchase.Name)
+                        .Replace("{{PurchaseId}}", purchase.PurchaseId.ToString())
+                        .Replace("{{TripCity}}", purchase.TripCity)
+                        .Replace("{{TripCountry}}", purchase.TripCountry)
+                        .Replace("{{DepartureDate}}", purchase.DepartureDate.ToString("yyyy-MM-dd"))
+                        .Replace("{{NumberOfTickets}}", purchase.NumberOfTickets.ToString())
+                        .Replace("{{TotalPayment}}", purchase.TotalPayment.ToString("F2"));
+
+                    var email = new Email
+                    {
+                        EmailTo = purchase.Email,
+                        ReceiverName = purchase.Name ?? "Customer",
+                        Subject = "Your TripTicket Purchase is Confirmed!",
+                        Message = filledHtml
+                    };
+                    await mailSender.SendEmail(email);
+                }
+                break;
+
+            case "trip_service_cancel":
+                var canceled = JsonConvert.DeserializeObject<PurchaseCanceled>(messageBody);
+                if (canceled != null)
+                {
+                    Console.WriteLine($"Purchase canceled: {canceled.PurchaseId}");
+                    var filledHtml = canceledTemplate
+                        .Replace("{{Name}}", canceled.Name)
+                        .Replace("{{PurchaseId}}", canceled.PurchaseId.ToString())
+                        .Replace("{{RefundAmount}}", canceled.RefundAmount.ToString("F2"))
+                        .Replace("{{TripCity}}", canceled.TripCity)
+                        .Replace("{{TripCountry}}", canceled.TripCountry)
+                        .Replace("{{DepartureDate}}", canceled.DepartureDate.ToString("yyyy-MM-dd"))
+                        .Replace("{{NumberOfTickets}}", canceled.NumberOfTickets.ToString())
+                        .Replace("{{TotalPayment}}", canceled.TotalPayment.ToString("F2"));
+
+                    var email = new Email
+                    {
+                        EmailTo = canceled.Email,
+                        ReceiverName = canceled.Name ?? "Customer",
+                        Subject = "Your TripTicket Purchase Has Been Canceled",
+                        Message = filledHtml
+                    };
+                    await mailSender.SendEmail(email);
+                }
+                break;
+
+            case "trip_service_expire":
+                var expired = JsonConvert.DeserializeObject<PurchaseExpired>(messageBody);
+                if (expired != null)
+                {
+                    Console.WriteLine($"Purchase expired: {expired.PurchaseId}");
+                    var filledHtml = expiredTemplate
+                        .Replace("{{Name}}", expired.Name)
+                        .Replace("{{PurchaseId}}", expired.PurchaseId.ToString())
+                        .Replace("{{TripCity}}", expired.TripCity)
+                        .Replace("{{TripCountry}}", expired.TripCountry)
+                        .Replace("{{DepartureDate}}", expired.DepartureDate.ToString("yyyy-MM-dd"))
+                        .Replace("{{NumberOfTickets}}", expired.NumberOfTickets.ToString())
+                        .Replace("{{TotalPayment}}", expired.TotalPayment.ToString("F2"));
+
+                    var email = new Email
+                    {
+                        EmailTo = expired.Email,
+                        ReceiverName = expired.Name ?? "Customer",
+                        Subject = "Your TripTicket Purchase Has Expired",
+                        Message = filledHtml
+                    };
+                    await mailSender.SendEmail(email);
+                }
+                break;
+
+            case "trip_service_complete":
+                var complete = JsonConvert.DeserializeObject<PurchaseCompleted>(messageBody);
+                if (complete != null)
+                {
+                    Console.WriteLine($"Purchase complete: {complete.PurchaseId}");
+                    var filledHtml = completeTemplate
+                        .Replace("{{Name}}", complete.Name)
+                        .Replace("{{PurchaseId}}", complete.PurchaseId.ToString())
+                        .Replace("{{TripCity}}", complete.TripCity)
+                        .Replace("{{TripCountry}}", complete.TripCountry)
+                        .Replace("{{DepartureDate}}", complete.DepartureDate.ToString("yyyy-MM-dd"))
+                        .Replace("{{NumberOfTickets}}", complete.NumberOfTickets.ToString())
+                        .Replace("{{TotalPayment}}", complete.TotalPayment.ToString("F2"));
+
+                    var email = new Email
+                    {
+                        EmailTo = complete.Email,
+                        ReceiverName = complete.Name ?? "Customer",
+                        Subject = "Your TripTicket Purchase is Complete",
+                        Message = filledHtml
+                    };
+                    await mailSender.SendEmail(email);
+                }
+                break;
+
+            case "trip_service_support_ticket":
+                var reply = JsonConvert.DeserializeObject<SupportTicketReply>(messageBody);
+                if (reply != null)
+                {
+                    Console.WriteLine($"Support ticket reply: {reply.TicketId}");
+                    var filledHtml = supportTicketReplyTemplate
+                        .Replace("{{Name}}", reply.Name)
+                        .Replace("{{TicketId}}", reply.TicketId.ToString())
+                        .Replace("{{Subject}}", reply.Subject)
+                        .Replace("{{Message}}", reply.Message);
+
+                    var email = new Email
+                    {
+                        EmailTo = reply.Email,
+                        ReceiverName = reply.Name ?? "Customer",
+                        Subject = "Trip Ticket Support Reply",
+                        Message = filledHtml
+                    };
+                    await mailSender.SendEmail(email);
+                }
+                break;
+
+            default:
+                Console.WriteLine($"Unknown routing key: {args.RoutingKey}");
+                break;
+        }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Failed to connect to RabbitMQ (attempt {i + 1}): {ex.Message}");
-        await Task.Delay(5000);
+        Console.WriteLine($"Error processing message from queue {args.RoutingKey}: {ex}");
     }
-}
+};
 
-if (bus != null)
+foreach (var q in queues)
 {
-    try
-    {
-        await bus.PubSub.SubscribeAsync<PurchaseSuccessful>("trip_service", async msg =>
-        {
-            try
-            {
-                Console.WriteLine($"Purchase successful. Purchase ID: {msg.PurchaseId}");
-
-                var filledHtml = purchaseTemplate
-                    .Replace("{{Name}}", msg.Name)
-                    .Replace("{{PurchaseId}}", msg.PurchaseId.ToString())
-                    .Replace("{{TripCity}}", msg.TripCity)
-                    .Replace("{{TripCountry}}", msg.TripCountry)
-                    .Replace("{{DepartureDate}}", msg.DepartureDate.ToString("yyyy-MM-dd"))
-                    .Replace("{{NumberOfTickets}}", msg.NumberOfTickets.ToString())
-                    .Replace("{{TotalPayment}}", msg.TotalPayment.ToString("F2"));
-
-                var email = new Email
-                {
-                    EmailTo = msg.Email,
-                    ReceiverName = msg.Name ?? "Customer",
-                    Subject = "Your TripTicket Purchase is Confirmed!",
-                    Message = filledHtml
-                };
-
-                await mailSender.SendEmail(email);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing PurchaseSuccessful message: {ex}");
-            }
-        });
-
-        await bus.PubSub.SubscribeAsync<PurchaseCanceled>("trip_service_cancel", async msg =>
-        {
-            try
-            {
-                Console.WriteLine($"Purchase canceled. Purchase ID: {msg.PurchaseId}");
-
-                var filledHtml = canceledTemplate
-                    .Replace("{{Name}}", msg.Name)
-                    .Replace("{{PurchaseId}}", msg.PurchaseId.ToString())
-                    .Replace("{{RefundAmount}}", msg.RefundAmount.ToString("F2"))
-                    .Replace("{{TripCity}}", msg.TripCity)
-                    .Replace("{{TripCountry}}", msg.TripCountry)
-                    .Replace("{{DepartureDate}}", msg.DepartureDate.ToString("yyyy-MM-dd"))
-                    .Replace("{{NumberOfTickets}}", msg.NumberOfTickets.ToString())
-                    .Replace("{{TotalPayment}}", msg.TotalPayment.ToString("F2"));
-
-                var email = new Email
-                {
-                    EmailTo = msg.Email,
-                    ReceiverName = msg.Name ?? "Customer",
-                    Subject = "Your TripTicket Purchase Has Been Canceled",
-                    Message = filledHtml
-                };
-
-                await mailSender.SendEmail(email);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing PurchaseCanceled message: {ex}");
-            }
-        });
-
-        await bus.PubSub.SubscribeAsync<PurchaseExpired>("trip_service_expire", async msg =>
-        {
-            try
-            {
-                Console.WriteLine($"Purchase expired. Purchase ID: {msg.PurchaseId}");
-
-                var filledHtml = expiredTemplate
-                    .Replace("{{Name}}", msg.Name)
-                    .Replace("{{PurchaseId}}", msg.PurchaseId.ToString())
-                    .Replace("{{TripCity}}", msg.TripCity)
-                    .Replace("{{TripCountry}}", msg.TripCountry)
-                    .Replace("{{DepartureDate}}", msg.DepartureDate.ToString("yyyy-MM-dd"))
-                    .Replace("{{NumberOfTickets}}", msg.NumberOfTickets.ToString())
-                    .Replace("{{TotalPayment}}", msg.TotalPayment.ToString("F2"));
-
-                var email = new Email
-                {
-                    EmailTo = msg.Email,
-                    ReceiverName = msg.Name ?? "Customer",
-                    Subject = "Your TripTicket Purchase Has Expired",
-                    Message = filledHtml
-                };
-
-                await mailSender.SendEmail(email);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing PurchaseExpired message: {ex}");
-            }
-        });
-
-        await bus.PubSub.SubscribeAsync<PurchaseCompleted>("trip_service_complete", async msg =>
-        {
-            try
-            {
-                Console.WriteLine($"Purchase complete. Purchase ID: {msg.PurchaseId}");
-
-                var filledHtml = completeTemplate
-                    .Replace("{{Name}}", msg.Name)
-                    .Replace("{{PurchaseId}}", msg.PurchaseId.ToString())
-                    .Replace("{{TripCity}}", msg.TripCity)
-                    .Replace("{{TripCountry}}", msg.TripCountry)
-                    .Replace("{{DepartureDate}}", msg.DepartureDate.ToString("yyyy-MM-dd"))
-                    .Replace("{{NumberOfTickets}}", msg.NumberOfTickets.ToString())
-                    .Replace("{{TotalPayment}}", msg.TotalPayment.ToString("F2"));
-
-                var email = new Email
-                {
-                    EmailTo = msg.Email,
-                    ReceiverName = msg.Name ?? "Customer",
-                    Subject = "Your TripTicket Purchase is Complete",
-                    Message = filledHtml
-                };
-
-                await mailSender.SendEmail(email);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing PurchaseCompleted message: {ex}");
-            }
-        });
-
-        await bus.PubSub.SubscribeAsync<SupportTicketReply>("trip_service_support_ticket", async msg =>
-        {
-            try
-            {
-                Console.WriteLine($"Support ticket reply. Support ticket ID: {msg.TicketId}");
-
-                var filledHtml = supportTicketReplyTemplate
-                    .Replace("{{Name}}", msg.Name)
-                    .Replace("{{TicketId}}", msg.TicketId.ToString())
-                    .Replace("{{Subject}}", msg.Subject)
-                    .Replace("{{Message}}", msg.Message);
-
-                var email = new Email
-                {
-                    EmailTo = msg.Email,
-                    ReceiverName = msg.Name ?? "Customer",
-                    Subject = "Trip Ticket Support Reply",
-                    Message = filledHtml
-                };
-
-                await mailSender.SendEmail(email);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error processing SupportTicketReply message: {ex}");
-            }
-        });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"RabbitMQ is not available. Skipping subscriptions: {ex.Message}");
-    }
-}
-else
-{
-    Console.WriteLine("Could not create bus. No subscriptions will be made.");
+    channel.BasicConsume(queue: q, autoAck: true, consumer: consumer);
 }
 
-Console.ReadLine();
+Console.WriteLine("Listening for all messages...");
+Thread.Sleep(Timeout.Infinite);

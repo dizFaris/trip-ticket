@@ -1,4 +1,5 @@
-﻿using EasyNetQ;
+﻿using Newtonsoft.Json;
+using RabbitMQ.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,38 +9,40 @@ using tripTicket.Services.Interfaces;
 
 namespace tripTicket.Services.Services
 {
-    public class RabbitMqBus : IMessageService, IDisposable
+    public class MessageService :  IMessageService
     {
-        private readonly IBus _bus;
+        private readonly string _hostname = Environment.GetEnvironmentVariable("_rabbitMqHost") ?? "localhost";
+        private readonly string _username = Environment.GetEnvironmentVariable("_rabbitMqUser") ?? "guest";
+        private readonly string _password = Environment.GetEnvironmentVariable("_rabbitMqPassword") ?? "guest";
+        private readonly int _port = int.Parse(Environment.GetEnvironmentVariable("_rabbitMqPort") ?? "5672");
 
-        public RabbitMqBus(string connectionString)
+        public void Publish<T>(T message, string queueName)
         {
             try
             {
-                _bus = RabbitHutch.CreateBus(connectionString);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to connect to RabbitMQ: {ex.Message}");
-                throw;
-            }
-        }
+                var factory = new ConnectionFactory()
+                {
+                    HostName = _hostname,
+                    UserName = _username,
+                    Password = _password,
+                    Port = _port
+                };
 
-        public void Publish<T>(T message)
-        {
-            try
-            {
-                _bus.PubSub.Publish(message);
+                using var connection = factory.CreateConnection();
+                using var channel = connection.CreateModel();
+
+                channel.QueueDeclare(queue: queueName, durable: false, exclusive: false, autoDelete: false, arguments: null);
+
+                var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(message));
+
+                channel.BasicPublish(exchange: "", routingKey: queueName, basicProperties: null, body: body);
+
+                Console.WriteLine($"Message sent to queue {queueName}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to publish message: {ex.Message}");
             }
-        }
-
-        public void Dispose()
-        {
-            _bus?.Dispose();
         }
     }
 }

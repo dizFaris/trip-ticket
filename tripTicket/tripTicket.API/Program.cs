@@ -36,20 +36,17 @@ builder.Services.AddTransient<IRecommendationService, RecommendationService>();
 builder.Services.AddTransient<ISupportTicketService, SupportTicketService>();
 builder.Services.AddTransient<ISupportReplyService, SupportReplyService>();
 builder.Services.AddTransient<ITripReviewService, TripReviewService>();
+builder.Services.AddTransient<IMessageService, MessageService>();
 builder.Services.AddTransient<ITransactionService>(sp =>
 {
     var config = sp.GetRequiredService<IConfiguration>();
     var context = sp.GetRequiredService<TripTicketDbContext>();
     var mapper = sp.GetRequiredService<IMapper>();
 
-    var secretKey = config["Stripe:SecretKey"]
-                    ?? Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY")
-                    ?? "sk_test_placeholder";
+    var secretKey = Environment.GetEnvironmentVariable("_stripe") ?? config["Stripe:SecretKey"] ?? "sk_test_placeholder";
 
     return new TransactionService(secretKey, context, mapper);
 });
-builder.Services.AddSingleton<IMessageService>(sp =>
-    new RabbitMqBus("host=localhost"));
 
 // Trip state machine
 builder.Services.AddTransient<BaseTripState>();

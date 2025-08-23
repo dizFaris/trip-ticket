@@ -113,7 +113,7 @@ namespace tripTicket.Services.Services
                 filteredQuery = filteredQuery.Where(p => p.DepartureDate <= search.ToDate.Value);
             }
 
-            filteredQuery = filteredQuery.OrderByDescending(p => p.DepartureDate);
+            filteredQuery = filteredQuery.OrderBy(p => p.DepartureDate);
 
             return filteredQuery;
         }

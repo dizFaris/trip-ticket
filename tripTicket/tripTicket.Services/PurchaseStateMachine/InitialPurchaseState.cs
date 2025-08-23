@@ -1,5 +1,4 @@
-﻿using EasyNetQ;
-using MapsterMapper;
+﻿using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

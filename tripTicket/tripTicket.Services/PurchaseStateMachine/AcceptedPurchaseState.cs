@@ -1,5 +1,4 @@
 ﻿using Azure.Core;
-using EasyNetQ;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -109,7 +108,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                     TripCountry = entity.Trip.City.Country.Name
                 };
 
-                _messageService.Publish(message);
+                _messageService.Publish(message, "trip_service_cancel");
             }
 
             var purchase = Mapper.Map<Model.Models.Purchase>(entity);
@@ -153,7 +152,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                 TripCountry = trip.City.Country.Name
             };
 
-            _messageService.Publish(message);
+            _messageService.Publish(message, "trip_service_complete");
 
             return purchase;
         }
@@ -186,7 +185,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                     TripCountry = purchase.Trip.City.Country.Name
                 };
 
-                _messageService.Publish(message);
+                _messageService.Publish(message, "trip_service_expire");
             }
 
             Context.SaveChanges();

@@ -237,6 +237,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                   initialDate: _fromDate,
                   allowPastDates: true,
                   placeHolder: 'Date from',
+                  firstDate: DateTime(2025),
                   lastDate: _toDate ?? DateTime(2100),
                   onDateSelected: (date) {
                     setState(() {
@@ -249,7 +250,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                   initialDate: _toDate,
                   allowPastDates: true,
                   placeHolder: 'Date to',
-                  firstDate: _fromDate ?? DateTime(1950),
+                  firstDate: _fromDate ?? DateTime(2025),
                   onDateSelected: (date) {
                     setState(() {
                       _toDate = date;

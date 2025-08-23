@@ -23,7 +23,7 @@ services:
         timeout: 10s
         retries: 10
     networks:
-        - tripticketnet2025
+      - tripticketnet2025
 
   tripticket-sql:
     image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
@@ -58,6 +58,7 @@ services:
       - _rabbitMqPassword=${_rabbitMqPassword}
       - _rabbitMqPort=${_rabbitMqPort}
       - _saPassword=${_saPassword}
+      - _stripe=${_stripe}
     ports:
       - 5255:5255
     networks:
@@ -70,9 +71,9 @@ services:
     restart: on-failure
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: tripTicket.Subscriber/Dockerfile
     depends_on:
-      - rabbitmq      
+      - rabbitmq
     environment:
         - _fromAddress=${_fromAddress}
         - _password=${_password}

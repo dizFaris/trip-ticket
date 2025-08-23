@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using EasyNetQ.Internals;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
 
@@ -42,9 +41,9 @@ public partial class TripTicketDbContext : DbContext
     public virtual DbSet<SupportReply> SupportReplies { get; set; }
     public virtual DbSet<TripReview> TripReviews { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=localhost, 1433;Initial Catalog=TripTicketDB; user=sa; Password=QWEasd123!; TrustServerCertificate=True");
+//    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+//#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+//        => optionsBuilder.UseSqlServer("Data Source=localhost, 1433;Initial Catalog=TripTicketDB; user=sa; Password=QWEasd123!; TrustServerCertificate=True");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

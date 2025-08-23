@@ -58,7 +58,7 @@ namespace tripTicket.Services.Services
                 Subject = ticket.Subject,
             };
 
-            _messageService.Publish(message);
+            _messageService.Publish(message, "trip_service_support_ticket");
 
             return reply;
         }
