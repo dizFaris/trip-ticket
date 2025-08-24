@@ -167,8 +167,10 @@ using (var scope = app.Services.CreateScope())
     var dataContext = scope.ServiceProvider.GetRequiredService<TripTicketDbContext>();
     dataContext.Database.Migrate();
 
+    Console.WriteLine("[Recommendation service] Training or loading model, please wait...");
     var recommendationService = new RecommendationService(dataContext);
     recommendationService.TrainModel();
+    Console.WriteLine("[Recommendation service] Model is ready.");
 }
 
 app.UseHangfireDashboard();
