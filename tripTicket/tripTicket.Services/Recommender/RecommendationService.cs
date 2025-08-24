@@ -14,7 +14,7 @@ namespace tripTicket.Services.Recommender
     public class RecommendationService : IRecommendationService
     {
         private readonly TripTicketDbContext _context;
-        private static MLContext _mlContext = new MLContext();
+        private static MLContext _mlContext = null!;
         private static ITransformer _model = null!;
         private static readonly object _isLocked = new object();
         private const string ModelFilePath = "trip-recommender.zip";
@@ -28,6 +28,9 @@ namespace tripTicket.Services.Recommender
         {
             lock (_isLocked)
             {
+                if (_mlContext == null)
+                    _mlContext = new MLContext();
+
                 if (File.Exists(ModelFilePath))
                 {
                     using var stream = new FileStream(ModelFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -74,20 +77,60 @@ namespace tripTicket.Services.Recommender
             var predictionEngine = _mlContext.Model.CreatePredictionEngine<UserTripInteraction, RecommendationPrediction>(_model);
 
             var allTrips = _context.Trips.Where(t => t.TripStatus == "upcoming").ToList();
-            var purchasedTripIds = _context.Purchases.Where(p => p.UserId == userId).Select(p => p.TripId).ToHashSet();
+            var purchasedTrips = _context.Purchases
+                .Where(p => p.UserId == userId)
+                .Include(p => p.Trip)
+                    .ThenInclude(t => t.City)
+                    .ThenInclude(c => c.Country)
+                .Select(p => p.Trip)
+                .ToList();
 
-            var scoredTrips = allTrips
-                .Where(t => !purchasedTripIds.Contains(t.Id))
+
+            var tripFeatures = allTrips.Select(t => new TripFeatureVector
+            {
+                Trip = t,
+                Vector = BuildTripVector(t)
+            }).ToList();
+
+            if (!tripFeatures.Any())
+                return;
+
+            var userProfileVector = purchasedTrips
+                .Select(BuildTripVector)
+                .Aggregate(new float[tripFeatures.First().Vector.Length], (acc, vec) =>
+                {
+                    for (int i = 0; i < vec.Length; i++)
+                        acc[i] += vec[i];
+                    return acc;
+                });
+
+            if (purchasedTrips.Any())
+            {
+                for (int i = 0; i < userProfileVector.Length; i++)
+                    userProfileVector[i] /= purchasedTrips.Count;
+            }
+
+            var purchasedTripIds = purchasedTrips.Select(t => t.Id).ToHashSet();
+
+            var scoredTrips = tripFeatures
+                .Where(t => !purchasedTripIds.Contains(t.Trip.Id))
                 .Select(t => new
                 {
-                    Trip = t,
-                    Score = predictionEngine.Predict(new UserTripInteraction
+                    Trip = t.Trip,
+                    ContentScore = CosineSimilarity(userProfileVector, t.Vector),
+                    CFScore = predictionEngine.Predict(new UserTripInteraction
                     {
                         UserId = (uint)userId,
-                        TripId = (uint)t.Id
+                        TripId = (uint)t.Trip.Id
                     }).Score
                 })
-                .OrderByDescending(x => x.Score)
+
+                .Select(t => new
+                {
+                    t.Trip,
+                    Score = t.ContentScore * 0.7f + t.CFScore * 0.3f
+                })
+                .OrderByDescending(t => t.Score)
                 .Take(numRecommendations)
                 .ToList();
 
@@ -105,11 +148,49 @@ namespace tripTicket.Services.Recommender
             await _context.UserRecommendations.AddRangeAsync(newRecs);
             await _context.SaveChangesAsync();
         }
-    }
 
-    public class RecommendationPrediction
-    {
-        public float Score { get; set; }
+        private float[] BuildTripVector(Trip trip)
+        {
+            var tripTypes = new[] {
+                    "Romantic",
+                    "Adventure",
+                    "Cultural",
+                    "Relaxing",
+                    "Family",
+                    "Luxury",
+                    "Eco-tourism",
+                    "Road Trip",
+                    "Wellness",
+                    "Historical",
+                    "City Tour",
+                    "Safari",
+                    "Nature",
+                    "Beach",
+                    "Vacation"
+            };
+            float[] vector = new float[tripTypes.Length + 2];
+
+            for (int i = 0; i < tripTypes.Length; i++)
+                vector[i] = trip.TripType == tripTypes[i] ? 1f : 0f;
+
+            vector[tripTypes.Length] = (float)trip.TicketPrice / 1000f;
+
+            vector[tripTypes.Length + 1] = (float)(trip.ReturnDate.DayNumber - trip.DepartureDate.DayNumber) / 30f;
+
+            return vector;
+        }
+
+        private float CosineSimilarity(float[] v1, float[] v2)
+        {
+            float dot = 0, normA = 0, normB = 0;
+            for (int i = 0; i < v1.Length; i++)
+            {
+                dot += v1[i] * v2[i];
+                normA += v1[i] * v1[i];
+                normB += v2[i] * v2[i];
+            }
+            return dot / ((float)Math.Sqrt(normA) * (float)Math.Sqrt(normB) + 1e-5f);
+        }
     }
 
     public class UserTripInteraction
@@ -121,5 +202,16 @@ namespace tripTicket.Services.Recommender
         public uint TripId { get; set; }
 
         public float Label { get; set; }
+    }
+
+    public class RecommendationPrediction
+    {
+        public float Score { get; set; }
+    }
+
+    public class TripFeatureVector
+    {
+        public Trip Trip { get; set; } = null!;
+        public float[] Vector { get; set; } = null!;
     }
 }

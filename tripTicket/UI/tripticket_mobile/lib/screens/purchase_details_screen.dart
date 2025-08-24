@@ -267,7 +267,7 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(
                                       width: 180,
@@ -279,7 +279,7 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                         ),
                                       ),
                                     ),
-                                    Row(
+                                    Column(
                                       children: [
                                         Text(
                                           "${widget.purchase.trip.city} / ",
@@ -288,19 +288,23 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                                             fontSize: 20,
                                           ),
                                         ),
-                                        CountryFlag.fromCountryCode(
-                                          widget.purchase.trip.countryCode,
-                                          height: 16,
-                                          width: 20,
-                                          shape: const Circle(),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          widget.purchase.trip.country,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20,
-                                          ),
+                                        Row(
+                                          children: [
+                                            CountryFlag.fromCountryCode(
+                                              widget.purchase.trip.countryCode,
+                                              height: 16,
+                                              width: 20,
+                                              shape: const Circle(),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              widget.purchase.trip.country,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 20,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
@@ -448,10 +452,10 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                         SizedBox(height: 16),
                         Center(
                           child: BarcodeWidget(
-                            barcode: Barcode.code128(),
+                            barcode: Barcode.qrCode(),
                             data: "${widget.purchase.id}",
-                            width: 200,
-                            height: 80,
+                            width: 100,
+                            height: 100,
                             drawText: false,
                           ),
                         ),
@@ -460,78 +464,82 @@ class _PurchaseDetailsScreenState extends State<PurchaseDetailsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             if (widget.purchase.status == "accepted")
-                              ElevatedButton(
+                              SizedBox(
+                                width: 160,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    backgroundColor: AppColors.primaryRed,
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text("Cancel Purchase"),
+                                        content: const Text(
+                                          "Are you sure you want to cancel this purchase?",
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.of(ctx).pop(),
+                                            child: const Text("No"),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              Navigator.of(ctx).pop();
+                                              _cancelPurchase();
+                                            },
+                                            child: const Text("Yes"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                  child: const Text(
+                                    "Cancel purchase",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            SizedBox(
+                              width: 160,
+                              child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 30,
+                                    vertical: 12,
                                   ),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  backgroundColor: AppColors.primaryRed,
+                                  backgroundColor: AppColors.primaryGreen,
                                 ),
                                 onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                      title: const Text("Cancel Purchase"),
-                                      content: const Text(
-                                        "Are you sure you want to cancel this purchase?",
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TripDetailsScreen(
+                                        tripId: widget.purchase.trip.id,
                                       ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.of(ctx).pop(),
-                                          child: const Text("No"),
-                                        ),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.of(ctx).pop();
-                                            _cancelPurchase();
-                                          },
-                                          child: const Text("Yes"),
-                                        ),
-                                      ],
                                     ),
                                   );
                                 },
                                 child: const Text(
-                                  "Cancel",
+                                  "Trip details",
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: AppColors.primaryYellow,
                                   ),
-                                ),
-                              ),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 8,
-                                  horizontal: 20,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                backgroundColor: AppColors.primaryGreen,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TripDetailsScreen(
-                                      tripId: widget.purchase.trip.id,
-                                    ),
-                                  ),
-                                );
-                              },
-                              child: const Text(
-                                "Trip details",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryYellow,
                                 ),
                               ),
                             ),
