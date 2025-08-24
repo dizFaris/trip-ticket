@@ -468,7 +468,7 @@ class _TripsScreenState extends State<TripsScreen> {
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          childAspectRatio: 0.75,
+                          childAspectRatio: 0.73,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                         ),

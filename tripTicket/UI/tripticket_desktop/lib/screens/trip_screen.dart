@@ -55,7 +55,15 @@ class _TripScreenState extends State<TripScreen> {
   bool _isSaving = false;
   bool get _inputEnabled =>
       !_isEditing || (_isEditing && _tripStatus == 'upcoming');
+
   final _formKey = GlobalKey<FormState>();
+  final _countryFieldKey = GlobalKey<FormFieldState<int>>();
+  final _departureCountryFieldKey = GlobalKey<FormFieldState<int>>();
+  final _cityFieldKey = GlobalKey<FormFieldState<int>>();
+  final _departureCityFieldKey = GlobalKey<FormFieldState<int>>();
+  final _tripTypeFieldKey = GlobalKey<FormFieldState<String>>();
+  final _transportTypeFieldKey = GlobalKey<FormFieldState<String>>();
+  final _descriptionFieldKey = GlobalKey<FormFieldState<String>>();
 
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _availableTicketsController =
@@ -184,7 +192,9 @@ class _TripScreenState extends State<TripScreen> {
 
       _descriptionController.text = trip.description!;
 
-      _cancellationFeeController.text = trip.cancellationFee.toString();
+      _cancellationFeeController.text = trip.cancellationFee != null
+          ? trip.cancellationFee.toString()
+          : "0";
 
       _freeCancellationUntil = trip.freeCancellationUntil;
 
@@ -621,6 +631,7 @@ class _TripScreenState extends State<TripScreen> {
     required void Function(int?) onChanged,
     required int? value,
     bool? enabled,
+    GlobalKey<FormFieldState<int>>? fieldKey,
   }) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -630,6 +641,7 @@ class _TripScreenState extends State<TripScreen> {
     return SizedBox(
       width: 256,
       child: DropdownButtonFormField<int>(
+        key: fieldKey,
         decoration: InputDecoration(
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(
@@ -652,7 +664,7 @@ class _TripScreenState extends State<TripScreen> {
           return null;
         },
         value: value,
-        items: _countries.map((country) {
+        items: countries.map((country) {
           return DropdownMenuItem<int>(
             value: country.id,
             child: Row(
@@ -680,9 +692,7 @@ class _TripScreenState extends State<TripScreen> {
         onChanged: (enabled ?? true)
             ? (val) {
                 onChanged(val);
-                if (_formKey.currentState != null) {
-                  _formKey.currentState!.validate();
-                }
+                fieldKey?.currentState?.validate();
               }
             : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
@@ -702,14 +712,17 @@ class _TripScreenState extends State<TripScreen> {
     required void Function(int?) onChanged,
     required int? value,
     bool? enabled,
+    GlobalKey<FormFieldState<int>>? fieldKey,
   }) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
       borderSide: BorderSide.none,
     );
+
     return SizedBox(
       width: 256,
       child: DropdownButtonFormField<int>(
+        key: fieldKey,
         decoration: InputDecoration(
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(
@@ -749,9 +762,7 @@ class _TripScreenState extends State<TripScreen> {
         onChanged: (enabled ?? true)
             ? (val) {
                 onChanged(val);
-                if (_formKey.currentState != null) {
-                  _formKey.currentState!.validate();
-                }
+                fieldKey?.currentState?.validate();
               }
             : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
@@ -772,6 +783,7 @@ class _TripScreenState extends State<TripScreen> {
     required List<T> items,
     required ValueChanged<T?> onChanged,
     bool? enabled,
+    GlobalKey<FormFieldState<T>>? fieldKey,
   }) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -781,6 +793,7 @@ class _TripScreenState extends State<TripScreen> {
     return SizedBox(
       width: 256,
       child: DropdownButtonFormField<T>(
+        key: fieldKey,
         decoration: InputDecoration(
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(
@@ -817,9 +830,7 @@ class _TripScreenState extends State<TripScreen> {
         onChanged: (enabled ?? true)
             ? (val) {
                 onChanged(val);
-                if (_formKey.currentState != null) {
-                  _formKey.currentState!.validate();
-                }
+                fieldKey?.currentState?.validate();
               }
             : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
@@ -844,6 +855,7 @@ class _TripScreenState extends State<TripScreen> {
     required Map<String, IconData> items,
     required ValueChanged<String?> onChanged,
     bool? enabled,
+    GlobalKey<FormFieldState<String>>? fieldKey,
   }) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
@@ -853,6 +865,7 @@ class _TripScreenState extends State<TripScreen> {
     return SizedBox(
       width: 161,
       child: DropdownButtonFormField<String>(
+        key: fieldKey,
         decoration: InputDecoration(
           isDense: true,
           contentPadding: const EdgeInsets.symmetric(
@@ -889,9 +902,7 @@ class _TripScreenState extends State<TripScreen> {
         onChanged: (enabled ?? true)
             ? (val) {
                 onChanged(val);
-                if (_formKey.currentState != null) {
-                  _formKey.currentState!.validate();
-                }
+                fieldKey?.currentState?.validate();
               }
             : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
@@ -983,6 +994,7 @@ class _TripScreenState extends State<TripScreen> {
                                     countries: _countries,
                                     enabled: _inputEnabled,
                                     value: _selectedCountryId,
+                                    fieldKey: _countryFieldKey,
                                     onChanged: (value) async {
                                       var countryCities =
                                           await _getCountryCities(value!);
@@ -1011,8 +1023,11 @@ class _TripScreenState extends State<TripScreen> {
                                   SizedBox(width: 8),
                                   _cityDropdown(
                                     cities: _cities,
-                                    enabled: _inputEnabled,
+                                    enabled:
+                                        _inputEnabled &&
+                                        _selectedCountryId != null,
                                     value: _selectedCityId,
+                                    fieldKey: _cityFieldKey,
                                     onChanged: (value) {
                                       setState(() {
                                         _selectedCityId = value;
@@ -1140,6 +1155,7 @@ class _TripScreenState extends State<TripScreen> {
                                     enabled: _inputEnabled,
                                     value: _tripType,
                                     items: _tripTypes,
+                                    fieldKey: _tripTypeFieldKey,
                                     onChanged: (val) {
                                       setState(() {
                                         _tripType = val;
@@ -1341,6 +1357,7 @@ class _TripScreenState extends State<TripScreen> {
                                     countries: _countries,
                                     enabled: _inputEnabled,
                                     value: _departureCountryId,
+                                    fieldKey: _departureCountryFieldKey,
                                     onChanged: (value) async {
                                       var departureCountryCities =
                                           await _getCountryCities(value!);
@@ -1370,8 +1387,11 @@ class _TripScreenState extends State<TripScreen> {
                                   SizedBox(width: 8),
                                   _cityDropdown(
                                     cities: _departureCities,
-                                    enabled: _inputEnabled,
+                                    enabled:
+                                        _inputEnabled &&
+                                        _departureCountryId != null,
                                     value: _departureCityId,
+                                    fieldKey: _departureCityFieldKey,
                                     onChanged: (value) {
                                       setState(() {
                                         _departureCityId = value;
@@ -1428,11 +1448,12 @@ class _TripScreenState extends State<TripScreen> {
                                     height: 150,
                                     child: TextFormField(
                                       controller: _descriptionController,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
                                       enabled: _inputEnabled,
                                       onChanged: (_) {
-                                        if (_formKey.currentState != null) {
-                                          _formKey.currentState!.validate();
-                                        }
+                                        _descriptionFieldKey.currentState
+                                            ?.validate();
                                       },
                                       validator: (value) {
                                         if (value == null ||
@@ -1487,6 +1508,7 @@ class _TripScreenState extends State<TripScreen> {
                                     value: _transportType,
                                     enabled: _inputEnabled,
                                     items: _transportTypes,
+                                    fieldKey: _transportTypeFieldKey,
                                     onChanged: (val) {
                                       setState(() {
                                         _transportType = val;
@@ -1581,6 +1603,15 @@ class _TripScreenState extends State<TripScreen> {
                                               controller:
                                                   _cancellationFeeController,
                                               enabled: _inputEnabled,
+                                              onChanged: (_) {
+                                                if (_cancellationFeeError !=
+                                                    null) {
+                                                  setState(() {
+                                                    _cancellationFeeError =
+                                                        null;
+                                                  });
+                                                }
+                                              },
                                               inputFormatters: <TextInputFormatter>[
                                                 FilteringTextInputFormatter
                                                     .digitsOnly,
