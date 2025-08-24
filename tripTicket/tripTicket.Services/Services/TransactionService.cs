@@ -63,7 +63,7 @@ namespace tripTicket.Services.Services
 
             if (!string.IsNullOrWhiteSpace(search.FTS))
             {
-                query = query.Where(p => p.Id.ToString().Contains(search.FTS) 
+                query = query.Where(p => p.PurchaseId.ToString().Contains(search.FTS) 
                     || p.StripeTransactionId.ToString().Contains(search.FTS));
             }
 

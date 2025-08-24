@@ -1548,6 +1548,8 @@ class _TripScreenState extends State<TripScreen> {
                                           DatePickerButton(
                                             initialDate: _freeCancellationUntil,
                                             enabled: _inputEnabled,
+                                            allowPastDates: true,
+                                            firstDate: DateTime.now(),
                                             onDateSelected: (date) {
                                               setState(() {
                                                 _freeCancellationUntil = date;

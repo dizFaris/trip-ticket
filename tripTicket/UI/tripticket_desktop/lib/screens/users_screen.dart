@@ -28,14 +28,13 @@ class _UsersScreenState extends State<UsersScreen> {
   int _totalPages = 0;
   List<User> _users = [];
   final _headers = [
-    {'label': 'ID', 'flex': 1},
     {'label': 'Username', 'flex': 1},
     {'label': 'First name', 'flex': 1},
     {'label': 'Last name', 'flex': 1},
     {'label': 'Email', 'flex': 3},
     {'label': 'Phone', 'flex': 1},
     {'label': 'Birth date', 'flex': 1},
-    {'label': 'Created at', 'flex': 2},
+    {'label': 'Created at', 'flex': 1},
     {'label': '', 'flex': 1},
   ];
 
@@ -443,15 +442,6 @@ class _UsersScreenState extends State<UsersScreen> {
                                   children: [
                                     Expanded(
                                       flex: 1,
-                                      child: Text(
-                                        user.id.toString(),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      flex: 1,
                                       child: Text(user.firstName),
                                     ),
                                     Expanded(
@@ -477,7 +467,7 @@ class _UsersScreenState extends State<UsersScreen> {
                                       ),
                                     ),
                                     Expanded(
-                                      flex: 2,
+                                      flex: 1,
                                       child: Text(
                                         user.createdAt.toString().substring(
                                           0,

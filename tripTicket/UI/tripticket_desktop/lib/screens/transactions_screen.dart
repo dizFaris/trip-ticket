@@ -36,7 +36,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
   List<Transaction> _transactions = [];
 
   final _headers = [
-    {'label': 'ID', 'flex': 1},
     {'label': 'Purchase ID', 'flex': 1},
     {'label': 'Type', 'flex': 1},
     {'label': 'Amount', 'flex': 1},
@@ -482,15 +481,6 @@ class _TransactionsScreenState extends State<TransactionsScreen> {
                                 ),
                                 child: Row(
                                   children: [
-                                    Expanded(
-                                      flex: 1,
-                                      child: Text(
-                                        transaction.id.toString(),
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
                                     Expanded(
                                       flex: 1,
                                       child: Text(

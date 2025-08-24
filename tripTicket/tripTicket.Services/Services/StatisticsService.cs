@@ -22,7 +22,7 @@ namespace tripTicket.Services.Services
         public async Task<decimal> GetDailyEarningsAsync(DateTime date)
         {
             var total = await Context.Purchases
-                .Where(p => p.Status == "complete" && p.CreatedAt.Date == date.Date)
+                .Where(p => (p.Status == "complete" || p.Status == "expired") && p.CreatedAt.Date == date.Date)
                 .SumAsync(p => p.TotalPayment);
 
             return total;
@@ -34,7 +34,7 @@ namespace tripTicket.Services.Services
             var end = start.AddMonths(1);
 
             var query = await Context.Purchases
-                .Where(p => p.Status == "complete" && p.CreatedAt >= start && p.CreatedAt < end)
+                .Where(p => (p.Status == "complete" || p.Status == "expired") && p.CreatedAt >= start && p.CreatedAt < end)
                 .GroupBy(p => p.CreatedAt.Date)
                 .Select(g => new
                 {
@@ -63,7 +63,7 @@ namespace tripTicket.Services.Services
             var end = start.AddYears(1);
 
             var query = await Context.Purchases
-                .Where(p => p.Status == "complete" && p.CreatedAt >= start && p.CreatedAt < end)
+                .Where(p => (p.Status == "complete" || p.Status == "expired") && p.CreatedAt >= start && p.CreatedAt < end)
                 .GroupBy(p => new { p.CreatedAt.Year, p.CreatedAt.Month })
                 .Select(g => new
                 {
@@ -99,7 +99,7 @@ namespace tripTicket.Services.Services
             var end = start.AddDays(1);
 
             var total = await Context.Purchases
-                .Where(p => p.Status == "complete" && p.CreatedAt >= start && p.CreatedAt < end)
+                .Where(p => (p.Status == "complete" || p.Status == "expired") && p.CreatedAt >= start && p.CreatedAt < end)
                 .SumAsync(p => (decimal?)p.TotalPayment) ?? 0m;
 
             return EarningsPdfGenerator.GenerateDailyReport(date, total);
@@ -111,7 +111,7 @@ namespace tripTicket.Services.Services
             var end = start.AddYears(1);
 
             var query = await Context.Purchases
-                .Where(p => p.Status == "complete" && p.CreatedAt >= start && p.CreatedAt < end)
+                .Where(p => (p.Status == "complete" || p.Status == "expired") && p.CreatedAt >= start && p.CreatedAt < end)
                 .GroupBy(p => p.CreatedAt.Month)
                 .Select(g => new
                 {
