@@ -314,83 +314,84 @@ class _TicketPurchaseScreenState extends State<TicketPurchaseScreen> {
                           ),
                         Row(
                           children: [
-                            Text(
-                              'Departure date: ',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Departure date: ',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                if (widget.trip.freeCancellationUntil != null)
+                                  Text(
+                                    'Free cancellation until: ',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                if (widget.trip.cancellationFee != null)
+                                  Text(
+                                    'Cancellation fee: ',
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                Text(
+                                  'Available tickets: ',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              widget.trip.departureDate
-                                  .toIso8601String()
-                                  .substring(0, 10),
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                        if (widget.trip.freeCancellationUntil != null)
-                          Row(
-                            children: [
-                              Text(
-                                'Free cancellation until: ',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
+                            SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.trip.departureDate
+                                      .toIso8601String()
+                                      .substring(0, 10),
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                widget.trip.freeCancellationUntil!
-                                    .toIso8601String()
-                                    .substring(0, 10),
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                                if (widget.trip.freeCancellationUntil != null)
+                                  Text(
+                                    widget.trip.freeCancellationUntil!
+                                        .toIso8601String()
+                                        .substring(0, 10),
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                if (widget.trip.cancellationFee != null)
+                                  Text(
+                                    "${widget.trip.cancellationFee}%",
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                Text(
+                                  "${widget.trip.availableTickets}",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        if (widget.trip.cancellationFee != null)
-                          Row(
-                            children: [
-                              Text(
-                                'Cancellation fee: ',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              Text(
-                                "${widget.trip.cancellationFee}%",
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        Row(
-                          children: [
-                            Text(
-                              'Available tickets: ',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                              ),
-                            ),
-                            Text(
-                              "${widget.trip.availableTickets}",
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                              ],
                             ),
                           ],
                         ),
