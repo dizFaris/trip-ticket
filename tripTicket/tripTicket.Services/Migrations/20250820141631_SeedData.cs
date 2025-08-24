@@ -24,7 +24,7 @@ namespace tripTicket.Services.Migrations
                 columns: new[] { "Id", "FirstName", "LastName", "Username", "Email", "Phone", "PasswordHash", "PasswordSalt", "BirthDate", "IsActive", "CreatedAt" },
                 values: new object[,] {
                     { 1, "Admin", "Admin", "admin", "admin@example.com", "1234567890", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), true, DateTime.UtcNow },
-                    { 2, "Test", "User", "testuser", "test@example.com", "1234567890", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), true, DateTime.UtcNow },
+                    { 2, "Test", "User", "test", "test@example.com", "1234567890", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), true, DateTime.UtcNow },
                     { 3, "Faris", "Dizdarevic", "faris", "faris.diz789@gmail.com", "0603360416", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(2000, 1, 1), true, DateTime.UtcNow },
                     { 4, "Emily", "Johnson", "emilyj", "emily.johnson@example.com", "3456789012", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1988, 11, 12), true, DateTime.UtcNow },
                     { 5, "Michael", "Brown", "michaelb", "michael.brown@example.com", "4567890123", "fbUwB9Q69z7aYVUaaw+1o8UTlM0=", "PRnruT43mLsmBSxHAtJ3oQ==", new DateOnly(1992, 3, 3), true, DateTime.UtcNow },
@@ -405,24 +405,20 @@ namespace tripTicket.Services.Migrations
                 columns: new[] { "Id", "UserId", "TripId", "Score", "CreatedAt" },
                 values: new object[,]
                 {
-                    { 10, 2, 4, 0.88m, DateTime.UtcNow },
-                    { 11, 2, 5, 0.81m, DateTime.UtcNow },
-                    { 12, 2, 6, 0.88m, DateTime.UtcNow },
-                    { 13, 2, 7, 0.81m, DateTime.UtcNow },
-                    { 14, 2, 8, 0.75m, DateTime.UtcNow },
-                    { 15, 2, 9, 0.70m, DateTime.UtcNow },
-                    { 16, 2, 10, 0.65m, DateTime.UtcNow },
-                    { 17, 2, 11, 0.58m, DateTime.UtcNow },
-                    { 18, 2, 12, 0.52m, DateTime.UtcNow },
-                    { 19, 3, 4, 0.85m, DateTime.UtcNow },
-                    { 20, 3, 5, 0.77m, DateTime.UtcNow },
-                    { 21, 3, 6, 0.80m, DateTime.UtcNow },
-                    { 22, 3, 7, 0.77m, DateTime.UtcNow },
-                    { 23, 3, 8, 0.73m, DateTime.UtcNow },
-                    { 24, 3, 9, 0.68m, DateTime.UtcNow },
-                    { 25, 3, 10, 0.62m, DateTime.UtcNow },
-                    { 26, 3, 11, 0.57m, DateTime.UtcNow },
-                    { 27, 3, 12, 0.53m, DateTime.UtcNow }
+                    { 10, 2, 5, 0.81m, DateTime.UtcNow },
+                    { 11, 2, 7, 0.88m, DateTime.UtcNow },
+                    { 12, 2, 8, 0.75m, DateTime.UtcNow },
+                    { 13, 2, 9, 0.70m, DateTime.UtcNow },
+                    { 14, 2, 10, 0.65m, DateTime.UtcNow },
+                    { 15, 2, 11, 0.58m, DateTime.UtcNow },
+                    { 16, 2, 12, 0.52m, DateTime.UtcNow },
+                    { 17, 3, 4, 0.85m, DateTime.UtcNow },
+                    { 18, 3, 7, 0.77m, DateTime.UtcNow },
+                    { 19, 3, 8, 0.73m, DateTime.UtcNow },
+                    { 20, 3, 9, 0.68m, DateTime.UtcNow },
+                    { 21, 3, 10, 0.62m, DateTime.UtcNow },
+                    { 22, 3, 11, 0.57m, DateTime.UtcNow },
+                    { 23, 3, 12, 0.53m, DateTime.UtcNow }
                 });
         }
 
