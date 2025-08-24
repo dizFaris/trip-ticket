@@ -55,6 +55,7 @@ class _TripScreenState extends State<TripScreen> {
   bool _isSaving = false;
   bool get _inputEnabled =>
       !_isEditing || (_isEditing && _tripStatus == 'upcoming');
+  final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _availableTicketsController =
@@ -66,6 +67,14 @@ class _TripScreenState extends State<TripScreen> {
       TextEditingController();
   final TextEditingController _minTicketsForDiscountController =
       TextEditingController();
+
+  String? _ticketsError;
+  String? _priceError;
+  String? _departureDateError;
+  String? _returnDateError;
+  String? _cancellationDateError;
+  String? _discountError;
+  String? _cancellationFeeError;
 
   final List<String> _tripTypes = [
     "Romantic",
@@ -258,6 +267,37 @@ class _TripScreenState extends State<TripScreen> {
   }
 
   Future<void> _addNewTrip() async {
+    final tripData = {
+      "CityId": _selectedCityId,
+      "DepartureCityId": _departureCityId,
+      "DepartureDate": _departureDate?.toIso8601String().substring(0, 10),
+      "ReturnDate": _returnDate?.toIso8601String().substring(0, 10),
+      "TripType": _tripType,
+      "TransportType": _transportType,
+      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
+      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
+      "Description": _descriptionController.text,
+      "FreeCancellationUntil": _freeCancellationUntil
+          ?.toIso8601String()
+          .substring(0, 10),
+      "CancellationFee":
+          double.tryParse(_cancellationFeeController.text) ?? 0.0,
+      "MinTicketsForDiscount":
+          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
+      "DiscountPercentage":
+          double.tryParse(_discountPercentageController.text) ?? 0.0,
+      "Photo": _selectedPhoto != null ? base64Encode(_selectedPhoto!) : null,
+      "TripDays": _tripDays,
+    };
+
+    final validationError = _validateTripData(tripData);
+    if (!validationError) {
+      setState(() {
+        _isSaving = false;
+      });
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -283,50 +323,6 @@ class _TripScreenState extends State<TripScreen> {
     setState(() {
       _isSaving = true;
     });
-    final tripData = {
-      "CityId": _selectedCityId,
-      "DepartureCityId": _departureCityId,
-      "DepartureDate": _departureDate?.toIso8601String().substring(0, 10),
-      "ReturnDate": _returnDate?.toIso8601String().substring(0, 10),
-      "TripType": _tripType,
-      "TransportType": _transportType,
-      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
-      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
-      "Description": _descriptionController.text,
-      "FreeCancellationUntil": _freeCancellationUntil
-          ?.toIso8601String()
-          .substring(0, 10),
-      "CancellationFee":
-          double.tryParse(_cancellationFeeController.text) ?? 0.0,
-      "MinTicketsForDiscount":
-          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
-      "DiscountPercentage":
-          double.tryParse(_discountPercentageController.text) ?? 0.0,
-      "Photo": _selectedPhoto != null ? base64Encode(_selectedPhoto!) : null,
-      "TripDays": _tripDays,
-    };
-
-    final validationError = _validateTripData(tripData);
-    if (validationError != null) {
-      if (!mounted) return;
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Validation Error"),
-          content: Text(validationError),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-      setState(() {
-        _isSaving = false;
-      });
-      return;
-    }
 
     try {
       await _tripProvider.insert(tripData);
@@ -377,6 +373,37 @@ class _TripScreenState extends State<TripScreen> {
   }
 
   Future<void> _saveTrip() async {
+    final tripData = {
+      "CityId": _selectedCityId,
+      "DepartureCityId": _departureCityId,
+      "DepartureDate": _departureDate?.toIso8601String().substring(0, 10),
+      "ReturnDate": _returnDate?.toIso8601String().substring(0, 10),
+      "TripType": _tripType,
+      "TransportType": _transportType,
+      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
+      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
+      "Description": _descriptionController.text,
+      "FreeCancellationUntil": _freeCancellationUntil
+          ?.toIso8601String()
+          .substring(0, 10),
+      "CancellationFee":
+          double.tryParse(_cancellationFeeController.text) ?? 0.0,
+      "MinTicketsForDiscount":
+          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
+      "DiscountPercentage":
+          double.tryParse(_discountPercentageController.text) ?? 0.0,
+      "Photo": _selectedPhoto != null ? base64Encode(_selectedPhoto!) : null,
+      "TripDays": _tripDays,
+    };
+
+    final validationError = _validateTripData(tripData);
+    if (!validationError) {
+      setState(() {
+        _isSaving = false;
+      });
+      return;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -402,50 +429,6 @@ class _TripScreenState extends State<TripScreen> {
     setState(() {
       _isSaving = true;
     });
-    final tripData = {
-      "CityId": _selectedCityId,
-      "DepartureCityId": _departureCityId,
-      "DepartureDate": _departureDate?.toIso8601String().substring(0, 10),
-      "ReturnDate": _returnDate?.toIso8601String().substring(0, 10),
-      "TripType": _tripType,
-      "TransportType": _transportType,
-      "TicketPrice": double.tryParse(_priceController.text) ?? 0.0,
-      "AvailableTickets": int.tryParse(_availableTicketsController.text) ?? 0,
-      "Description": _descriptionController.text,
-      "FreeCancellationUntil": _freeCancellationUntil
-          ?.toIso8601String()
-          .substring(0, 10),
-      "CancellationFee":
-          double.tryParse(_cancellationFeeController.text) ?? 0.0,
-      "MinTicketsForDiscount":
-          int.tryParse(_minTicketsForDiscountController.text) ?? 0,
-      "DiscountPercentage":
-          double.tryParse(_discountPercentageController.text) ?? 0.0,
-      "Photo": _selectedPhoto != null ? base64Encode(_selectedPhoto!) : null,
-      "TripDays": _tripDays,
-    };
-
-    final validationError = _validateTripData(tripData);
-    if (validationError != null) {
-      if (!mounted) return;
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text("Validation Error"),
-          content: Text(validationError),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Ok"),
-            ),
-          ],
-        ),
-      );
-      setState(() {
-        _isSaving = false;
-      });
-      return;
-    }
 
     try {
       await _tripProvider.update(widget.tripId!, tripData);
@@ -495,98 +478,98 @@ class _TripScreenState extends State<TripScreen> {
     }
   }
 
-  String? _validateTripData(Map<String, dynamic> tripData) {
-    final errors = <String>[];
+  bool _validateTripData(Map<String, dynamic> tripData) {
+    final isFormValid = _formKey.currentState?.validate() ?? false;
 
-    if (tripData["CityId"] == null) {
-      errors.add("City must be selected.");
-    }
-    if (tripData["DepartureCityId"] == null) {
-      errors.add("Departure city must be selected.");
-    }
-    if (tripData["DepartureDate"] == null ||
-        tripData["DepartureDate"].isEmpty) {
-      errors.add("Departure date is required.");
-    }
-    if (tripData["ReturnDate"] == null || tripData["ReturnDate"].isEmpty) {
-      errors.add("Return date is required.");
-    }
-    if (tripData["TripType"] == null || tripData["TripType"].isEmpty) {
-      errors.add("Trip type is required.");
-    }
-    if (tripData["TransportType"] == null ||
-        tripData["TransportType"].isEmpty) {
-      errors.add("Transport type is required.");
-    }
-    if (tripData["TicketPrice"] == null || tripData["TicketPrice"] <= 0) {
-      errors.add("Ticket price must be greater than zero.");
-    }
-    if (tripData["AvailableTickets"] == null ||
-        tripData["AvailableTickets"] < 0) {
-      errors.add("Available tickets must be zero or more.");
-    }
+    setState(() {
+      _ticketsError = null;
+      _priceError = null;
+      _departureDateError = null;
+      _returnDateError = null;
+      _cancellationDateError = null;
+      _discountError = null;
+      _cancellationFeeError = null;
 
-    try {
-      if (tripData["DepartureDate"] != null &&
-          tripData["DepartureDate"].isNotEmpty) {
-        _departureDate = DateTime.parse(tripData["DepartureDate"]);
+      final tickets = tripData["AvailableTickets"] ?? 0;
+      final price = tripData["TicketPrice"] ?? 0.0;
+
+      if (tickets <= 0) {
+        _ticketsError = "Number of tickets must be greater than zero";
       }
-    } catch (_) {
-      errors.add("Departure date format is invalid.");
-    }
-    try {
-      if (tripData["ReturnDate"] != null && tripData["ReturnDate"].isNotEmpty) {
-        _returnDate = DateTime.parse(tripData["ReturnDate"]);
+      if (price <= 0) _priceError = "Ticket price must be greater than zero";
+
+      final departureDateStr = tripData["DepartureDate"];
+      final returnDateStr = tripData["ReturnDate"];
+      final departureDate = departureDateStr != null
+          ? DateTime.tryParse(departureDateStr)
+          : null;
+      final returnDate = returnDateStr != null
+          ? DateTime.tryParse(returnDateStr)
+          : null;
+
+      if (departureDateStr == null || departureDateStr.isEmpty) {
+        _departureDateError = "Departure date is required";
       }
-    } catch (_) {
-      errors.add("Return date format is invalid.");
-    }
-    try {
-      if (tripData["FreeCancellationUntil"] != null &&
-          tripData["FreeCancellationUntil"].isNotEmpty) {
-        _freeCancellationUntil = DateTime.parse(
-          tripData["FreeCancellationUntil"],
-        );
+      if (returnDateStr == null || returnDateStr.isEmpty) {
+        _returnDateError = "Return date is required";
       }
-    } catch (_) {
-      errors.add("Free cancellation date format is invalid.");
-    }
 
-    if (_departureDate != null && _returnDate != null) {
-      if (_departureDate!.isAfter(_returnDate!)) {
-        errors.add("Departure date must be before return date.");
+      if (departureDate != null &&
+          returnDate != null &&
+          departureDate.isAfter(returnDate)) {
+        _returnDateError = "Departure date must be before return date";
       }
-    }
 
-    if (_departureDate != null && _freeCancellationUntil != null) {
-      final diff = _departureDate!.difference(_freeCancellationUntil!).inDays;
-      if (diff < 3) {
-        errors.add(
-          "Free cancellation must end at least 3 days before departure.",
-        );
+      final freeCancellationUntilStr = tripData["FreeCancellationUntil"];
+      final freeCancellationUntil = freeCancellationUntilStr != null
+          ? DateTime.tryParse(freeCancellationUntilStr)
+          : null;
+
+      if (departureDate != null && freeCancellationUntil != null) {
+        final diff = departureDate.difference(freeCancellationUntil).inDays;
+        if (diff < 3) {
+          _cancellationDateError =
+              "Free cancellation must end at least 3 days before departure";
+        }
       }
-    }
 
-    final discount = tripData["DiscountPercentage"] ?? 0.0;
-    if (discount < 0 || discount > 100) {
-      errors.add("Discount percentage must be between 0 and 100.");
-    }
+      final discount = (tripData["DiscountPercentage"] ?? 0.0).toDouble();
+      final minTickets = (tripData["MinTicketsForDiscount"] ?? 0).toInt();
 
-    final cancellationFee = tripData["CancellationFee"] ?? 0.0;
-    if (cancellationFee < 0) {
-      errors.add("Cancellation fee cannot be negative.");
-    }
+      if (discount < 0 || discount > 100 || minTickets < 0) {
+        _discountError = "Discount must be 0-100% for at least 1 ticket";
+      } else if ((discount > 0 && minTickets == 0) ||
+          (minTickets > 0 && discount == 0)) {
+        _discountError =
+            "Both discount and minimum tickets must be set if one is > 0";
+      }
 
-    final minTickets = tripData["MinTicketsForDiscount"] ?? 0;
-    if (minTickets < 0) {
-      errors.add("Minimum tickets for discount cannot be negative.");
-    }
+      final cancellationFee = (tripData["CancellationFee"] ?? 0.0).toDouble();
 
-    if (errors.isEmpty) {
-      return null;
-    } else {
-      return errors.join('\n');
-    }
+      if (freeCancellationUntil != null) {
+        if (cancellationFee <= 0) {
+          _cancellationFeeError =
+              "Cancellation fee must be set if free cancellation is selected";
+        } else if (cancellationFee < 1 || cancellationFee > 100) {
+          _cancellationFeeError = "Cancellation fee must be between 1 and 100";
+        }
+      } else {
+        if (cancellationFee > 0) {
+          _cancellationDateError = "Select Free Cancellation Until";
+        }
+      }
+    });
+
+    final noCustomErrors =
+        _ticketsError == null &&
+        _priceError == null &&
+        _departureDateError == null &&
+        _returnDateError == null &&
+        _cancellationDateError == null &&
+        _discountError == null &&
+        _cancellationFeeError == null;
+
+    return isFormValid && noCustomErrors;
   }
 
   _cancelTrip() async {
@@ -662,7 +645,12 @@ class _TripScreenState extends State<TripScreen> {
           focusedBorder: border,
           hintText: 'Select a country',
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
+          errorStyle: const TextStyle(color: Colors.red),
         ),
+        validator: (value) {
+          if (value == null) return "Country must be selected";
+          return null;
+        },
         value: value,
         items: _countries.map((country) {
           return DropdownMenuItem<int>(
@@ -689,7 +677,14 @@ class _TripScreenState extends State<TripScreen> {
             ),
           );
         }).toList(),
-        onChanged: (enabled ?? true) ? onChanged : null,
+        onChanged: (enabled ?? true)
+            ? (val) {
+                onChanged(val);
+                if (_formKey.currentState != null) {
+                  _formKey.currentState!.validate();
+                }
+              }
+            : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
         dropdownColor: Colors.white,
         icon: const Icon(
@@ -730,6 +725,7 @@ class _TripScreenState extends State<TripScreen> {
           focusedBorder: border,
           hintText: 'Select a city',
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
+          errorStyle: const TextStyle(color: Colors.red),
         ),
         value: value,
         items: cities.map((city) {
@@ -746,7 +742,18 @@ class _TripScreenState extends State<TripScreen> {
             ),
           );
         }).toList(),
-        onChanged: (enabled ?? true) ? onChanged : null,
+        validator: (value) {
+          if (value == null) return "City must be selected";
+          return null;
+        },
+        onChanged: (enabled ?? true)
+            ? (val) {
+                onChanged(val);
+                if (_formKey.currentState != null) {
+                  _formKey.currentState!.validate();
+                }
+              }
+            : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
         dropdownColor: Colors.white,
         icon: const Icon(
@@ -789,6 +796,7 @@ class _TripScreenState extends State<TripScreen> {
           focusedBorder: border,
           hintText: label,
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
+          errorStyle: const TextStyle(color: Colors.red),
         ),
         value: value,
         items: items
@@ -806,7 +814,14 @@ class _TripScreenState extends State<TripScreen> {
               ),
             )
             .toList(),
-        onChanged: (enabled ?? true) ? onChanged : null,
+        onChanged: (enabled ?? true)
+            ? (val) {
+                onChanged(val);
+                if (_formKey.currentState != null) {
+                  _formKey.currentState!.validate();
+                }
+              }
+            : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
         dropdownColor: Colors.white,
         icon: const Icon(
@@ -815,6 +830,10 @@ class _TripScreenState extends State<TripScreen> {
           color: Colors.black,
         ),
         iconSize: 24,
+        validator: (value) {
+          if (value == null) return "Trip type must be selected";
+          return null;
+        },
       ),
     );
   }
@@ -849,6 +868,7 @@ class _TripScreenState extends State<TripScreen> {
           focusedBorder: border,
           hintText: label,
           hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
+          errorStyle: const TextStyle(color: Colors.red),
         ),
         value: value,
         items: items.entries.map((entry) {
@@ -866,9 +886,20 @@ class _TripScreenState extends State<TripScreen> {
             ),
           );
         }).toList(),
-        onChanged: (enabled ?? true) ? onChanged : null,
+        onChanged: (enabled ?? true)
+            ? (val) {
+                onChanged(val);
+                if (_formKey.currentState != null) {
+                  _formKey.currentState!.validate();
+                }
+              }
+            : null,
         style: const TextStyle(fontSize: 16, color: Colors.black),
         dropdownColor: Colors.white,
+        validator: (value) {
+          if (value == null) return "Transport is required";
+          return null;
+        },
         icon: const Icon(
           Icons.keyboard_arrow_down,
           size: 24,
@@ -927,237 +958,240 @@ class _TripScreenState extends State<TripScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Country",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                    Form(
+                      key: _formKey,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Country",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                _countryDropdown(
-                                  countries: _countries,
-                                  enabled: _inputEnabled,
-                                  value: _selectedCountryId,
-                                  onChanged: (value) async {
-                                    var countryCities = await _getCountryCities(
-                                      value!,
-                                    );
-                                    setState(() {
-                                      _selectedCityId = null;
-                                      _selectedCountryId = value;
-                                      _cities = countryCities;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "City",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                _cityDropdown(
-                                  cities: _cities,
-                                  enabled: _inputEnabled,
-                                  value: _selectedCityId,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedCityId = value;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Departure date",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                DatePickerButton(
-                                  firstDate: DateTime.now().add(
-                                    Duration(days: 5),
-                                  ),
-                                  lastDate: _returnDate ?? DateTime(2100),
-                                  initialDate: _departureDate,
-                                  enabled: _inputEnabled,
-                                  onDateSelected: (date) {
-                                    setState(() {
-                                      _departureDate = date;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Return date",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                DatePickerButton(
-                                  firstDate:
-                                      _departureDate ??
-                                      DateTime.now().add(Duration(days: 5)),
-                                  lastDate: DateTime(2100),
-                                  initialDate: _returnDate,
-                                  enabled: _inputEnabled,
-                                  onDateSelected: (date) {
-                                    setState(() {
-                                      _returnDate = date;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Trip type",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                _dropdown<String>(
-                                  label: 'Select type',
-                                  enabled: _inputEnabled,
-                                  value: _tripType,
-                                  items: _tripTypes,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      _tripType = val;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Ticket price",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                SizedBox(
-                                  width: 170,
-                                  height: 32,
-                                  child: TextField(
-                                    controller: _priceController,
+                                  SizedBox(width: 8),
+                                  _countryDropdown(
+                                    countries: _countries,
                                     enabled: _inputEnabled,
-                                    inputFormatters: <TextInputFormatter>[
-                                      FilteringTextInputFormatter.digitsOnly,
-                                      LengthLimitingTextInputFormatter(8),
-                                    ],
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
+                                    value: _selectedCountryId,
+                                    onChanged: (value) async {
+                                      var countryCities =
+                                          await _getCountryCities(value!);
+                                      setState(() {
+                                        _selectedCityId = null;
+                                        _selectedCountryId = value;
+                                        _cities = countryCities;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "City",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  _cityDropdown(
+                                    cities: _cities,
+                                    enabled: _inputEnabled,
+                                    value: _selectedCityId,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedCityId = value;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Departure date",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      DatePickerButton(
+                                        firstDate: DateTime.now().add(
+                                          const Duration(days: 5),
                                         ),
-                                    decoration: InputDecoration(
-                                      labelText: null,
-                                      prefixIcon: Icon(Icons.euro_symbol),
-                                      hintText: '0.00',
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 6,
+                                        lastDate: _returnDate ?? DateTime(2100),
+                                        initialDate: _departureDate,
+                                        enabled: _inputEnabled,
+                                        onDateSelected: (date) {
+                                          setState(() {
+                                            _departureDate = date;
+                                            _departureDateError = null;
+                                          });
+                                        },
                                       ),
-                                      filled: true,
-                                      fillColor: _inputEnabled
-                                          ? AppColors.primaryGray
-                                          : Colors.blueGrey[300],
-                                      border: OutlineInputBorder(
-                                        borderSide: BorderSide.none,
-                                        borderRadius: BorderRadius.circular(8),
+                                      if (_departureDateError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 2,
+                                            left: 12,
+                                          ),
+                                          child: Text(
+                                            _departureDateError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Return date",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Available tickets",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                  SizedBox(width: 8),
+                                  Column(
+                                    children: [
+                                      DatePickerButton(
+                                        firstDate:
+                                            _departureDate ??
+                                            DateTime.now().add(
+                                              Duration(days: 5),
+                                            ),
+                                        lastDate: DateTime(2100),
+                                        initialDate: _returnDate,
+                                        enabled: _inputEnabled,
+                                        onDateSelected: (date) {
+                                          setState(() {
+                                            _returnDate = date;
+                                            _returnDateError = null;
+                                          });
+                                        },
+                                      ),
+                                      if (_returnDateError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 2,
+                                            left: 12,
+                                          ),
+                                          child: Text(
+                                            _returnDateError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Trip type",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                SizedBox(
-                                  child: Row(
+                                  SizedBox(width: 8),
+                                  _dropdown<String>(
+                                    label: 'Select type',
+                                    enabled: _inputEnabled,
+                                    value: _tripType,
+                                    items: _tripTypes,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _tripType = val;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Ticket price",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       SizedBox(
-                                        width: 50,
+                                        width: 170,
                                         height: 32,
-                                        child: TextField(
-                                          controller:
-                                              _availableTicketsController,
+                                        child: TextFormField(
+                                          controller: _priceController,
                                           enabled: _inputEnabled,
-                                          keyboardType: TextInputType.number,
-                                          textAlign: TextAlign.center,
+                                          onChanged: (_) {
+                                            if (_priceError != null) {
+                                              setState(() {
+                                                _priceError = null;
+                                              });
+                                            }
+                                          },
                                           inputFormatters: <TextInputFormatter>[
                                             FilteringTextInputFormatter
                                                 .digitsOnly,
-                                            LengthLimitingTextInputFormatter(3),
+                                            LengthLimitingTextInputFormatter(8),
                                           ],
+                                          keyboardType:
+                                              const TextInputType.numberWithOptions(
+                                                decimal: true,
+                                              ),
                                           decoration: InputDecoration(
                                             labelText: null,
-                                            hintText: '0',
+                                            prefixIcon: Icon(Icons.euro_symbol),
+                                            hintText: '0.00',
                                             isDense: true,
                                             contentPadding:
                                                 EdgeInsets.symmetric(
@@ -1176,391 +1210,595 @@ class _TripScreenState extends State<TripScreen> {
                                           ),
                                         ),
                                       ),
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "$_purchasedTickets already purchased",
-                                        style: TextStyle(fontSize: 16),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 4),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Departure Country",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                _countryDropdown(
-                                  countries: _countries,
-                                  enabled: _inputEnabled,
-                                  value: _departureCountryId,
-                                  onChanged: (value) async {
-                                    var departureCountryCities =
-                                        await _getCountryCities(value!);
-                                    setState(() {
-                                      _departureCityId = null;
-                                      _departureCountryId = value;
-                                      _departureCities = departureCountryCities;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Departure City",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                _cityDropdown(
-                                  cities: _departureCities,
-                                  enabled: _inputEnabled,
-                                  value: _departureCityId,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _departureCityId = value;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Schedule",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                TripDayEditor(
-                                  initialDays: _tripDays,
-                                  enabled: _inputEnabled,
-                                  onChanged: (updatedTripDays) {
-                                    _tripDays = updatedTripDays;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Short description",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                SizedBox(
-                                  width: 400,
-                                  height: 150,
-                                  child: TextField(
-                                    controller: _descriptionController,
-                                    enabled: _inputEnabled,
-                                    maxLines: null,
-                                    expands: true,
-                                    textAlignVertical: TextAlignVertical.top,
-                                    inputFormatters: [
-                                      LengthLimitingTextInputFormatter(200),
-                                    ],
-                                    decoration: InputDecoration(
-                                      hintText: 'Describe your trip...',
-                                      filled: true,
-                                      fillColor: _inputEnabled
-                                          ? AppColors.primaryGray
-                                          : Colors.blueGrey[300],
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      contentPadding: EdgeInsets.all(8),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Transport type",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                _transportTypeDropdown(
-                                  label: 'Select Transport',
-                                  value: _transportType,
-                                  enabled: _inputEnabled,
-                                  items: _transportTypes,
-                                  onChanged: (val) {
-                                    setState(() {
-                                      _transportType = val;
-                                    });
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Cancellation",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Free until",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    DatePickerButton(
-                                      initialDate: _freeCancellationUntil,
-                                      enabled: _inputEnabled,
-                                      onDateSelected: (date) {
-                                        setState(() {
-                                          _freeCancellationUntil = date;
-                                        });
-                                      },
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 8),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(width: 170, child: Text("")),
-                                SizedBox(width: 8),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Fee",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    SizedBox(
-                                      width: 100,
-                                      height: 32,
-                                      child: TextField(
-                                        controller: _cancellationFeeController,
-                                        enabled: _inputEnabled,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          LengthLimitingTextInputFormatter(2),
-                                        ],
-                                        decoration: InputDecoration(
-                                          labelText: null,
-                                          prefixIcon: Icon(Icons.percent),
-                                          hintText: '0',
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 6,
+                                      if (_priceError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 2,
+                                            left: 12,
                                           ),
-                                          filled: true,
-                                          fillColor: _inputEnabled
-                                              ? AppColors.primaryGray
-                                              : Colors.blueGrey[300],
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
+                                          child: Text(
+                                            _priceError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Discount",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    ],
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 80,
-                                      height: 32,
-                                      child: TextField(
-                                        controller:
-                                            _discountPercentageController,
-                                        enabled: _inputEnabled,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          LengthLimitingTextInputFormatter(2),
-                                        ],
-                                        decoration: InputDecoration(
-                                          labelText: null,
-                                          prefixIcon: Icon(Icons.percent),
-                                          hintText: '0',
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 6,
-                                          ),
-                                          filled: true,
-                                          fillColor: _inputEnabled
-                                              ? AppColors.primaryGray
-                                              : Colors.blueGrey[300],
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 8),
-                                    Text(
-                                      "for",
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Available tickets",
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    SizedBox(width: 8),
-                                    SizedBox(
-                                      width: 80,
-                                      height: 32,
-                                      child: TextField(
-                                        controller:
-                                            _minTicketsForDiscountController,
-                                        enabled: _inputEnabled,
-                                        inputFormatters: <TextInputFormatter>[
-                                          FilteringTextInputFormatter
-                                              .digitsOnly,
-                                          LengthLimitingTextInputFormatter(2),
-                                        ],
-                                        decoration: InputDecoration(
-                                          labelText: null,
-                                          prefixIcon: Icon(
-                                            Icons.confirmation_num,
-                                            size: 16,
-                                            color: Colors.black,
-                                          ),
-                                          hintText: '0',
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 6,
-                                          ),
-                                          filled: true,
-                                          fillColor: _inputEnabled
-                                              ? AppColors.primaryGray
-                                              : Colors.blueGrey[300],
-                                          border: OutlineInputBorder(
-                                            borderSide: BorderSide.none,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
+                                  ),
+                                  SizedBox(width: 8),
+                                  SizedBox(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: 50,
+                                              height: 32,
+                                              child: TextFormField(
+                                                controller:
+                                                    _availableTicketsController,
+                                                enabled: _inputEnabled,
+                                                onChanged: (_) {
+                                                  if (_ticketsError != null) {
+                                                    setState(() {
+                                                      _ticketsError = null;
+                                                    });
+                                                  }
+                                                },
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                textAlign: TextAlign.center,
+                                                inputFormatters:
+                                                    <TextInputFormatter>[
+                                                      FilteringTextInputFormatter
+                                                          .digitsOnly,
+                                                      LengthLimitingTextInputFormatter(
+                                                        3,
+                                                      ),
+                                                    ],
+                                                decoration: InputDecoration(
+                                                  labelText: null,
+                                                  hintText: '0',
+                                                  isDense: true,
+                                                  contentPadding:
+                                                      EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 6,
+                                                      ),
+                                                  filled: true,
+                                                  fillColor: _inputEnabled
+                                                      ? AppColors.primaryGray
+                                                      : Colors.blueGrey[300],
+                                                  border: OutlineInputBorder(
+                                                    borderSide: BorderSide.none,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 8),
+                                            Text(
+                                              "$_purchasedTickets already purchased",
+                                              style: TextStyle(fontSize: 16),
+                                            ),
+                                          ],
+                                        ),
+                                        if (_ticketsError != null)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 2,
+                                              left: 12,
+                                            ),
+                                            child: Text(
+                                              _ticketsError!,
+                                              style: const TextStyle(
+                                                color: Colors.red,
+                                                fontSize: 12,
+                                              ),
                                             ),
                                           ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 4),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Departure Country",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  _countryDropdown(
+                                    countries: _countries,
+                                    enabled: _inputEnabled,
+                                    value: _departureCountryId,
+                                    onChanged: (value) async {
+                                      var departureCountryCities =
+                                          await _getCountryCities(value!);
+                                      setState(() {
+                                        _departureCityId = null;
+                                        _departureCountryId = value;
+                                        _departureCities =
+                                            departureCountryCities;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Departure City",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  _cityDropdown(
+                                    cities: _departureCities,
+                                    enabled: _inputEnabled,
+                                    value: _departureCityId,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _departureCityId = value;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Schedule",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  TripDayEditor(
+                                    initialDays: _tripDays,
+                                    enabled: _inputEnabled,
+                                    onChanged: (updatedTripDays) {
+                                      _tripDays = updatedTripDays;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Short description",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  SizedBox(
+                                    width: 400,
+                                    height: 150,
+                                    child: TextFormField(
+                                      controller: _descriptionController,
+                                      enabled: _inputEnabled,
+                                      onChanged: (_) {
+                                        if (_formKey.currentState != null) {
+                                          _formKey.currentState!.validate();
+                                        }
+                                      },
+                                      validator: (value) {
+                                        if (value == null ||
+                                            value.trim().isEmpty) {
+                                          return "Description is required";
+                                        }
+                                        return null;
+                                      },
+                                      maxLines: null,
+                                      expands: true,
+                                      textAlignVertical: TextAlignVertical.top,
+                                      inputFormatters: [
+                                        LengthLimitingTextInputFormatter(200),
+                                      ],
+                                      decoration: InputDecoration(
+                                        hintText: 'Describe your trip...',
+                                        filled: true,
+                                        fillColor: _inputEnabled
+                                            ? AppColors.primaryGray
+                                            : Colors.blueGrey[300],
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        contentPadding: EdgeInsets.all(8),
+                                        errorStyle: TextStyle(
+                                          color: Colors.red,
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 8),
-                            SizedBox(height: 8),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                SizedBox(
-                                  width: 170,
-                                  child: Text(
-                                    "Photo",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Transport type",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(width: 8),
-                                TripPhotoPicker(
-                                  initialPhoto: _selectedPhoto,
-                                  enabled: _inputEnabled,
-                                  onPhotoSelected: (bytes) {
-                                    _selectedPhoto = bytes;
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
+                                  SizedBox(width: 8),
+                                  _transportTypeDropdown(
+                                    label: 'Select Transport',
+                                    value: _transportType,
+                                    enabled: _inputEnabled,
+                                    items: _transportTypes,
+                                    onChanged: (val) {
+                                      setState(() {
+                                        _transportType = val;
+                                      });
+                                    },
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Cancellation",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Free until",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          DatePickerButton(
+                                            initialDate: _freeCancellationUntil,
+                                            enabled: _inputEnabled,
+                                            onDateSelected: (date) {
+                                              setState(() {
+                                                _freeCancellationUntil = date;
+                                                _cancellationDateError = null;
+                                              });
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                                      if (_cancellationDateError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 2,
+                                            left: 12,
+                                          ),
+                                          child: Text(
+                                            _cancellationDateError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 8),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(width: 170, child: Text("")),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "Fee",
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          SizedBox(
+                                            width: 100,
+                                            height: 32,
+                                            child: TextField(
+                                              controller:
+                                                  _cancellationFeeController,
+                                              enabled: _inputEnabled,
+                                              inputFormatters: <TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                                LengthLimitingTextInputFormatter(
+                                                  2,
+                                                ),
+                                              ],
+                                              decoration: InputDecoration(
+                                                labelText: null,
+                                                prefixIcon: Icon(Icons.percent),
+                                                hintText: '0',
+                                                isDense: true,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 6,
+                                                    ),
+                                                filled: true,
+                                                fillColor: _inputEnabled
+                                                    ? AppColors.primaryGray
+                                                    : Colors.blueGrey[300],
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide.none,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (_cancellationFeeError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 2,
+                                            left: 12,
+                                          ),
+                                          child: Text(
+                                            _cancellationFeeError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Discount",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          SizedBox(
+                                            width: 80,
+                                            height: 32,
+                                            child: TextField(
+                                              controller:
+                                                  _discountPercentageController,
+                                              enabled: _inputEnabled,
+                                              onChanged: (_) {
+                                                if (_discountError != null) {
+                                                  setState(() {
+                                                    _discountError = null;
+                                                  });
+                                                }
+                                              },
+                                              inputFormatters: <TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                                LengthLimitingTextInputFormatter(
+                                                  2,
+                                                ),
+                                              ],
+                                              decoration: InputDecoration(
+                                                labelText: null,
+                                                prefixIcon: Icon(Icons.percent),
+                                                hintText: '0',
+                                                isDense: true,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 6,
+                                                    ),
+                                                filled: true,
+                                                fillColor: _inputEnabled
+                                                    ? AppColors.primaryGray
+                                                    : Colors.blueGrey[300],
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide.none,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            "for",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          SizedBox(
+                                            width: 80,
+                                            height: 32,
+                                            child: TextField(
+                                              controller:
+                                                  _minTicketsForDiscountController,
+                                              enabled: _inputEnabled,
+                                              onChanged: (_) {
+                                                if (_discountError != null) {
+                                                  setState(() {
+                                                    _discountError = null;
+                                                  });
+                                                }
+                                              },
+                                              inputFormatters: <TextInputFormatter>[
+                                                FilteringTextInputFormatter
+                                                    .digitsOnly,
+                                                LengthLimitingTextInputFormatter(
+                                                  2,
+                                                ),
+                                              ],
+                                              decoration: InputDecoration(
+                                                labelText: null,
+                                                prefixIcon: Icon(
+                                                  Icons.confirmation_num,
+                                                  size: 16,
+                                                  color: Colors.black,
+                                                ),
+                                                hintText: '0',
+                                                isDense: true,
+                                                contentPadding:
+                                                    EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 6,
+                                                    ),
+                                                filled: true,
+                                                fillColor: _inputEnabled
+                                                    ? AppColors.primaryGray
+                                                    : Colors.blueGrey[300],
+                                                border: OutlineInputBorder(
+                                                  borderSide: BorderSide.none,
+                                                  borderRadius:
+                                                      BorderRadius.circular(8),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      if (_discountError != null)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 2,
+                                            left: 12,
+                                          ),
+                                          child: Text(
+                                            _discountError!,
+                                            style: const TextStyle(
+                                              color: Colors.red,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              SizedBox(height: 8),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(
+                                    width: 170,
+                                    child: Text(
+                                      "Photo",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  TripPhotoPicker(
+                                    initialPhoto: _selectedPhoto,
+                                    enabled: _inputEnabled,
+                                    onPhotoSelected: (bytes) {
+                                      _selectedPhoto = bytes;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,

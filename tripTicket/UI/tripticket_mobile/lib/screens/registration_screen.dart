@@ -26,11 +26,43 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
-
+  final Map<String, String?> _fieldErrors = {};
+  String? _birthDateError;
   Validator minLengthValidator(int min) =>
       (value) => minLength(value, min);
   Validator maxLengthValidator(int max) =>
       (value) => maxLength(value, max);
+
+  List<Validator> _getValidators(String label) {
+    switch (label) {
+      case "Username":
+        return [
+          inputRequired,
+          noSpecialCharacters,
+          minLengthValidator(3),
+          maxLengthValidator(20),
+        ];
+      case "First Name":
+        return [inputRequired, minLengthValidator(2), maxLengthValidator(20)];
+      case "Last Name":
+        return [inputRequired, minLengthValidator(2), maxLengthValidator(30)];
+      case "Email":
+        return [inputRequired, emailFormat, maxLengthValidator(70)];
+      case "Phone":
+        return [
+          inputRequired,
+          onlyNumbers,
+          minLengthValidator(6),
+          maxLengthValidator(10),
+        ];
+      case "Password":
+        return [inputRequired, password, maxLengthValidator(30)];
+      case "Confirm Password":
+        return [inputRequired, maxLengthValidator(30)];
+      default:
+        return [];
+    }
+  }
 
   Future<void> _registerUser() async {
     try {
@@ -63,7 +95,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context, true);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
               },
               child: Text("Ok"),
             ),
@@ -118,6 +153,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       ),
                     )
                   : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildTextField(
                           _usernameController,
@@ -167,11 +203,20 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               onDateSelected: (date) {
                                 setState(() {
                                   _birthDate = date;
+                                  _birthDateError = null;
                                 });
                               },
                             ),
                           ],
                         ),
+                        if (_birthDateError != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2, left: 12),
+                            child: Text(
+                              _birthDateError!,
+                              style: TextStyle(color: Colors.red, fontSize: 12),
+                            ),
+                          ),
                         const SizedBox(height: 8),
                         _buildTextField(
                           _emailController,
@@ -261,26 +306,55 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 backgroundColor: AppColors.primaryGreen,
                               ),
                               onPressed: () {
-                                if (_formKey.currentState!.validate()) {
-                                  if (_birthDate == null) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: Text("Validation Error"),
-                                        content: Text(
-                                          "Birth date is required.",
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: Text("Ok"),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                    return;
+                                setState(() {
+                                  _fieldErrors.clear();
+                                  _birthDateError = null;
+                                });
+
+                                bool isDateValid = true;
+                                if (_birthDate == null) {
+                                  setState(() {
+                                    _birthDateError = "Birth date is required.";
+                                  });
+                                  isDateValid = false;
+                                }
+
+                                bool isFormValid = true;
+                                final fields = {
+                                  "Username": _usernameController,
+                                  "First Name": _firstNameController,
+                                  "Last Name": _lastNameController,
+                                  "Email": _emailController,
+                                  "Phone": _phoneController,
+                                  "Password": _passwordController,
+                                  "Confirm Password":
+                                      _confirmPasswordController,
+                                };
+
+                                fields.forEach((label, controller) {
+                                  for (final validator in _getValidators(
+                                    label,
+                                  )) {
+                                    final result = validator(controller.text);
+                                    if (result != null) {
+                                      _fieldErrors[label] = result;
+                                      isFormValid = false;
+                                      break;
+                                    }
                                   }
+
+                                  if (label == "Confirm Password" &&
+                                      controller.text !=
+                                          _passwordController.text) {
+                                    _fieldErrors[label] =
+                                        "Passwords do not match";
+                                    isFormValid = false;
+                                  }
+                                });
+
+                                setState(() {});
+
+                                if (isFormValid && isDateValid) {
                                   setState(() {
                                     _isLoading = true;
                                   });
@@ -361,6 +435,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
+        errorText: _fieldErrors[label],
+        errorStyle: const TextStyle(color: Colors.red),
       ),
       validator: (value) {
         for (final validator in validators) {
@@ -371,6 +447,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           return "Passwords do not match";
         }
         return null;
+      },
+      onChanged: (_) {
+        if (_fieldErrors[label] != null) {
+          setState(() {
+            _fieldErrors[label] = null;
+          });
+        }
       },
     );
   }
