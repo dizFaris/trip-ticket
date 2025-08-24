@@ -921,6 +921,12 @@ class _TripScreenState extends State<TripScreen> {
     );
   }
 
+  int? _calcMaxDays() {
+    if (_departureDate == null || _returnDate == null) return 0;
+    if (_returnDate!.isBefore(_departureDate!)) return 0;
+    return _returnDate!.difference(_departureDate!).inDays + 1;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1417,6 +1423,7 @@ class _TripScreenState extends State<TripScreen> {
                                   SizedBox(width: 8),
                                   TripDayEditor(
                                     initialDays: _tripDays,
+                                    maxDays: _calcMaxDays(),
                                     enabled: _inputEnabled,
                                     onChanged: (updatedTripDays) {
                                       _tripDays = updatedTripDays;

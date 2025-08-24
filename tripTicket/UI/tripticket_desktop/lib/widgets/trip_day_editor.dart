@@ -6,12 +6,14 @@ class TripDayEditor extends StatefulWidget {
   final List<Map<String, Object>>? initialDays;
   final void Function(List<Map<String, Object>> tripDays)? onChanged;
   final bool enabled;
+  final int? maxDays;
 
   const TripDayEditor({
     super.key,
     this.initialDays,
     this.onChanged,
     this.enabled = true,
+    this.maxDays,
   });
 
   @override
@@ -21,12 +23,44 @@ class TripDayEditor extends StatefulWidget {
 class _TripDayEditorState extends State<TripDayEditor> {
   late List<Map<String, Object>> tripDays;
 
+  bool get _canAddMoreDays =>
+      widget.enabled &&
+      (widget.maxDays == null || tripDays.length < widget.maxDays!);
+
+  int? get _remainingDays =>
+      widget.maxDays == null ? null : (widget.maxDays! - tripDays.length);
+
   @override
   void initState() {
     super.initState();
     tripDays = widget.initialDays != null
         ? List<Map<String, Object>>.from(widget.initialDays!)
         : [];
+
+    if (widget.maxDays != null && tripDays.length > widget.maxDays!) {
+      tripDays = tripDays.sublist(0, widget.maxDays!);
+      _reindexDayNumbers();
+      WidgetsBinding.instance.addPostFrameCallback((_) => _notifyChange());
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant TripDayEditor oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.maxDays != null && tripDays.length > widget.maxDays!) {
+      setState(() {
+        tripDays = tripDays.sublist(0, widget.maxDays!);
+        _reindexDayNumbers();
+      });
+      _notifyChange();
+    }
+  }
+
+  void _reindexDayNumbers() {
+    for (var i = 0; i < tripDays.length; i++) {
+      tripDays[i]['dayNumber'] = i;
+    }
   }
 
   void _notifyChange() {
@@ -74,7 +108,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
                         size: 20,
                       ),
                     )
-                  : SizedBox.shrink(),
+                  : const SizedBox.shrink(),
             ),
           ),
         ),
@@ -85,12 +119,10 @@ class _TripDayEditorState extends State<TripDayEditor> {
   Widget dayRowInput(int dayIndex) {
     final day = tripDays[dayIndex];
 
-    TextEditingController dayController = TextEditingController(
-      text: day['title'] as String?,
-    );
-    dayController.selection = TextSelection.fromPosition(
-      TextPosition(offset: dayController.text.length),
-    );
+    final dayController = TextEditingController(text: day['title'] as String?)
+      ..selection = TextSelection.fromPosition(
+        TextPosition(offset: (day['title'] as String? ?? '').length),
+      );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,7 +138,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
                 : null,
           ),
           child: Padding(
-            padding: EdgeInsets.all(6),
+            padding: const EdgeInsets.all(6),
             child: Row(
               children: [
                 Text(
@@ -147,7 +179,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
                 const SizedBox(width: 8),
                 widget.enabled
                     ? buildDayActionButton(false, dayIndex)
-                    : SizedBox.shrink(),
+                    : const SizedBox.shrink(),
               ],
             ),
           ),
@@ -186,11 +218,14 @@ class _TripDayEditorState extends State<TripDayEditor> {
               }
             } else {
               tripDays.removeAt(dayIndex);
+              _reindexDayNumbers();
             }
             _notifyChange();
           });
         },
-        child: Center(child: Icon(Icons.remove, color: Colors.black, size: 20)),
+        child: const Center(
+          child: Icon(Icons.remove, color: Colors.black, size: 20),
+        ),
       ),
     );
   }
@@ -199,12 +234,10 @@ class _TripDayEditorState extends State<TripDayEditor> {
     final items = tripDays[dayIndex]['tripDayItems'] as List;
     final item = items[itemIndex];
 
-    TextEditingController textController = TextEditingController(
-      text: item['action'],
-    );
-    textController.selection = TextSelection.fromPosition(
-      TextPosition(offset: textController.text.length),
-    );
+    final textController = TextEditingController(text: item['action'])
+      ..selection = TextSelection.fromPosition(
+        TextPosition(offset: (item['action'] as String? ?? '').length),
+      );
 
     return Container(
       decoration: BoxDecoration(
@@ -272,7 +305,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
                           _notifyChange();
                         });
                       },
-                      child: Center(
+                      child: const Center(
                         child: Icon(
                           Icons.remove,
                           color: Colors.black,
@@ -281,7 +314,7 @@ class _TripDayEditorState extends State<TripDayEditor> {
                       ),
                     ),
                   )
-                : SizedBox.shrink(),
+                : const SizedBox.shrink(),
           ],
         ),
       ),
@@ -290,6 +323,8 @@ class _TripDayEditorState extends State<TripDayEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final addDisabled = !_canAddMoreDays;
+
     return Card(
       child: Container(
         width: 400,
@@ -315,39 +350,65 @@ class _TripDayEditorState extends State<TripDayEditor> {
                       widget.enabled
                           ? Padding(
                               padding: const EdgeInsets.all(8),
-                              child: ElevatedButton.icon(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primaryYellow,
-                                  foregroundColor: Colors.black,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
+                              child: Column(
+                                children: [
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: addDisabled
+                                          ? Colors.grey
+                                          : AppColors.primaryYellow,
+                                      foregroundColor: Colors.black,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      minimumSize: const Size(100, 36),
+                                    ),
+                                    icon: const Icon(Icons.add, size: 20),
+                                    label: const Text(
+                                      'Add new day',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    onPressed: addDisabled
+                                        ? null
+                                        : () {
+                                            setState(() {
+                                              tripDays.add({
+                                                'dayNumber': tripDays.length,
+                                                'title': '',
+                                                'tripDayItems': [
+                                                  {
+                                                    'time': '00:00',
+                                                    'action': '',
+                                                    'orderNumber': 0,
+                                                  },
+                                                ],
+                                              });
+                                              _notifyChange();
+                                            });
+                                          },
                                   ),
-                                  minimumSize: const Size(100, 36),
-                                ),
-                                icon: const Icon(Icons.add, size: 20),
-                                label: const Text(
-                                  'Add new day',
-                                  style: TextStyle(fontWeight: FontWeight.w600),
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    tripDays.add({
-                                      'dayNumber': tripDays.length,
-                                      'title': '',
-                                      'tripDayItems': [
-                                        {
-                                          'time': '00:00',
-                                          'action': '',
-                                          'orderNumber': 0,
-                                        },
-                                      ],
-                                    });
-                                    _notifyChange();
-                                  });
-                                },
+                                  if (widget.maxDays != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 6),
+                                      child: Text(
+                                        _remainingDays! <= 0
+                                            ? 'Max ${widget.maxDays} day(s) reached.'
+                                            : 'You can add $_remainingDays more day(s).',
+                                        style: TextStyle(
+                                          color: _remainingDays! <= 0
+                                              ? Colors.red
+                                              : Colors.black87,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                ],
                               ),
                             )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                     ],
                   ),
                 ),
