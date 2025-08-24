@@ -311,7 +311,7 @@ class _TripScreenState extends State<TripScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
+        title: const Text('Confirm Add'),
         content: const Text('Are you sure you want to add this trip?'),
         actions: [
           TextButton(
@@ -417,7 +417,7 @@ class _TripScreenState extends State<TripScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
+        title: const Text('Confirm Save'),
         content: const Text('Are you sure you want to edit this trip?'),
         actions: [
           TextButton(

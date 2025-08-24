@@ -166,6 +166,9 @@ using (var scope = app.Services.CreateScope())
 {
     var dataContext = scope.ServiceProvider.GetRequiredService<TripTicketDbContext>();
     dataContext.Database.Migrate();
+
+    var recommendationService = new RecommendationService(dataContext);
+    recommendationService.TrainModel();
 }
 
 app.UseHangfireDashboard();

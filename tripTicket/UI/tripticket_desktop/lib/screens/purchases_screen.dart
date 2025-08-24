@@ -1087,7 +1087,7 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
                                                                                       context,
                                                                                     ) => AlertDialog(
                                                                                       title: const Text(
-                                                                                        'Confirm Delete',
+                                                                                        'Confirm Cancel',
                                                                                       ),
                                                                                       content: const Text(
                                                                                         'Are you sure you want to cancel this purchase?',
