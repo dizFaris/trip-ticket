@@ -26,7 +26,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   int? _selectedMonth;
   EarningsReport? _earningsReport;
 
-  final List<int> _years = List.generate(50, (index) => 1980 + index);
+  final List<int> _years = List.generate(50, (index) => 2023 + index);
   final List<int> _months = List.generate(12, (index) => index + 1);
 
   final List<DropdownMenuItem<int>> _statisticOptions = const [

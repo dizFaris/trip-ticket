@@ -10,6 +10,7 @@ using tripTicket.Model.Messages;
 using tripTicket.Model.Models;
 using tripTicket.Services.Database;
 using tripTicket.Services.Interfaces;
+using tripTicket.Services.Recommender;
 using tripTicket.Services.Services;
 
 namespace tripTicket.Services.PurchaseStateMachine
@@ -58,7 +59,7 @@ namespace tripTicket.Services.PurchaseStateMachine
                 _messageService.Publish(message, "trip_service");
 
                 var recommendationService = new RecommendationService(Context);
-                await recommendationService.UpdateUserRecommendationsAsync(purchase.UserId);
+                    await recommendationService.UpdateUserRecommendationsAsync(purchase.UserId);
             }
             else
             {

@@ -19,6 +19,7 @@ using Microsoft.OpenApi.Models;
 using tripTicket.Model.Models;
 using QuestPDF.Infrastructure;
 using MapsterMapper;
+using tripTicket.Services.Recommender;
 
 var builder = WebApplication.CreateBuilder(args);
 
