@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:tripticket_mobile/app_colors.dart';
 import 'package:tripticket_mobile/main.dart';
 import 'package:tripticket_mobile/providers/user_provider.dart';
@@ -49,12 +50,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       case "Email":
         return [inputRequired, emailFormat, maxLengthValidator(70)];
       case "Phone":
-        return [
-          inputRequired,
-          onlyNumbers,
-          minLengthValidator(6),
-          maxLengthValidator(10),
-        ];
+        return [inputRequired, phoneValidator];
       case "Password":
         return [inputRequired, password, maxLengthValidator(30)];
       case "Confirm Password":
@@ -64,6 +60,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     }
   }
 
+  final phoneFormatter = MaskTextInputFormatter(
+    mask: '### ### ####',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+
   Future<void> _registerUser() async {
     try {
       final request = {
@@ -71,7 +72,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         "FirstName": _firstNameController.text,
         "LastName": _lastNameController.text,
         "Email": _emailController.text,
-        "Phone": _phoneController.text,
+        "Phone": phoneFormatter.getUnmaskedText(),
         "Password": _passwordController.text,
         "PasswordConfirm": _confirmPasswordController.text,
         "BirthDate": _birthDate?.toIso8601String().substring(0, 10),
@@ -233,20 +234,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _buildTextField(
                           _phoneController,
                           "Phone",
-                          maxLength: 10,
+                          hintText: "061 123 4567",
                           keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-
-                          validators: [
-                            inputRequired,
-                            onlyNumbers,
-                            minLengthValidator(6),
-                            maxLengthValidator(10),
-                          ],
+                          inputFormatters: [phoneFormatter],
+                          validators: [inputRequired, phoneValidator],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 10),
                         _buildTextField(
                           _passwordController,
                           "Password",
@@ -414,6 +407,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     List<Validator> validators = const [],
     List<TextInputFormatter>? inputFormatters,
     int? maxLength,
+    String? hintText,
   }) {
     return TextFormField(
       controller: controller,
@@ -423,6 +417,11 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: Colors.grey[400],
+          fontWeight: FontWeight.normal,
+        ),
         labelStyle: const TextStyle(color: Colors.black87),
         filled: true,
         fillColor: Colors.grey[100],
@@ -437,6 +436,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         ),
         errorText: _fieldErrors[label],
         errorStyle: const TextStyle(color: Colors.red),
+        errorMaxLines: 3,
       ),
       validator: (value) {
         for (final validator in validators) {

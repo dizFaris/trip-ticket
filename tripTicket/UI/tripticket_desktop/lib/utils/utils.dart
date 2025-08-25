@@ -27,6 +27,25 @@ String? onlyNumbers(String? value, [String message = 'Only numbers allowed.']) {
   return regex.hasMatch(value) ? null : message;
 }
 
+String? phoneValidator(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return "Phone number is required";
+  }
+
+  final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+
+  if (digitsOnly.length < 9 || digitsOnly.length > 10) {
+    return "Phone number must be 9 or 10 digits";
+  }
+
+  final pattern = RegExp(r'^[0-9\s\-]+$');
+  if (!pattern.hasMatch(value)) {
+    return "Phone number contains invalid characters";
+  }
+
+  return null;
+}
+
 String? minLength(String? value, int min, [String? message]) {
   if (value == null) return null;
   return value.length >= min
@@ -39,6 +58,12 @@ String? maxLength(String? value, int max, [String? message]) {
   return value.length <= max
       ? null
       : (message ?? 'Maximum $max characters allowed.');
+}
+
+String? emailFormat(String? value, [String message = 'Invalid email format.']) {
+  if (value == null || value.trim().isEmpty) return null;
+  final regex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+  return regex.hasMatch(value) ? null : message;
 }
 
 String? password(String? value, [String? message]) {

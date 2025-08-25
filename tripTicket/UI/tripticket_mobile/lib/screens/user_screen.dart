@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:tripticket_mobile/providers/auth_provider.dart';
 import 'package:tripticket_mobile/providers/user_provider.dart';
 import 'package:tripticket_mobile/screens/support_ticket_screen.dart';
@@ -36,6 +37,11 @@ class _UserScreenState extends State<UserScreen> {
   Validator maxLengthValidator(int max) =>
       (value) => maxLength(value, max);
 
+  final phoneFormatter = MaskTextInputFormatter(
+    mask: '### ### ####',
+    filter: {"#": RegExp(r'[0-9]')},
+  );
+
   @override
   void initState() {
     super.initState();
@@ -70,7 +76,7 @@ class _UserScreenState extends State<UserScreen> {
       updateData['Email'] = _emailController.text;
     }
     if (_phoneController.text.isNotEmpty) {
-      updateData['Phone'] = _phoneController.text;
+      updateData['Phone'] = phoneFormatter.getUnmaskedText();
     }
 
     if (_currentPasswordController.text.isNotEmpty &&
@@ -153,7 +159,15 @@ class _UserScreenState extends State<UserScreen> {
         _lastNameController.text = user.lastName;
         _birthDate = user.birthDate;
         _emailController.text = user.email;
-        _phoneController.text = user.phone ?? "";
+
+        if (user.phone != null && user.phone!.isNotEmpty) {
+          _phoneController.value = phoneFormatter.formatEditUpdate(
+            const TextEditingValue(),
+            TextEditingValue(text: user.phone!),
+          );
+        } else {
+          _phoneController.text = "";
+        }
 
         _initialData = {
           'Username': user.username,
@@ -193,7 +207,7 @@ class _UserScreenState extends State<UserScreen> {
         (_birthDate?.toIso8601String().substring(0, 10) !=
             _initialData['BirthDate']) ||
         _emailController.text != _initialData['Email'] ||
-        _phoneController.text != _initialData['Phone'] ||
+        phoneFormatter.getUnmaskedText() != (_initialData['Phone'] ?? '') ||
         _currentPasswordController.text.isNotEmpty ||
         _newPasswordController.text.isNotEmpty ||
         _confirmPasswordController.text.isNotEmpty;
@@ -302,20 +316,12 @@ class _UserScreenState extends State<UserScreen> {
                         _buildTextField(
                           _phoneController,
                           "Phone",
-                          maxLength: 10,
+                          hintText: "061 123 4567",
                           keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-
-                          validators: [
-                            inputRequired,
-                            onlyNumbers,
-                            minLengthValidator(6),
-                            maxLengthValidator(10),
-                          ],
+                          inputFormatters: [phoneFormatter],
+                          validators: [inputRequired, phoneValidator],
                         ),
-                        const SizedBox(height: 6),
+                        const SizedBox(height: 10),
                         _buildTextField(
                           _currentPasswordController,
                           "Password",
@@ -498,6 +504,7 @@ class _UserScreenState extends State<UserScreen> {
     List<TextInputFormatter>? inputFormatters,
     int? maxLength,
     bool isPasswordField = false,
+    String? hintText,
   }) {
     return TextFormField(
       controller: controller,
@@ -507,6 +514,11 @@ class _UserScreenState extends State<UserScreen> {
       inputFormatters: inputFormatters,
       decoration: InputDecoration(
         labelText: label,
+        hintText: hintText,
+        hintStyle: TextStyle(
+          color: Colors.grey[400],
+          fontWeight: FontWeight.normal,
+        ),
         labelStyle: const TextStyle(color: Colors.black87),
         filled: true,
         fillColor: Colors.grey[100],
@@ -519,6 +531,7 @@ class _UserScreenState extends State<UserScreen> {
           borderSide: BorderSide(color: AppColors.primaryGreen, width: 1.5),
           borderRadius: BorderRadius.circular(10),
         ),
+        errorMaxLines: 3,
       ),
       validator: (value) {
         if (isPasswordField) {

@@ -27,6 +27,25 @@ String? emailFormat(String? value, [String message = 'Invalid email format.']) {
   return regex.hasMatch(value) ? null : message;
 }
 
+String? phoneValidator(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return "Phone number is required";
+  }
+
+  final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
+
+  if (digitsOnly.length < 9 || digitsOnly.length > 10) {
+    return "Phone number must be 9 or 10 digits";
+  }
+
+  final pattern = RegExp(r'^[0-9\s\-]+$');
+  if (!pattern.hasMatch(value)) {
+    return "Phone number contains invalid characters";
+  }
+
+  return null;
+}
+
 String? onlyNumbers(String? value, [String message = 'Only numbers allowed.']) {
   if (value == null || value.isEmpty) return null;
   final regex = RegExp(r'^\d+$');

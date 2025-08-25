@@ -44,6 +44,7 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^30.1.41
   file_selector: ^1.0.3
   printing: ^5.14.2
+  mask_text_input_formatter: ^2.9.0
 
 dev_dependencies:
   flutter_test:

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tripticket_desktop/app_colors.dart';
 import 'package:tripticket_desktop/models/menu_model.dart';
 import 'package:tripticket_desktop/providers/auth_provider.dart';
+import 'package:tripticket_desktop/screens/add_admin_screen.dart';
 import 'package:tripticket_desktop/screens/countries_screen.dart';
+import 'package:tripticket_desktop/screens/edit_admin_screen.dart';
 import 'package:tripticket_desktop/screens/purchases_screen.dart';
 import 'package:tripticket_desktop/screens/support_replies_screen.dart';
 import 'package:tripticket_desktop/screens/support_tickets_screen.dart';
@@ -32,6 +34,8 @@ final List<DrawerItem> drawerItems = [
   DrawerItem(title: 'Reports', screen: StatisticsScreen()),
   DrawerItem(title: 'Support Tickets', screen: SupportTicketsScreen()),
   DrawerItem(title: 'Support Replies', screen: SupportRepliesScreen()),
+  DrawerItem(title: 'Add Admin', screen: AddAdminScreen()),
+  DrawerItem(title: 'Edit User', screen: UserScreen()),
 ];
 
 class MasterScreenState extends State<MasterScreen> {

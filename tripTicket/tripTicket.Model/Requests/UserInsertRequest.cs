@@ -22,5 +22,6 @@ namespace tripTicket.Model.Requests
         public string PasswordConfirm { get; set; }
 
         public DateOnly BirthDate { get; set; }
+        public string Role { get; set; } = "User";
     }
 }

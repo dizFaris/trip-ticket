@@ -28,6 +28,7 @@ Prije korištenja aplikacije pročitati napomene koje se mogu pronaći u ovom re
 - Statistike uzimaju u obzir samo narudžbe sa statusom COMPLETE i EXPIRED jer su to statusi na kojima je iznos zarade finalan
 - Samo korisnik koji je kupio karte za neko putovanje može ostaviti recenziju na isto, i to tek nakon što je to putovanje završeno.
 - Administrator prilikom pregleda završenih putovanja (status COMPLETE) može pristupiti i recenzijama tog putovanja. Neželjene recenzije se mogu ukloniti.
+- Ikone zastava odgovaraju stvarnim kodovima zemalja
 - Sve notifikacije unutar aplikacije se šalju **isključivo putem e-maila.**
 
 ## Kredencijali
