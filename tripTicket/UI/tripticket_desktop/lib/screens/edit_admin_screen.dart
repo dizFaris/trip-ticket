@@ -353,7 +353,7 @@ class _UserScreenState extends State<UserScreen> {
                           const SizedBox(height: 10),
                           _buildTextField(
                             _currentPasswordController,
-                            "Password",
+                            "Current Password",
                             obscureText: true,
                             maxLength: 30,
                             isPasswordField: true,
